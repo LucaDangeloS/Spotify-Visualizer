@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+      "rootDir": "ts",
+      "outDir": "dist",
+      "module": "commonjs",
+      "preserveConstEnums": true,
+      "sourceMap": true
+    }
+}
