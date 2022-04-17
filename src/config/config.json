@@ -1,0 +1,9 @@
+{
+    "beatConfidence": 0.21,
+    "barsConfidence": 0.25,
+    "keyConfidence": 0.24,
+    "modeConfidence": 0.23,
+    "sectionsConfidence": 0.10,
+    "pingDelay": 1000,
+    "syncOffsetThreshold": 60
+}

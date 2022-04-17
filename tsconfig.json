@@ -1,9 +1,21 @@
 {
     "compilerOptions": {
-      "rootDir": "ts",
+      "target": "es6",
+      "rootDir": "src",
       "outDir": "dist",
       "module": "commonjs",
       "preserveConstEnums": true,
-      "sourceMap": true
-    }
+      "sourceMap": true,
+      "resolveJsonModule": true,
+      "esModuleInterop": true,
+      "strictPropertyInitialization": false,
+      "isolatedModules": false,
+      "strict": false,
+      "experimentalDecorators": true,
+    },
+    "files": [
+      "src/main.ts",
+      "src/requests.ts",
+      "src/state.ts",
+    ]
 }
