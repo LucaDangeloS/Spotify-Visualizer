@@ -7,8 +7,6 @@ import { baseUrl, frontEndPort } from "./config/network-info.json";
 import fs, { readFileSync } from "fs";
 import State from "./state";
 import axios from "axios";
-// deprecated
-import request = require("request");
 
 
 export default class Server {
@@ -87,6 +85,8 @@ function serialize(obj) {
 
 class FlowRouter {
     public router : Router;
+    private auth_url: string = "https://accounts.spotify.com/authorize?";
+    private token_url: string = "https://accounts.spotify.com/api/token";
     // protected stateKey: string = "spotify_auth_state";
     // protected redirect_uri: string =  `${baseUrl}:${frontEndPort}/callback`;
 
@@ -108,11 +108,11 @@ class FlowRouter {
             let scope = "user-read-currently-playing";
         
             // whether the user must reauthorize upon every login
-            let showDialog = false;
+            let showDialog = true;
         
             //redirect to spotify authorization page
             res.redirect(
-                "https://accounts.spotify.com/authorize?" +
+                this.auth_url +
                     querystring.stringify({
                         response_type: "code",
                         client_id: client_id,
@@ -150,87 +150,70 @@ class FlowRouter {
                 //use authorization code, client id and client secret to get access token and refresh token from Spotify
                 //access token allows API request for a specific user's Spotify information.
                 //refresh token allows API request to get a new access token once original expires.
-                let authOptions = {
-                    url: "https://accounts.spotify.com/api/token",
-                    form: {
-                        code: code,
-                        redirect_uri: redirect_uri,
-                        grant_type: "authorization_code"
-                    },
-                    headers: {
-                        //authorization header is encoded in base64
-                        Authorization:
-                            "Basic " +
-                            Buffer.from(client_id + ":" + client_secret).toString(
-                                "base64"
-                            )
-                    },
+                let body = {
+                    code: code,
+                    redirect_uri: redirect_uri,
+                    grant_type: "authorization_code"
+                };
+                let headers = {
+                    //authorization header is encoded in base64
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    Authorization: "Basic " + Buffer.from(client_id + ":" + client_secret).toString("base64"),
                     json: true
                 };
         
+                axios.post(this.token_url, serialize(body), {headers: headers})
+                    .then(response => {
+                        if (response.status == 200) {
+                            let access_token = response.data.access_token;
+                            let refresh_token = response.data.refresh_token;
+            
+                            fs.writeFile('./token.txt', refresh_token, err => {
+                                if (err) { console.error("Error writing refresh_token to file: " + err); }
+                            })
+
+                            accessTokenCallback(response.data);
+                        
+                            res.redirect("/placeholder");
+                        }
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    })
+
+                return;
                 //send http request to Spotify to get access token and refresh token
-                request.post(authOptions, (error, response, body) => {
-                    if (!error && response.statusCode === 200) {
-                        //grab access token and refresh token from API response
-                        let access_token = body.access_token;
-                        let refresh_token = body.refresh_token;
+                // request.post(authOptions, (error, response, body) => {
+                //     if (!error && response.statusCode === 200) {
+                //         //grab access token and refresh token from API response
+                //         let access_token = body.access_token;
+                //         let refresh_token = body.refresh_token;
         
-                        fs.writeFile('./token.txt', refresh_token, err => {
-                            if (err) { console.error("Error writing refresh_token to file: " + err); }
-                        })
+                //         fs.writeFile('./token.txt', refresh_token, err => {
+                //             if (err) { console.error("Error writing refresh_token to file: " + err); }
+                //         })
         
-                        //ONCE ACCESS TOKEN IS PASSED TO BACK-END,
-                        //VISUALIZATION MAY BEGIN
+                //         //ONCE ACCESS TOKEN IS PASSED TO BACK-END,
+                //         //VISUALIZATION MAY BEGIN
         
-                        //pass access token to back-end server
-                        // this.state.backendSocket.emit("accessToken", access_token);
-                        accessTokenCallback(body);
-
-                        //get new access token upon request from back-end server
-
-                        // TODO implement refresh token
-                        // this.state.visualizerSocket.socket.on("refreshAccessToken", () => {
-                        //     console.log("token refresh requested");
-                        //     let authOptions = {
-                        //         url: "https://accounts.spotify.com/api/token",
-                        //         headers: {
-                        //             Authorization:
-                        //                 "Basic " +
-                        //                 Buffer.from(
-                        //                     client_id + ":" + client_secret
-                        //                 ).toString("base64")
-                        //         },
-                        //         form: {
-                        //             grant_type: "refresh_token",
-                        //             refresh_token: refresh_token
-                        //         },
-                        //         json: true
-                        //     };
-                        //     request.post(authOptions, function(error, response, body) {
-                        //         if (!error && response.statusCode === 200) {
-                        //             let new_access_token = body.access_token;
-                        //             //pass new access token to back-end server
-                        //             this.state.visualizerSocket.socket.emit("accessToken", new_access_token);
-                        //             console.log("new access token passed to back-end");
-                        //             console.log("access_token: " + new_access_token);
-                        //         }
-                        //     });
-                        // });
+                //         //pass access token to back-end server
+                //         // this.state.backendSocket.emit("accessToken", access_token);
+                //         accessTokenCallback(body);
         
-                        //redirect to main interface page
-                        res.redirect("/placeholder");
-                    }
+                //         //redirect to main interface page
+                //         res.redirect("/placeholder");
+                //     }
         
-                    //if authorization code is rejected, redirect with invalid token error
-                    else {
-                        res.redirect(
-                            "/#" +
-                                querystring.stringify({
-                                    error: "invalid_token"
-                                })
-                        );
-                    }
-                });
+                //     //if authorization code is rejected, redirect with invalid token error
+                //     else {
+                //         res.redirect(
+                //             "/#" +
+                //                 querystring.stringify({
+                //                     error: "invalid_token"
+                //                 })
+                //         );
+                //     }
+                // });
             }
         });
     }
