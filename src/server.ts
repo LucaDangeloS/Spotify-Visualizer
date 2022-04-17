@@ -1,13 +1,12 @@
-import express, { Router, Request, Response } from'express';
+import express, { Router, Request, Response } from 'express';
 import cors = require("cors");
 import crypto = require('crypto');
 import cookieParser = require("cookie-parser");
 import querystring = require("query-string");
 import { baseUrl, frontEndPort, auth_url, token_url } from "./config/network-info.json";
 import fs from "fs";
-import State from "./state";
 import axios from "axios";
-import APIFetcherI from "./api_controller";
+import { APIFetcherI } from "./api_controller";
 import { serialize } from "./utils";
 
 
@@ -15,16 +14,14 @@ import { serialize } from "./utils";
 export default class Server {
     public app : express.Application;
     private verbose: boolean = false;
-    private apiFetcher: APIFetcherI;
 
-    constructor(private port: number, client_id: string, client_secret: string, private state: State, apiFetcher: APIFetcherI, verbose?: boolean) {
+    constructor(private port: number, client_id: string, client_secret: string, apiTokenHook: any, verbose?: boolean) {
         this.verbose = verbose;
         this.port = port;
-        this.apiFetcher = apiFetcher;
         this.app = express()
             .use(cookieParser())
             .use(cors())
-            .use(FlowRouter.get(client_id, client_secret, (token: any) => {this.apiFetcher.readTokenResponse = token}))
+            .use(FlowRouter.get(client_id, client_secret, (token: any) => {apiTokenHook = token}))
             .use(express.static(__dirname + "/public"));
     }
 
@@ -32,8 +29,8 @@ export default class Server {
         this.app.listen(this.port, () => {if (this.verbose) console.log("Server started on port " + this.port)});
     }
 
-    static init(port: number, client_id: string, client_secret: string, state: State, apiFetcher: APIFetcherI, verbose?: boolean): Server { 
-        return new Server(port, client_id, client_secret, state, apiFetcher, verbose);
+    static init(port: number, client_id: string, client_secret: string, apiTokenHook: any, verbose?: boolean): Server { 
+        return new Server(port, client_id, client_secret, apiTokenHook, verbose);
     }
 
 }
@@ -41,8 +38,6 @@ export default class Server {
 // FlowRouter from Front-End server
 class FlowRouter {
     public router : Router;
-    // protected stateKey: string = "spotify_auth_state";
-    // protected redirect_uri: string =  `${baseUrl}:${frontEndPort}/callback`;
 
     constructor(client_id: string, client_secret: string, accessTokenCallback: Function) {
         this.router = Router();

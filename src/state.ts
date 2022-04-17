@@ -5,6 +5,7 @@ export default class State {
     backendSocket: SocketIO.Server = null;
     visualizerSocket: SocketIO.Server = null;
     accessToken: string = null;
+    headers: Object = {};
     visualizer: VisualizerInfo;
 
     constructor(fireBeat: Function, 
@@ -41,8 +42,8 @@ class VisualizerInfo {
     sections = Array<Object>();
     
     activeSection: Object = {};
-    activeSectionIndex: number;
-    lastSectionIndex: number;
+    activeSectionIndex: number = -1;
+    lastSectionIndex: number = -1;
 
     beats = Array<Object>();
 
@@ -50,11 +51,10 @@ class VisualizerInfo {
     activeBeatIndex: number;
     lastBeatIndex: number;
 
-    currentlyPlaying: Object = {};
-    trackAnalysis: Object = {};
+    currentlyPlaying: any = {};
+    trackAnalysis: any = {};
     hasAnalysis: boolean;
 
-    trackProgressLoop: Function = null;
     initialTimestamp: number;
     initialTrackProgress: number;
     trackProgress: number;

@@ -1,6 +1,9 @@
 {
     "auth_url": "https://accounts.spotify.com/authorize?",
     "token_url": "https://accounts.spotify.com/api/token",
+    "trackAnalysis_url": "https://api.spotify.com/v1/audio-analysis/",
+    "currentlyPlaying_url": "https://api.spotify.com/v1/me/player/currently-playing",
+    
     "baseUrl": "http://localhost",
     "frontEndPort": 8000,
     "backEndPort": 3000,
