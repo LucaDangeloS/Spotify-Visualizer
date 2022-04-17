@@ -1,9 +1,10 @@
-import { auth_url, trackAnalysis_url, currentlyPlaying_url } from "./config/network-info.json";
+import { token_url, auth_url, trackAnalysis_url, currentlyPlaying_url } from "./config/network-info.json";
 import { syncOffsetThreshold } from "./config/config.json";
 import { readFileSync } from "fs";
 import State from "./state";
 import axios from "axios";
-import { serialize } from "./utils";
+// import { serialize } from "./utils";
+import querystring = require("query-string");
 
 
 export enum ApiResponse {
@@ -15,8 +16,7 @@ export enum ApiResponse {
     DeSynced, // SyncTrackProgress | progress, initialTimestamp
 };
 export interface APIFetcherI {
-
-    // set readTokenResponse(token: { access_token: string; expires_in: number; });
+    set accessToken(token: { access_token: string; expires_in: number; });
     refreshToken(): void;
 }
 
@@ -34,13 +34,11 @@ export class APIFetcher implements APIFetcherI {
         this.testToken();
     }
 
-    private testToken() {
-        console.log("CALLED")
+    private async testToken() {
         try {
-            this.refreshToken();
+            await this.refreshToken();
         } catch (err) {
             console.error("ERROR: " + err);
-            // console.log(err);
         }
     }
 
@@ -49,15 +47,18 @@ export class APIFetcher implements APIFetcherI {
         this._accessToken = res.access_token;
         this._expireTimestamp = new Date(Date.now() + res.expires_in * 1000);
         this.state.headers = { Authorization: "Bearer " + res.access_token };
-        if (this.verbose)
+        // TODO Not needed
+        // this.state.accessToken = res.access_token;
+        if (this.verbose) {
             console.log("access token set " + this._accessToken);
             console.log("expire timestamp set " + this._expireTimestamp);
+        }
     }
 
     // Public methods
-    public refreshToken() {
+    public async refreshToken() {
         let refresh_token = readFileSync('./token.txt', 'utf-8');
-        let refresh_url = auth_url;
+        let refresh_url = token_url;
         let refresh_body = {
             grant_type: "refresh_token",
             refresh_token: refresh_token,
@@ -68,7 +69,7 @@ export class APIFetcher implements APIFetcherI {
                 "Content-Type": "application/x-www-form-urlencoded"
             }
         };
-        axios.post(refresh_url, serialize(refresh_body), headers)
+        axios.post(refresh_url, querystring.stringify(refresh_body), headers)
             .then(res => {
                 console.log("CALLED 2")
                 this.accessToken = res.data;

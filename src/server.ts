@@ -7,7 +7,7 @@ import { baseUrl, frontEndPort, auth_url, token_url } from "./config/network-inf
 import fs from "fs";
 import axios from "axios";
 import { APIFetcherI } from "./api_controller";
-import { serialize } from "./utils";
+// import { serialize } from "./utils";
 
 
 // Main Front-End Server with auth flow
@@ -15,13 +15,13 @@ export default class Server {
     public app : express.Application;
     private verbose: boolean = false;
 
-    constructor(private port: number, client_id: string, client_secret: string, apiTokenHook: any, verbose?: boolean) {
+    constructor(private port: number, client_id: string, client_secret: string, apiHook: APIFetcherI, verbose?: boolean) {
         this.verbose = verbose;
         this.port = port;
         this.app = express()
             .use(cookieParser())
             .use(cors())
-            .use(FlowRouter.get(client_id, client_secret, (token: any) => {apiTokenHook = token}))
+            .use(FlowRouter.get(client_id, client_secret, (token: any) => { apiHook.accessToken = token; }))
             .use(express.static(__dirname + "/public"));
     }
 
@@ -29,8 +29,8 @@ export default class Server {
         this.app.listen(this.port, () => {if (this.verbose) console.log("Server started on port " + this.port)});
     }
 
-    static init(port: number, client_id: string, client_secret: string, apiTokenHook: any, verbose?: boolean): Server { 
-        return new Server(port, client_id, client_secret, apiTokenHook, verbose);
+    static init(port: number, client_id: string, client_secret: string, apiHook: APIFetcherI, verbose?: boolean): Server { 
+        return new Server(port, client_id, client_secret, apiHook, verbose);
     }
 
 }
@@ -107,7 +107,7 @@ class FlowRouter {
                     json: true
                 };
         
-                axios.post(token_url, serialize(body), {headers: headers})
+                axios.post(token_url, querystring.stringify(body), {headers: headers})
                     .then(response => {
                         if (response.status == 200) {
                             let access_token = response.data.access_token;
@@ -119,7 +119,7 @@ class FlowRouter {
 
                             accessTokenCallback(response.data);
                         
-                            res.redirect("/placeholder");
+                            res.redirect("/");
                         } else {
                             res.redirect(
                                 "/#" + querystring.stringify({ error: "invalid_token" })

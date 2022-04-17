@@ -1,5 +1,5 @@
 import { APIFetcherI, ApiResponse} from './api_controller';
-import State from './State';
+import State from './state';
 
 export class TrackController {
 
