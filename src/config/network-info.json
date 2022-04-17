@@ -1,4 +1,6 @@
 {
+    "auth_url": "https://accounts.spotify.com/authorize?",
+    "token_url": "https://accounts.spotify.com/api/token",
     "baseUrl": "http://localhost",
     "frontEndPort": 8000,
     "backEndPort": 3000,

@@ -15,7 +15,9 @@
     },
     "files": [
       "src/main.ts",
-      "src/requests.ts",
+      "src/server.ts",
       "src/state.ts",
+      "src/api_controller.ts",
+      "src/utils.ts",
     ]
 }

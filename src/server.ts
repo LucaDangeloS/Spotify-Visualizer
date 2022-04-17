@@ -3,24 +3,28 @@ import cors = require("cors");
 import crypto = require('crypto');
 import cookieParser = require("cookie-parser");
 import querystring = require("query-string");
-import { baseUrl, frontEndPort } from "./config/network-info.json";
-import fs, { readFileSync } from "fs";
+import { baseUrl, frontEndPort, auth_url, token_url } from "./config/network-info.json";
+import fs from "fs";
 import State from "./state";
 import axios from "axios";
+import APIFetcherI from "./api_controller";
+import { serialize } from "./utils";
 
 
+// Main Front-End Server with auth flow
 export default class Server {
     public app : express.Application;
-    private _accessToken: string;
-    private _expireTimestamp: Date;
     private verbose: boolean = false;
+    private apiFetcher: APIFetcherI;
 
-    constructor(private port: number, private client_id: string, private client_secret: string, private state: State, verbose?: boolean) {
+    constructor(private port: number, client_id: string, client_secret: string, private state: State, apiFetcher: APIFetcherI, verbose?: boolean) {
         this.verbose = verbose;
+        this.port = port;
+        this.apiFetcher = apiFetcher;
         this.app = express()
             .use(cookieParser())
             .use(cors())
-            .use(FlowRouter.get(client_id, client_secret, (token: any) => {this.readTokenResponse = token}))
+            .use(FlowRouter.get(client_id, client_secret, (token: any) => {this.apiFetcher.readTokenResponse = token}))
             .use(express.static(__dirname + "/public"));
     }
 
@@ -28,65 +32,15 @@ export default class Server {
         this.app.listen(this.port, () => {if (this.verbose) console.log("Server started on port " + this.port)});
     }
 
-    static init(port: number, client_id: string, client_secret: string, state: State, verbose?: boolean): Server { 
-        return new Server(port, client_id, client_secret, state, verbose);
+    static init(port: number, client_id: string, client_secret: string, state: State, apiFetcher: APIFetcherI, verbose?: boolean): Server { 
+        return new Server(port, client_id, client_secret, state, apiFetcher, verbose);
     }
 
-    // Setters
-    private set accessToken(access_token: string) {
-        this._accessToken = access_token;
-        if (this.verbose)
-            console.log("access token set " + this._accessToken);
-    }
-    
-    private set expireTimestamp(expire_timestamp: Date) {
-        this._expireTimestamp = expire_timestamp;
-        if (this.verbose)
-            console.log("expire timestamp set " + this._expireTimestamp);
-    }
-
-    public set readTokenResponse(res: { access_token: string; expires_in: number; }){
-        this.accessToken = res.access_token;
-        this.expireTimestamp = new Date(Date.now() + res.expires_in * 1000);
-    }
-
-    // Public methods
-    public refreshToken() {
-        const refresh_token = readFileSync('./token.txt', 'utf-8');
-        const refresh_url = "https://accounts.spotify.com/api/token";
-        const refresh_body = {
-            grant_type: "refresh_token",
-            refresh_token: refresh_token,
-        };
-        const headers = {
-            headers: {
-                Authorization: `Basic ${Buffer.from(this.client_id + ":" + this.client_secret).toString('base64')}`,
-                ContentType: "application/x-www-form-urlencoded"
-            }
-        };
-        axios.post(refresh_url, serialize(refresh_body), headers)
-            .then(res => {
-                this._accessToken = res.data.access_token;
-            })
-            .catch(err => {
-                console.log(err);
-            })
-    }
 }
 
-function serialize(obj) {
-    let str = [];
-    for (let p in obj)
-    if (obj.hasOwnProperty(p)) {
-        str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
-    }
-    return str.join("&");
-}
-
+// FlowRouter from Front-End server
 class FlowRouter {
     public router : Router;
-    private auth_url: string = "https://accounts.spotify.com/authorize?";
-    private token_url: string = "https://accounts.spotify.com/api/token";
     // protected stateKey: string = "spotify_auth_state";
     // protected redirect_uri: string =  `${baseUrl}:${frontEndPort}/callback`;
 
@@ -112,7 +66,7 @@ class FlowRouter {
         
             //redirect to spotify authorization page
             res.redirect(
-                this.auth_url +
+                auth_url +
                     querystring.stringify({
                         response_type: "code",
                         client_id: client_id,
@@ -134,12 +88,8 @@ class FlowRouter {
             //this prevents cross-site request forgery
             //if state doesn't match, redirect to error page
             if (state === null || state !== storedState) {
-
                 res.redirect(
-                    "/#" +
-                        querystring.stringify({
-                            error: "state_mismatch"
-                        })
+                    "/#" + querystring.stringify({ error: "state_mismatch" })
                 );
             }
         
@@ -162,7 +112,7 @@ class FlowRouter {
                     json: true
                 };
         
-                axios.post(this.token_url, serialize(body), {headers: headers})
+                axios.post(token_url, serialize(body), {headers: headers})
                     .then(response => {
                         if (response.status == 200) {
                             let access_token = response.data.access_token;
@@ -175,45 +125,15 @@ class FlowRouter {
                             accessTokenCallback(response.data);
                         
                             res.redirect("/placeholder");
+                        } else {
+                            res.redirect(
+                                "/#" + querystring.stringify({ error: "invalid_token" })
+                            );
                         }
                     })
                     .catch(err => {
                         console.log(err);
                     })
-
-                return;
-                //send http request to Spotify to get access token and refresh token
-                // request.post(authOptions, (error, response, body) => {
-                //     if (!error && response.statusCode === 200) {
-                //         //grab access token and refresh token from API response
-                //         let access_token = body.access_token;
-                //         let refresh_token = body.refresh_token;
-        
-                //         fs.writeFile('./token.txt', refresh_token, err => {
-                //             if (err) { console.error("Error writing refresh_token to file: " + err); }
-                //         })
-        
-                //         //ONCE ACCESS TOKEN IS PASSED TO BACK-END,
-                //         //VISUALIZATION MAY BEGIN
-        
-                //         //pass access token to back-end server
-                //         // this.state.backendSocket.emit("accessToken", access_token);
-                //         accessTokenCallback(body);
-        
-                //         //redirect to main interface page
-                //         res.redirect("/placeholder");
-                //     }
-        
-                //     //if authorization code is rejected, redirect with invalid token error
-                //     else {
-                //         res.redirect(
-                //             "/#" +
-                //                 querystring.stringify({
-                //                     error: "invalid_token"
-                //                 })
-                //         );
-                //     }
-                // });
             }
         });
     }
