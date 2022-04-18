@@ -4,35 +4,16 @@ export default class State {
     backendSocket: SocketIO.Server = null;
     visualizerSocket: SocketIO.Server = null;
     headers: Object = {};
-    visualizer: VisualizerInfo;
+    visualizer: VisualizerInfo = new VisualizerInfo();
 
     
-    constructor() {
-        this.visualizer = new VisualizerInfo();
-    }
+    constructor() {}
 
     addSocket(socket: SocketIO.Server): boolean {
         this.visualizerSocket = socket;
         return true;
     }
 }
-
-class Funcs {
-    fireBeat: Function;
-    incrementBeat: Function;
-    stopVisualizer: Function;
-    syncTrackProgress: Function;
-    setCurrentlyPlaying: Function;
-
-    constructor(fireBeat: Function, incrementBeat: Function, stopVisualizer: Function, syncTrackProgress: Function, setCurrentlyPlaying: Function) {
-        this.fireBeat = fireBeat;
-        this.incrementBeat = incrementBeat;
-        this.stopVisualizer = stopVisualizer;
-        this.syncTrackProgress = syncTrackProgress;
-        this.setCurrentlyPlaying = setCurrentlyPlaying;
-    }
-}
-
 class VisualizerInfo {
     sections = Array<Object>();
     
@@ -43,16 +24,16 @@ class VisualizerInfo {
     beats = Array<Object>();
 
     activeBeat: any = {};
-    activeBeatIndex: number;
-    lastBeatIndex: number;
+    activeBeatIndex: number = -1;
+    lastBeatIndex: number = -1;
 
     currentlyPlaying: any = {};
     trackAnalysis: any = {};
     hasAnalysis: boolean;
 
-    initialTimestamp: number;
-    initialTrackProgress: number;
-    trackProgress: number;
+    initialTimestamp: number = 0;
+    initialTrackProgress: number = 0;
+    trackProgress: number = 0;
 
     active: boolean = false;
 }

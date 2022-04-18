@@ -4,7 +4,7 @@
     "keyConfidence": 0.24,
     "modeConfidence": 0.23,
     "sectionsConfidence": 0.10,
-    "pingDelay": 1000,
+    "pingDelay": 3000,
     "syncOffsetThreshold": 60,
     "trackProgressTickRate" : 5
 }

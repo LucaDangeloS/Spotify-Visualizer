@@ -6,7 +6,7 @@ require('dotenv').config();
 
 describe('API flow tests', function() {
   let state = new State();
-  let api = new APIFetcher(process.env.CLIENT_ID, process.env.CLIENT_SECRET, state);
+  let api = new APIFetcher(process.env.CLIENT_ID, process.env.CLIENT_SECRET, state, false);
 
     test('Token refresh', async () => {
       expect(api.waitForToken(10000)).resolves.toBe(true);
@@ -18,7 +18,7 @@ describe('API flow tests', function() {
 
     test('Request Song Playing', async () =>{
       let res = null
-      res = await api.fetchCurrentlyPlaying();
+      res = await api.fetchCurrentlyPlaying(state);
       expect(res).not.toBeNull();
       expect(res).not.toBe({status: ApiResponse.Error});
       api = null;

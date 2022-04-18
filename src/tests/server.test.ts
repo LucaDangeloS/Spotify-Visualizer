@@ -7,10 +7,10 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 
 require('dotenv').config();
 const state = new State();
-const api = new APIFetcher(process.env.CLIENT_ID, process.env.CLIENT_SECRET, state);
+const api = new APIFetcher(process.env.CLIENT_ID, process.env.CLIENT_SECRET, state, false);
 
 describe('Front-end server tests', () => {
-    const server = Server.init(frontEndPort, process.env.CLIENT_ID, process.env.CLIENT_SECRET, api);
+    const server = Server.init(frontEndPort, process.env.CLIENT_ID, process.env.CLIENT_SECRET, api, false);
 
     test('Server start', () => {
         expect(server).toBeInstanceOf(Server);

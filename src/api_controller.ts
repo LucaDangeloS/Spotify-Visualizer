@@ -180,8 +180,6 @@ export class APIFetcher implements APIFetcherI {
         }
 
         if (track === null || track === undefined) {
-            // TODO Ping method
-            // return ping(state);
             ret = {status: ApiResponse.Ok}
         }
     
@@ -189,8 +187,6 @@ export class APIFetcher implements APIFetcherI {
         if (playing && !state.visualizer.active) {
             // start the visualizer if the songs are synced
             if (songsInSync) {
-                // TODO Start Visualizer
-                // return startVisualizer(state);
                 ret = {status: ApiResponse.VizOff};
             }
             // otherwise, get the data for the new track
@@ -199,8 +195,7 @@ export class APIFetcher implements APIFetcherI {
     
         // if nothing is playing but the visualizer is active
         if (!playing && state.visualizer.active) {
-            // TODO Stop Visualizer
-            // stopVisualizer(state);
+
             ret = {status: ApiResponse.NoTrack};
         }
     
@@ -221,11 +216,7 @@ export class APIFetcher implements APIFetcherI {
             Math.abs(progressStats.error) > syncOffsetThreshold
         ) {
             var initialTimestamp = Date.now();
-            // TODO Stop Beat loop
-            // stopBeatLoop(state);
-            // state.funcs.syncTrackProgress(state, progress, initialTimestamp);
-            // TODO Sync beats
-            // syncBeats(state);
+
             ret = {status: ApiResponse.DeSynced, 
                 data: {progress: progress, initialTimestamp: initialTimestamp}};
         }

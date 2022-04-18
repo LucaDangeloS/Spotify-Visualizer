@@ -7,15 +7,15 @@ import Synchronizer from 'synchronizer';
 require('dotenv').config();
 
 
-describe('Track controls flow tests', function(){
+describe('Track controls flow tests', function() {
     const state = new State();
-    const api = new APIFetcher(process.env.CLIENT_ID, process.env.CLIENT_SECRET, state, true);
-    const controller = new TrackController(state, api);
-    const sync = new Synchronizer(api, controller, true);
+    const api = new APIFetcher(process.env.CLIENT_ID, process.env.CLIENT_SECRET, state, false);
+    const controller = new TrackController(state, api, false);
+    const sync = new Synchronizer(api, controller, false);
 
-    test.only('ping test', async () => {
+    test('ping test', async () => {
         await api.waitForToken();
         sync.initialize();
-        await setTimeout(()=>{ sync.terminate(); }, 4000);
+        sync.terminate();
     });
 });

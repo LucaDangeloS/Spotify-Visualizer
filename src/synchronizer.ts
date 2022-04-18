@@ -7,7 +7,7 @@ import State from './state';
 
 export default class Synchronizer {
     private verbose: boolean = false;
-    private pingLoop: ReturnType<typeof setTimeout> = null;
+    private pingLoop: boolean = false;
 
     constructor(private api: APIFetcherI, private trackController: TrackController, private state: State, verbose?: boolean) {
         this.api = api;
@@ -20,11 +20,13 @@ export default class Synchronizer {
     public initialize() {
         if (this.verbose)
             console.log("Initializing synchronizer");
-        this.ping();
+        this.startPingLoop();
     }
 
     public terminate() {
         this.stopPingLoop();
+        if (this.verbose)
+                console.log("\n\t==========\n\tTERMINATED\n\t==========\n");
     }
 
     // -- Private methods -- //
@@ -35,25 +37,25 @@ export default class Synchronizer {
         let res = await this.api.fetchCurrentlyPlaying(this.state);
         this.processResponse(res);
         await delay(pingDelay);
-        this.ping();
+        if (this.pingLoop)
+            this.ping();
     }
 
     private startPingLoop(): void {
-        if (this.pingLoop == null)
-            this.pingLoop = setTimeout(this.ping, pingDelay);
+        this.pingLoop = true;
+        this.ping();
     }
 
     private stopPingLoop(): void {
         if (this.pingLoop !== null) {
-            clearInterval(this.pingLoop);
+            this.pingLoop = false;
             this.trackController.stopVisualizer();
-            if (this.verbose)
-                console.log("\n\t==========\n\tTERMINATED\n\t==========\n");
         }
     }
 
     private processResponse(res: {status: ApiResponse, data?: any}) {
-        // console.log(res.status);
+        if (this.verbose)
+            console.log("status: " + res.status);
         switch (res.status) {
             case ApiResponse.Ok: {
                 break;
@@ -86,10 +88,12 @@ export default class Synchronizer {
             }
 
             case ApiResponse.DeSynced: {
+                this.trackController.stopBeatLoop();
                 this.trackController.syncTrackProgress(
                     res.data.progress,
                     res.data.initialTimestamp
                 );
+                this.trackController.syncBeats();
                 break;
             }
 
