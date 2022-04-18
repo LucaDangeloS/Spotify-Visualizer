@@ -4,7 +4,7 @@ export default class State {
     funcs: Funcs = null;
     backendSocket: SocketIO.Server = null;
     visualizerSocket: SocketIO.Server = null;
-    accessToken: string = null;
+    // accessToken: string = null;
     headers: Object = {};
     visualizer: VisualizerInfo;
 
@@ -17,8 +17,9 @@ export default class State {
         this.visualizer = new VisualizerInfo();
     }
 
-    addSocket(socket: SocketIO.Server) {
+    addSocket(socket: SocketIO.Server): boolean {
         this.visualizerSocket = socket;
+        return true;
     }
 }
 
@@ -47,7 +48,7 @@ class VisualizerInfo {
 
     beats = Array<Object>();
 
-    activeBeat: Object = {};
+    activeBeat: any = {};
     activeBeatIndex: number;
     lastBeatIndex: number;
 

@@ -25,7 +25,7 @@ export default class Server {
             .use(express.static(__dirname + "/public"));
     }
 
-    start() {
+    start(): void {
         this.app.listen(this.port, () => {if (this.verbose) console.log("Server started on port " + this.port)});
     }
 

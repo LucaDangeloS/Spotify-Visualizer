@@ -11,7 +11,10 @@ const server = Server.init(frontEndPort, process.env.CLIENT_ID, process.env.CLIE
 const controller = new TrackController(state, api);
 server.start();
 
-setTimeout(()=>{ api.fetchCurrentlyPlaying(); }, 1000);
+async function main() {
+    await api.waitForToken();
+    setTimeout(()=>{ controller.ping(); }, 1000);
+}
 
-
+main();
 // setTimeout(()=>{ console.log(state.accessToken) }, 8000);
