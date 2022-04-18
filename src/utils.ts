@@ -8,8 +8,12 @@ import State from "./state";
 //     return str.join("&");
 // }
 
-
-
+/**
+ * Method borrowed from https://github.com/zachwinter/kaleidosync
+ * Beat interval data is not present for entire duration of track data, and it is in seconds, not ms
+ * We must make sure the first beat starts at 0, and the last ends at the end of the track
+ * Then convert all time data to ms.
+ */
 export function normalizeIntervals (state: State, { track, analysis }) {
     if (state.visualizer.hasAnalysis) {
         const beats = analysis["beats"];
@@ -32,4 +36,8 @@ export function normalizeIntervals (state: State, { track, analysis }) {
             interval.duration = interval.duration * 1000;
         });
     }
+}
+
+export function delay(time: number): Promise<void> {
+    return new Promise<void>((resolve) => setTimeout(resolve, time));
 }

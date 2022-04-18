@@ -3,18 +3,22 @@ import State from './state';
 import { APIFetcher } from './api_controller';
 import { frontEndPort, visualizerPort } from "./config/network-info.json";
 import { TrackController } from './track_controller';
+import Synchronizer from './synchronizer';
 require('dotenv').config();
 
-const state = new State();
-const api = new APIFetcher(process.env.CLIENT_ID, process.env.CLIENT_SECRET, state, true);
-const server = Server.init(frontEndPort, process.env.CLIENT_ID, process.env.CLIENT_SECRET, api, true);
-const controller = new TrackController(state, api);
-server.start();
+
+main();
+
 
 async function main() {
+    const state = new State();
+    const api = new APIFetcher(process.env.CLIENT_ID, process.env.CLIENT_SECRET);
+    const server = Server.init(frontEndPort, process.env.CLIENT_ID, process.env.CLIENT_SECRET, api,);
+    const controller = new TrackController(state, api);
+    const sync = new Synchronizer(api, controller, state);
+    
     await api.waitForToken();
-    await api.fetchCurrentlyPlaying();
-    // setTimeout(()=>{ controller.ping(); }, 1000);
+    sync.initialize();
+    
+    // setTimeout(()=>{ sync.terminate(); }, 8000);
 }
-
-// main();

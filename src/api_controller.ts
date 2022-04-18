@@ -1,9 +1,9 @@
 import { token_url, trackAnalysis_url, currentlyPlaying_url } from "./config/network-info.json";
 import { syncOffsetThreshold } from "./config/config.json";
-import { normalizeIntervals } from "./utils";
+import { delay, normalizeIntervals } from "./utils";
 import { readFileSync } from "fs";
 import State from "./state";
-import axios from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import querystring from 'query-string';
 
 
@@ -18,7 +18,8 @@ export enum ApiResponse {
 };
 export interface APIFetcherI {
     set accessToken(token: { access_token: string; expires_in: number; });
-    fetchCurrentlyPlaying(): Promise<{status: ApiResponse, data?: any}>;
+    waitForToken(timeout?: number): Promise<boolean>;
+    fetchCurrentlyPlaying(state: State): Promise<{status: ApiResponse, data?: any}>;
     refreshToken(): void;
 }
 
@@ -27,12 +28,12 @@ export class APIFetcher implements APIFetcherI {
     private _accessToken: string;
     private _expireTimestamp: Date;
     private verbose: boolean = false;
+    private headers: Object = {};
     
-    constructor(private client_id: string, private client_secret: string, private state: State, verbose?: boolean) {
+    constructor(private client_id: string, private client_secret: string, verbose?: boolean) {
         this.verbose = verbose;
         this.client_id = client_id;
         this.client_secret = client_secret;
-        this.state = state;
         // try {
         //     this.refreshToken();
         // } catch(err) {}
@@ -40,15 +41,15 @@ export class APIFetcher implements APIFetcherI {
 
     private async testToken(): Promise<boolean> {
         let headers: any = {
-            headers: this.state.headers,
+            headers: this.headers,
             json: true
         };
         var s = -1;
         // request the currently playing song from spotify API
         await axios.get(currentlyPlaying_url, headers)
-            .then((response) => {
+            .then((response: AxiosResponse) => {
                 s = response.status;
-            }).catch(err => { return false; });
+            }).catch((err: AxiosError) => {});
         if (this.verbose) 
             console.log("Request status: " + s);
         return (s <= 204 && s >= 200);
@@ -58,28 +59,23 @@ export class APIFetcher implements APIFetcherI {
     public set accessToken(res: { access_token: string; expires_in: number; }) {
         this._accessToken = res.access_token;
         this._expireTimestamp = new Date(Date.now() + res.expires_in * 1000);
-        this.state.headers = { Authorization: "Bearer " + res.access_token };
-        // TODO Not needed
-        // this.state.accessToken = res.access_token;
+        this.headers = { Authorization: "Bearer " + res.access_token };
+
         if (this.verbose) {
             console.log("access token set " + this._accessToken);
             console.log("expire timestamp set " + this._expireTimestamp);
         }
     }
 
-    private delay(time: number): Promise<void> {
-        return new Promise<void>((resolve) => setTimeout(resolve, time));
-    }
-
     // -- Public methods -- //
-    public async waitForToken(timeout: number = 6000): Promise<boolean> {
+    public async waitForToken(timeout: number = 10000): Promise<boolean> {
         let sleep_time = 1000;
         if (this.verbose)
             console.log("Testing token...");
         if (timeout <= 0) return false;
         if (!(await this.testToken())) {
             await this.refreshToken();
-            await this.delay(sleep_time);
+            await delay(sleep_time);
         } else {
             return true;
         }
@@ -101,71 +97,62 @@ export class APIFetcher implements APIFetcherI {
             }
         };
         await axios.post(refresh_url, querystring.stringify(refresh_body), headers)
-            .then(res => {
+            .then((res: AxiosResponse) => {
                 this.accessToken = res.data;
             })
-            .catch(err => {
-                if (this.verbose)
-                    console.error(err.data.error);
-                throw new Error(err);
+            .catch((err: AxiosError) => {
+                throw new Error(err.message);
             })
     }
     
     /**
      * gets the currently playing song + track progress from spotify API
      */
-     public async fetchCurrentlyPlaying(): Promise<{status: ApiResponse, data?: any}> {
+     public async fetchCurrentlyPlaying(state: State): Promise<{status: ApiResponse, data?: any}> {
         // grab the current time
         var timestamp = Date.now();
         let headers: any = {
-            headers: this.state.headers,
+            headers: this.headers,
             json: true
         };
+        let ret = null;
+        let refresh_token = false;
+        let aux = null;
         // request the currently playing song from spotify API
         await axios.get(currentlyPlaying_url, headers)
-            .then(async (response) => {
-                // access token is expired, we must request a new one
-                if (response.status === 401) {
-                    await this.refreshToken();
-                    this.fetchCurrentlyPlaying();
-                }
+            .then((response: AxiosResponse) => {
                 // no device is playing music
-                else if (response.status === 204) {
+                if (response.status == 204) {
                     if (this.verbose)
                         console.log("\nNo playback detected");
-                    // if (this.state.visualizer.active) {
-                    //     // TODO 
-                    //     // this.state.funcs.stopVisualizer(this.state);
-                    //     return {status: ApiResponse.NoPlayback};
-                    // }
-                    // keep listening in case playback resumes
-                    // ping(state);
-                    return {status: ApiResponse.NoPlayback};
-                }
-                // no error, proceed
-                else {
+                    ret = {status: ApiResponse.NoPlayback};
+                } else {
                     if (this.verbose)
                         console.log("\nDetected playing: " + response.data.item.name);
-                    // process the response
-                    this.processResponse({
+
+                    aux = {
                         track: response.data.item,
                         playing: response.data.is_playing,
                         // account for time to call api in progress
                         progress: response.data.progress_ms + (Date.now() - timestamp)
-                    });
+                    }
                 }
-            }
-        ).catch(err => {
-            if (this.state.headers == null) {
-                if (this.verbose)
-                    console.error("No auth headers set");
-            } else {
-                if (this.verbose)
-                    console.error(err.data.error);
-                return {status: ApiResponse.Error};
-            }
-        });
-        return {status: ApiResponse.Error};
+            }).catch((err: AxiosError) => {
+                if (err.response!.status == 401) {
+                    refresh_token = true;
+                } else
+                    ret = {status: ApiResponse.Error, data: err.response};
+            });
+
+        if (refresh_token) {
+            if (this.verbose)
+                console.log("Refreshing token...");
+            await this.refreshToken();
+            ret = await this.fetchCurrentlyPlaying(state);
+        } else if (aux != null) {
+            ret = await this.processResponse(state, aux);
+        }
+        return ret || {status: ApiResponse.Error, data: null};
     };
 
 
@@ -173,15 +160,15 @@ export class APIFetcher implements APIFetcherI {
     /**
      * figure out what to do, according to state and track data
      */
-     private async processResponse({ track, playing, progress }) : Promise<{status: ApiResponse, data?: any}>{
+     private async processResponse(state: State, { track, playing, progress }) : Promise<{status: ApiResponse, data?: any}>{
         let songsInSync =
-            JSON.stringify(this.state.visualizer.currentlyPlaying) ===
+            JSON.stringify(state.visualizer.currentlyPlaying) ===
             JSON.stringify(track);
         
         let progressStats = {
-            client: this.state.visualizer.trackProgress,
+            client: state.visualizer.trackProgress,
             server: progress,
-            error: this.state.visualizer.trackProgress - progress
+            error: state.visualizer.trackProgress - progress
         };
 
         let ret = null;
@@ -194,12 +181,12 @@ export class APIFetcher implements APIFetcherI {
 
         if (track === null || track === undefined) {
             // TODO Ping method
-            // return ping(this.state);
+            // return ping(state);
             ret = {status: ApiResponse.Ok}
         }
     
         // if something is playing, but visualizer isn't on
-        if (playing && !this.state.visualizer.active) {
+        if (playing && !state.visualizer.active) {
             // start the visualizer if the songs are synced
             if (songsInSync) {
                 // TODO Start Visualizer
@@ -207,36 +194,36 @@ export class APIFetcher implements APIFetcherI {
                 ret = {status: ApiResponse.VizOff};
             }
             // otherwise, get the data for the new track
-            ret = await this.fetchTrackData({ track, progress });
+            ret = await this.fetchTrackData(state, { track, progress });
         }
     
         // if nothing is playing but the visualizer is active
-        if (!playing && this.state.visualizer.active) {
+        if (!playing && state.visualizer.active) {
             // TODO Stop Visualizer
             // stopVisualizer(state);
             ret = {status: ApiResponse.NoTrack};
         }
     
         // if the wrong song is playing
-        if (playing && this.state.visualizer.active && !songsInSync) {
+        if (playing && state.visualizer.active && !songsInSync) {
             // get the data for the new track
             // TODO
             // stopVisualizer(state);
-            ret = await this.fetchTrackData({ track, progress });
+            ret = await this.fetchTrackData(state, { track, progress });
         }
     
         // if the approximate track progress and the api track progress fall out of sync by more than 250ms
         // resync the progress and the beat loop
         if (
             playing &&
-            this.state.visualizer.active &&
+            state.visualizer.active &&
             songsInSync &&
             Math.abs(progressStats.error) > syncOffsetThreshold
         ) {
             var initialTimestamp = Date.now();
             // TODO Stop Beat loop
             // stopBeatLoop(state);
-            // this.state.funcs.syncTrackProgress(this.state, progress, initialTimestamp);
+            // state.funcs.syncTrackProgress(state, progress, initialTimestamp);
             // TODO Sync beats
             // syncBeats(state);
             ret = {status: ApiResponse.DeSynced, 
@@ -245,62 +232,59 @@ export class APIFetcher implements APIFetcherI {
     
         // keep the ping loop going
         // ping(state);
-        return ret || {status: ApiResponse.Error};
+        return ret || {status: ApiResponse.Ok};
     }
 
 
     /**
      * gets the song analysis (beat intervals, etc) for the current song from the spotify API
      */
-    private async fetchTrackData({ track, progress }): Promise<{status: ApiResponse, data?: any}>{
+    private async fetchTrackData(state: State, { track, progress }): Promise<{status: ApiResponse, data?: any}>{
         // fetch the current time
         let timestamp = Date.now();
         let headers: any = {
-            headers: this.state.headers,
+            headers: this.headers,
             json: true
         };
         let ret = null;
+        let refresh_token = false;
         // request song analysis from spotify
         await axios.get(trackAnalysis_url + track.id, headers)
-            .then(async (response) => {
-                // access token is expired, we must request a new one
-                if (response.status === 401) {
-                    await this.refreshToken();
-                    return await this.fetchTrackData({ track, progress });
-                }  else {
-                    let analysis = response.data;
-                    // if the track has no analysis data, don't visualize it
-                    if (
-                        analysis === undefined ||
-                        analysis["beats"] === undefined ||
-                        analysis["beats"].length == 0
-                    ) {
-                        this.state.visualizer.hasAnalysis = false;
-                    } else {
-                        this.state.visualizer.hasAnalysis = true;
-                        // adjust beat data for ease of use
-                        // TODO Normalize
-                        normalizeIntervals(this.state, { track, analysis });
-                    }
-                    // account for time to call api in initial timestamp
-                    var initialTimestamp = Date.now() - (Date.now() - timestamp);
-                    //TODO
-                    // this.state.funcs.syncTrackProgress(this.state, progress, initialTimestamp);
-                    // set the new currently playing song
-                    // this.state.funcs.setCurrentlyPlaying(this.state, {
-                    //     track,
-                    //     analysis
-                    // });
-                    ret = {status: ApiResponse.WrongPlayback, 
-                        data: {
-                            track: track,
-                            analysis: analysis,
-                            progress: progress, 
-                            initialTimestamp: initialTimestamp
-                        }};
+            .then((response: AxiosResponse) => {
+                let analysis = response.data;
+                // if the track has no analysis data, don't visualize it
+                if (
+                    analysis === undefined ||
+                    analysis["beats"] === undefined ||
+                    analysis["beats"].length == 0
+                ) {
+                    state.visualizer.hasAnalysis = false;
+                } else {
+                    state.visualizer.hasAnalysis = true;
+                    normalizeIntervals(state, { track, analysis });
                 }
+                // account for time to call api in initial timestamp
+                var initialTimestamp = Date.now() - (Date.now() - timestamp);
+
+                ret = {status: ApiResponse.WrongPlayback, 
+                    data: {
+                        track: track,
+                        analysis: analysis,
+                        progress: progress, 
+                        initialTimestamp: initialTimestamp
+                    }};
+                
+            }).catch((err: AxiosError) => {
+                if (err.response!.status == 401) {
+                    refresh_token = true;
+                } else
+                    ret = {Status: ApiResponse.Error, data: err.response}
             });
 
-        return ret || {Status: ApiResponse.Error};
+        if (refresh_token) {
+            await this.refreshToken();
+            ret = await this.fetchTrackData(state, { track, progress });
+        }
+        return ret || {Status: ApiResponse.Error, data: null};
     };
 }

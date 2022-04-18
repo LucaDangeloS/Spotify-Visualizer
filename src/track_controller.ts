@@ -1,10 +1,9 @@
 import { APIFetcherI, ApiResponse} from './api_controller';
-import { pingDelay, trackProgressTickRate } from './config/config.json';
+import { trackProgressTickRate, beatConfidence } from './config/config.json';
 import State from './state';
 
 export class TrackController {
 
-    private pingLoop: ReturnType<typeof setTimeout> = null;
     private beatLoop: ReturnType<typeof setTimeout> = null;
     private trackProgressLoop: ReturnType<typeof setTimeout> = null;
     private verbose: boolean = false;
@@ -19,18 +18,19 @@ export class TrackController {
     /**
      * Sets the currently playing song and track analysis in state
      */
-    public setCurrentlyPlaying({ track, analysis }): void {
+    public setCurrentlyPlaying(track: Object, analysis: Object): void {
         this.state.visualizer.currentlyPlaying = track;
         this.state.visualizer.trackAnalysis = analysis;
 
         this.startVisualizer();
 
-        if (this.verbose)
+        if (this.verbose){
             console.log(
                 `Now playing: ${
                     this.state.visualizer.currentlyPlaying.album.artists[0].name
                 } – ${this.state.visualizer.currentlyPlaying.name}`
             );
+        }
     }
 
     /**
@@ -41,7 +41,7 @@ export class TrackController {
             console.log("\nVisualizer started");
         this.state.visualizer.active = true;
         //TODO
-        // this.syncBeats(state);
+        this.syncBeats();
         // ping(state);
     }
 
@@ -79,18 +79,6 @@ export class TrackController {
         this.state.visualizer.initialTrackProgress = initialProgress;
     }
 
-    /**
-     * Establishes ping loop to query current track progress 
-     */
-    public ping(): void {
-        if (this.pingLoop == null) {
-            this.pingLoop = setInterval(
-                () => this.api.fetchCurrentlyPlaying(),
-                pingDelay
-            );
-        }
-    }
-
     // -- Private methods -- //
     private stopBeatLoop(): void {
         if (this.beatLoop !== null) {
@@ -112,21 +100,43 @@ export class TrackController {
         }, trackProgressTickRate);
     }
 
-    private stopPingLoop(): void {
-        if (this.pingLoop !== null) {
-            clearInterval(this.pingLoop);
-            this.stopVisualizer();
-            if (this.verbose)
-                console.log("\n\t==========\n\tTERMINATED\n\t==========\n");
-        }
-    }
-
     private stageBeat(): void {
         //set the timeout id to a variable in state for convenient loop cancellation.
         this.beatLoop = setTimeout(
-            () => this.state.funcs.fireBeat(),
+            () => this.fireBeat(),
             this.calculateTimeUntilNextBeat()
         );
+    }
+
+    // TODO Change for callback function
+    private fireBeat(): void {
+        console.log("BEAT");
+        this.incrementBeat();
+    }
+
+    private incrementBeat() {
+    
+        let beats = this.state.visualizer.trackAnalysis["beats"];
+        let sections = this.state.visualizer.trackAnalysis["sections"]
+        let lastBeatIndex = this.state.visualizer.activeBeatIndex;
+        let lastSectionIndex = this.state.visualizer.activeSectionIndex;
+    
+        if (this.state.visualizer.activeSectionIndex < sections.length - 1 &&
+            this.state.visualizer.trackProgress >= sections[lastSectionIndex].start + sections[lastSectionIndex].duration) 
+            {
+                this.state.visualizer.activeSectionIndex += 1;
+                this.state.visualizer.activeSection = sections[this.state.visualizer.activeSectionIndex]
+        }
+        // if the last beat index is the last beat of the song, stop beat loop
+        if (beats.length - 1 !== lastBeatIndex) {
+            // stage the beat
+            this.stageBeat();
+    
+            
+            // update the active beat to be the next beat
+            this.state.visualizer.activeBeatIndex = lastBeatIndex + 1;
+            this.state.visualizer.activeBeat = beats[this.state.visualizer.activeBeatIndex];
+        }
     }
 
     private calculateTrackProgress(): void {
@@ -136,21 +146,57 @@ export class TrackController {
     }
 
     private calculateTimeUntilNextBeat(): number {
-        var activeBeatStart = this.state.visualizer.activeBeat.start;
-        var activeBeatDuration = this.state.visualizer.activeBeat.duration;
+        let activeBeatStart = this.state.visualizer.activeBeat.start;
+        let activeBeatDuration = this.state.visualizer.activeBeat.duration;
         // console.log("Beat conf. " + state.visualizer.activeBeat.confidence)
     
-        var trackProgress = this.state.visualizer.trackProgress;
-        var timeUntilNextBeat =
+        let trackProgress = this.state.visualizer.trackProgress;
+        let timeUntilNextBeat =
             activeBeatDuration - (trackProgress - activeBeatStart);
+
         return timeUntilNextBeat;
     }
 
-}
+    /**
+ * Manages the beat fire loop and detection of the active beat.
+ */
+    private syncBeats() {
+        if (this.state.visualizer.hasAnalysis) {
+            // reset the active beat
+            this.state.visualizer.activeBeat = {};
+            this.state.visualizer.activeSection = {};
+            this.state.visualizer.activeBeatIndex = 0;
+            this.state.visualizer.activeSectionIndex = 0;
 
-// Ok, // Next Ping
-// VizOff, // Start Viz
-// NoTrack, // Stop Viz
-// NoPlayback, // Next Ping
-// WrongPlayback, // SyncTrackProgress | track, analysis, progress, initialTimestamp
-// DeSynced, // SyncTrackProgress | progress, initialTimestamp
+            // grab this.state vars
+            var trackProgress = this.state.visualizer.trackProgress;
+            var beats = this.state.visualizer.trackAnalysis["beats"];
+            var sections = this.state.visualizer.trackAnalysis["sections"]
+            
+            for (var i = 0; i < sections.length - 2; i++) {
+                if (
+                    trackProgress > sections[i].start &&
+                    trackProgress < sections[i + 1].start
+                ) {
+                    this.state.visualizer.activeSection = sections[i];
+                    this.state.visualizer.activeSectionIndex = i;
+                }
+            }
+
+            // find and set the currently active beat
+            for (var i = 0; i < beats.length - 2; i++) {
+                if (
+                    trackProgress > beats[i].start &&
+                    trackProgress < beats[i + 1].start
+                ) {
+                    this.state.visualizer.activeBeat = beats[i];
+                    this.state.visualizer.activeBeatIndex = i;
+                    break;
+                }
+            }
+            // stage the beat
+            this.stageBeat();
+        }
+    }
+
+}

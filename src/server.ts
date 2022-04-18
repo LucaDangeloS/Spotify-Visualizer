@@ -6,7 +6,7 @@ import cookieParser from "cookie-parser";
 import querystring from "query-string";
 import { baseUrl, frontEndPort, auth_url, token_url } from "./config/network-info.json";
 import fs from "fs";
-import axios from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import { APIFetcherI } from "./api_controller";
 // import { serialize } from "./utils";
 
@@ -122,7 +122,7 @@ class FlowRouter {
                 };
         
                 axios.post(token_url, querystring.stringify(body), {headers: headers})
-                    .then(response => {
+                    .then((response: AxiosResponse) => {
                         if (response.status == 200) {
                             let access_token = response.data.access_token;
                             let refresh_token = response.data.refresh_token;
@@ -140,7 +140,7 @@ class FlowRouter {
                             );
                         }
                     })
-                    .catch(err => {
+                    .catch((err: AxiosError) => {
                         console.log(err);
                     })
             }

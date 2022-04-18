@@ -3,7 +3,7 @@ import State from 'state';
 import { APIFetcher, ApiResponse } from 'api_controller';
 import { baseUrl, frontEndPort, visualizerPort } from "config/network-info.json";
 import { TrackController } from 'track_controller';
-import axios from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 
 require('dotenv').config();
 const state = new State();
@@ -19,12 +19,12 @@ describe('Front-end server tests', () => {
 
     test('Server up', async () => {
         await axios.get(`${baseUrl}:${frontEndPort}`)
-        .then(res => {
+        .then((res: AxiosResponse) => {
             expect(res.status).toBe(200);
             expect(res.data).not.toBe(undefined);
         })
         .catch(
-            err => {
+            (err: AxiosError) => {
                 console.error(err);
             }
         )
@@ -32,26 +32,26 @@ describe('Front-end server tests', () => {
 
     test('Path "/login"', async () => {
         await axios.get(`${baseUrl}:${frontEndPort}/login`)
-        .then(res => {
+        .then((res: AxiosResponse) => {
             expect(res.status).toBe(200);
             expect(res.data).not.toBe(undefined);
         })
         .catch(
-            err => {
-                console.error(err.response.data);
+            (err: AxiosError) => {
+                console.error(err.response);
             }
         )
     })
 
     test('Path "/callback"', async () => {
         await axios.get(`${baseUrl}:${frontEndPort}/callback`)
-        .then(res => {
+        .then((res: AxiosResponse) => {
             expect(res.status).toBe(200);
             expect(res.data).not.toBe(undefined);
         })
         .catch(
-            err => {
-                console.error(err.response.data);
+            (err: AxiosError) => {
+                console.error(err.response);
             }
         )
     })
