@@ -1,9 +1,8 @@
-import { token_url, auth_url, trackAnalysis_url, currentlyPlaying_url } from "./config/network-info.json";
+import { token_url, trackAnalysis_url, currentlyPlaying_url } from "./config/network-info.json";
 import { syncOffsetThreshold } from "./config/config.json";
 import { readFileSync } from "fs";
 import State from "./state";
 import axios from "axios";
-// import { serialize } from "./utils";
 import querystring = require("query-string");
 
 
@@ -31,15 +30,9 @@ export class APIFetcher implements APIFetcherI {
         this.client_id = client_id;
         this.client_secret = client_secret;
         this.state = state;
-        this.testToken();
-    }
-
-    private async testToken() {
         try {
-            await this.refreshToken();
-        } catch (err) {
-            console.error("ERROR: " + err);
-        }
+            this.refreshToken();
+        } catch(err) {}
     }
 
     // Setters
@@ -71,7 +64,6 @@ export class APIFetcher implements APIFetcherI {
         };
         axios.post(refresh_url, querystring.stringify(refresh_body), headers)
             .then(res => {
-                console.log("CALLED 2")
                 this.accessToken = res.data;
             })
             .catch(err => {
@@ -86,7 +78,6 @@ export class APIFetcher implements APIFetcherI {
      public fetchCurrentlyPlaying() {
         // grab the current time
         var timestamp = Date.now();
-        console.log(this.state.headers);
         let headers: any = {
             headers: this.state.headers,
             json: true
@@ -125,7 +116,13 @@ export class APIFetcher implements APIFetcherI {
                     });
                 }
             }
-        );
+        ).catch(err => {
+            if (this.state.headers == null) {
+                console.error("No auth headers set");
+            } else {
+                console.error(err);
+            }
+        });
     };
 
 

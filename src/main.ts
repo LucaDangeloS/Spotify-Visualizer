@@ -10,8 +10,8 @@ const api = new APIFetcher(process.env.CLIENT_ID, process.env.CLIENT_SECRET, sta
 const server = Server.init(frontEndPort, process.env.CLIENT_ID, process.env.CLIENT_SECRET, api, true);
 const controller = new TrackController(state, api);
 server.start();
-// api.fetchCurrentlyPlaying();
 
-setTimeout(()=>{ api.refreshToken() }, 3000);
+setTimeout(()=>{ api.fetchCurrentlyPlaying(); }, 1000);
+
 
 // setTimeout(()=>{ console.log(state.accessToken) }, 8000);
