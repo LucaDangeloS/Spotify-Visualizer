@@ -1,4 +1,4 @@
-import SocketIO = require("socket.io");
+import SocketIO from 'socket.io';
 
 export default class State {
     funcs: Funcs = null;
@@ -8,12 +8,13 @@ export default class State {
     headers: Object = {};
     visualizer: VisualizerInfo;
 
-    constructor(fireBeat: Function, 
-            incrementBeat: Function, 
-            stopVisualizer: Function, 
-            syncTrackProgress: Function, 
-            setCurrentlyPlaying: Function) {
-        this.funcs = new Funcs(fireBeat, incrementBeat, stopVisualizer, syncTrackProgress, setCurrentlyPlaying);
+    
+    constructor(fireBeat?: Function, 
+            incrementBeat?: Function, 
+            stopVisualizer?: Function, 
+            syncTrackProgress?: Function, 
+            setCurrentlyPlaying?: Function) {
+        // this.funcs = new Funcs(fireBeat, incrementBeat, stopVisualizer, syncTrackProgress, setCurrentlyPlaying);
         this.visualizer = new VisualizerInfo();
     }
 

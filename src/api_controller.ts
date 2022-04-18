@@ -4,7 +4,7 @@ import { normalizeIntervals } from "./utils";
 import { readFileSync } from "fs";
 import State from "./state";
 import axios from "axios";
-import querystring = require("query-string");
+import querystring from 'query-string';
 
 
 export enum ApiResponse {
@@ -67,16 +67,23 @@ export class APIFetcher implements APIFetcherI {
         }
     }
 
+    private delay(time: number): Promise<void> {
+        return new Promise<void>((resolve) => setTimeout(resolve, time));
+    }
+
     // -- Public methods -- //
-    public async waitForToken(timeout: number = 6000): Promise<void> {
+    public async waitForToken(timeout: number = 6000): Promise<boolean> {
         let sleep_time = 1000;
-        if (timeout <= 0) return;
+        if (this.verbose)
+            console.log("Testing token...");
+        if (timeout <= 0) return false;
         if (!(await this.testToken())) {
             await this.refreshToken();
-            setTimeout(() => { this.waitForToken(timeout - sleep_time); }, sleep_time);
+            await this.delay(sleep_time);
         } else {
-            return;
+            return true;
         }
+        return await this.waitForToken(timeout - sleep_time);
     }
 
     // TODO change to boolean in the future
@@ -98,8 +105,9 @@ export class APIFetcher implements APIFetcherI {
                 this.accessToken = res.data;
             })
             .catch(err => {
-                console.error(err);
-                // throw new Error(err);
+                if (this.verbose)
+                    console.error(err.data.error);
+                throw new Error(err);
             })
     }
     
@@ -149,9 +157,11 @@ export class APIFetcher implements APIFetcherI {
             }
         ).catch(err => {
             if (this.state.headers == null) {
-                console.error("No auth headers set");
+                if (this.verbose)
+                    console.error("No auth headers set");
             } else {
-                console.error(err);
+                if (this.verbose)
+                    console.error(err.data.error);
                 return {status: ApiResponse.Error};
             }
         });

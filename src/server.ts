@@ -1,8 +1,9 @@
 import express, { Router, Request, Response } from 'express';
-import cors = require("cors");
-import crypto = require('crypto');
-import cookieParser = require("cookie-parser");
-import querystring = require("query-string");
+import * as http from "http";
+import cors from 'cors'
+import crypto from 'crypto';
+import cookieParser from "cookie-parser";
+import querystring from "query-string";
 import { baseUrl, frontEndPort, auth_url, token_url } from "./config/network-info.json";
 import fs from "fs";
 import axios from "axios";
@@ -12,10 +13,11 @@ import { APIFetcherI } from "./api_controller";
 
 // Main Front-End Server with auth flow
 export default class Server {
-    public app : express.Application;
+    private app : express.Application;
     private verbose: boolean = false;
+    public server: http.Server = null;
 
-    constructor(private port: number, client_id: string, client_secret: string, apiHook: APIFetcherI, verbose?: boolean) {
+    constructor(public readonly port: number, client_id: string, client_secret: string, apiHook: APIFetcherI, verbose?: boolean) {
         this.verbose = verbose;
         this.port = port;
         this.app = express()
@@ -26,7 +28,19 @@ export default class Server {
     }
 
     start(): void {
-        this.app.listen(this.port, () => {if (this.verbose) console.log("Server started on port " + this.port)});
+        if (this.server == null)
+            this.server = this.app.listen(this.port, () => {
+                if (this.verbose) 
+                    console.log("Server started on port " + this.port)
+            });
+    }
+
+    close(): void {
+        if (this.server != null)
+            this.server.close(() => {
+                if (this.verbose) 
+                    console.log("Server closed")
+            });
     }
 
     static init(port: number, client_id: string, client_secret: string, apiHook: APIFetcherI, verbose?: boolean): Server { 

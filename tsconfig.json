@@ -10,7 +10,7 @@
       "esModuleInterop": true,
       "strictPropertyInitialization": false,
       "isolatedModules": false,
-      "strict": false,
+      // "strict": false,
       "experimentalDecorators": true,
     },
     "files": [
