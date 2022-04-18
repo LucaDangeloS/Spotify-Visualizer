@@ -7,7 +7,7 @@ import State from './state';
 
 export default class Synchronizer {
     private verbose: boolean = false;
-    private pingLoop: boolean = false;
+    private pingLoop: ReturnType<typeof setTimeout> = null;
 
     constructor(private api: APIFetcherI, private trackController: TrackController, private state: State, verbose?: boolean) {
         this.api = api;
@@ -18,15 +18,18 @@ export default class Synchronizer {
 
     // -- Public methods -- //
     public initialize() {
-        if (this.verbose)
+        if (this.verbose) {
             console.log("Initializing synchronizer");
+        }
         this.startPingLoop();
     }
 
     public terminate() {
         this.stopPingLoop();
-        if (this.verbose)
-                console.log("\n\t==========\n\tTERMINATED\n\t==========\n");
+        this.trackController.stopVisualizer();
+        if (this.verbose) {
+            console.log("\n\t==========\n\tTERMINATED\n\t==========\n");
+        }
     }
 
     // -- Private methods -- //
@@ -36,26 +39,24 @@ export default class Synchronizer {
     private async ping(): Promise<void> {
         let res = await this.api.fetchCurrentlyPlaying(this.state);
         this.processResponse(res);
-        await delay(pingDelay);
-        if (this.pingLoop)
-            this.ping();
+        this.pingLoop = setTimeout(() => { this.ping() }, pingDelay);
     }
 
     private startPingLoop(): void {
-        this.pingLoop = true;
-        this.ping();
+        this.pingLoop = setTimeout(() => { this.ping() }, pingDelay);
     }
 
     private stopPingLoop(): void {
         if (this.pingLoop !== null) {
-            this.pingLoop = false;
-            this.trackController.stopVisualizer();
+            clearTimeout(this.pingLoop);
         }
+        this.trackController.stopVisualizer();
     }
 
     private processResponse(res: {status: ApiResponse, data?: any}) {
-        if (this.verbose)
+        if (this.verbose) {
             console.log("status: " + res.status);
+        }
         switch (res.status) {
             case ApiResponse.Ok: {
                 break;

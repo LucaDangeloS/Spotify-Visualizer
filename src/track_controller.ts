@@ -37,8 +37,9 @@ export class TrackController {
      * sets visualizer to active, syncs beats, and begins ping loop
      */
     public startVisualizer(): void {
-        if (this.verbose)
+        if (this.verbose) {
             console.log("\nVisualizer started");
+        }
         this.state.visualizer.active = true;
 
         this.syncBeats();
@@ -48,8 +49,9 @@ export class TrackController {
      * sets visualizer to inactive, terminates beat loop, and turns off led strip
      */
     public stopVisualizer(): void {
-        if (this.verbose)
+        if (this.verbose) {
             console.log("\nVisualizer stopped");
+        }
         this.state.visualizer.active = false;
         // stop the track progress loop if it's running
         this.stopTrackProgressLoop();

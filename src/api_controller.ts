@@ -50,8 +50,9 @@ export class APIFetcher implements APIFetcherI {
             .then((response: AxiosResponse) => {
                 s = response.status;
             }).catch((err: AxiosError) => {});
-        if (this.verbose) 
+        if (this.verbose) {
             console.log("Request status: " + s);
+        }
         return (s <= 204 && s >= 200);
     }
 
@@ -70,8 +71,9 @@ export class APIFetcher implements APIFetcherI {
     // -- Public methods -- //
     public async waitForToken(timeout: number = 10000): Promise<boolean> {
         let sleep_time = 1000;
-        if (this.verbose)
+        if (this.verbose) {
             console.log("Testing token...");
+        }
         if (timeout <= 0) return false;
         if (!(await this.testToken())) {
             await this.refreshToken();
@@ -123,12 +125,14 @@ export class APIFetcher implements APIFetcherI {
             .then((response: AxiosResponse) => {
                 // no device is playing music
                 if (response.status == 204) {
-                    if (this.verbose)
+                    if (this.verbose) {
                         console.log("\nNo playback detected");
+                    }
                     ret = {status: ApiResponse.NoPlayback};
                 } else {
-                    if (this.verbose)
+                    if (this.verbose) {
                         console.log("\nDetected playing: " + response.data.item.name);
+                    }
 
                     aux = {
                         track: response.data.item,
@@ -145,8 +149,9 @@ export class APIFetcher implements APIFetcherI {
             });
 
         if (refresh_token) {
-            if (this.verbose)
+            if (this.verbose) {
                 console.log("Refreshing token...");
+            }
             await this.refreshToken();
             ret = await this.fetchCurrentlyPlaying(state);
         } else if (aux != null) {

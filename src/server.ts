@@ -30,16 +30,18 @@ export default class Server {
     start(): void {
         if (this.server == null)
             this.server = this.app.listen(this.port, () => {
-                if (this.verbose) 
+                if (this.verbose) {
                     console.log("Server started on port " + this.port)
+                }
             });
     }
 
     close(): void {
         if (this.server != null)
             this.server.close(() => {
-                if (this.verbose) 
+                if (this.verbose) {
                     console.log("Server closed")
+                }
             });
     }
 
