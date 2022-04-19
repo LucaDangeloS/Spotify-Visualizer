@@ -1,195 +1,159 @@
-from re import S
-from numpy import left_shift, right_shift
-import pygame
-from time import sleep
-from math import ceil, cos, pi, sin
+import colorsys
+import numpy as np
+from matplotlib.colors import hsv_to_rgb
+import matplotlib.pyplot as plt
+# from mpl_toolkits import mplot3d
 
-white = (250, 250, 250)
-red = (255, 0 ,0)
-green = (0, 255, 0)
-blue = (0, 0, 255)
-black = (0, 0, 0)
-bg_color = black
-fps = 30
+# # green line = lightness
+# # blue line = saturation/lightness ?
+# # red line = hue
+# res = map(lambda x: matplotlib.colors.to_hex(x), palette)
+# rgb_colors = palette
+# palette = list(res)
+# print(rgb_colors)
+# specplot(palette, rgb=True)
 
-left_shift = 60
 
-# Plot
-plot_top_shift = 150
-plot_line_thickness = 1
-plot_height = 120
-plot_width = 256
+def invert_rgb_color(r, g, b):
+    return (1-r, 1-g, 1-b)
 
-# Spectrum
-factor = 150 # Precision
-square_width = 1
-square_height = 40
-square_amount = round(2*pi*factor)
-top_shift = plot_top_shift + 50
 
-# Sliders
-slider_top_shift = top_shift + 100
-slider_spacing = 60
+def make_figure(n):
+    if n > 1:
+        fig = plt.figure(figsize=(1, n))
+    else:
+        fig = plt.figure()
+    return fig
 
-class Slider():
-    def __init__(self):
-        self.offset = None
-        self.pos = None
-        self.selected = False
 
-# Sliders values
-class Slide_pos():
-    def __init__(self):
-        self.m = 1/2
-        self.fi = pi/2
-        self.a = 1
-        self.fun = cos
+def convert_colors(color_array, c_type):
+    h = [0] * len(color_array)
+    s = [0] * len(color_array)
+    v = [0] * len(color_array)
+    c_type = c_type.lower()
+    for i, color in enumerate(color_array):
+        if c_type == 'rgb':
+            h[i], s[i], v[i] = colorsys.rgb_to_hsv(color[0]*255, color[1]*255, color[2]*255)
+        elif c_type == 'hex':
+            h[i], s[i], v[i] = colorsys.hex_to_hsv(color)
+        elif c_type == 'hsl':
+            h[i], s[i], v[i] = color
         
-        self.m_slider = Slider()
-        self.a_slider = Slider()
-        self.fi_slider = Slider()
+        if v[i] > 1:
+            v[i] = v[i]/255
 
-# Display
-display_width = 2*left_shift + square_amount
-display_height = plot_height + slider_top_shift + slider_spacing*8
+    return (h, s, v)
 
-colorspace = [
-    (round(255 * i/ square_amount), round(255 * i/ square_amount), round(255 * i/ square_amount))
-    for i in range(square_amount + 1)
-]
 
-def draw_slider(x, y, width, height, color, slide_pos, slider, screen, action = None, tag = None):
-    cur = pygame.mouse.get_pos()
-    click = pygame.mouse.get_pressed()
-    rect_width = 10
-    rect_height = 24
-    multiplier_max = 6
-    amplitude_max = 1
-    fi_max = 6*pi
-    font = pygame.font.Font('freesansbold.ttf', 14)
+def plot_colors(color_array, ax, type="hsl"):
+    # Code taken from https://stackoverflow.com/questions/10787103/2d-hsv-color-space-in-matplotlib
+    V, H = np.mgrid[0:1:100j, 0:1:300j]
+    S = np.ones_like(V)
+    HSV = np.dstack((H,S,V))
+    RGB = hsv_to_rgb(HSV)
 
-    if not slider.offset:
-        slider.offset = (x, y)
-        if action == 'amplitude':
-            slider.pos = (width + x, y)
-        elif action == 'multiplier':
-            slider.pos = (x + width/(multiplier_max/slide_pos.m), y)
-        elif action == 'fi':
-            slider.pos = (x + width/(fi_max/slide_pos.fi), y)
-    pygame.draw.rect(screen, color, (x, y, width, height))
+    ax.imshow(RGB, origin="lower", extent=[0, 360, 0, 1], aspect=150)
+    ax.set_xlabel("Hue", fontweight='bold')
+    ax.set_ylabel("Value", fontweight='bold')
+    ax.set_title("$S_{HSV}=1$")
 
-    if  x + width > cur[0] > x and (y + height + rect_height/2 > cur[1] > y - rect_height/2 or slider.selected == True):
-        if click[0] == 1 and action != None:
-            slider.selected = True
-            slider.pos = (cur[0], y)
-            if action == 'multiplier':
-                slide_pos.m = (multiplier_max/width) * (cur[0] - x)
-            if action == 'amplitude':
-                slide_pos.a = (amplitude_max/width) * (cur[0] - x)
-            if action == 'fi':
-                slide_pos.fi = (fi_max/width) * (cur[0] - x)
-        if click[0] == 0 and action != None:
-            slider.selected = False
+    h_list, s_list, l_list = convert_colors(color_array, type)
 
-    if slider.pos:
-        pygame.draw.rect(screen, pygame.Color(white), 
-                    (
-                        slider.pos[0] - rect_width/2,
-                        slider.pos[1] - rect_width,
-                        rect_width,
-                        rect_height
-                    ))
+    for i, (h, s, v) in enumerate(zip(h_list, s_list, l_list)):
+        # Horrible hack to get the colors typing, don't judge me
+        # Transform color space to HSL
+        #Plot dot
+        ax.plot(h*360, s, 'o', color='white', markersize=3)
+
+        # Plot line between dots
+        if i > 0:
+            prev_h = h_list[i-1]
+            prev_s = s_list[i-1]
+            line_color = invert_rgb_color(*colorsys.hsv_to_rgb(h, s, 1))
+            ax.plot([prev_h*360, h*360], [prev_s, s], color=line_color , linestyle='--', linewidth=1)
+            if i == len(h_list) - 1:
+                ax.text(h*360, s, "End", fontsize=8, color="white", fontweight="bold")
+                prev_h = h_list[0]
+                prev_s = s_list[0]
+                ax.plot([prev_h*360, h*360], [prev_s, s], linestyle=':', linewidth=1)
+                
+        elif i == 0:
+            ax.text(h*360, s, "Start", fontsize=8, color="white", fontweight="bold")
+
+
+def plot_colors_3d(color_array, ax, type="hsl"):
+    ax.set_xlabel('Hue', fontweight='bold')
+    ax.set_ylabel('Saturation', fontweight='bold')
+    ax.set_zlabel('Lightness', fontweight='bold')
+    ax.set_title('HSL Color Space')
+    ax.set_xlim(0, 360)
+    ax.set_ylim(0, 1)
+    ax.set_zlim(0, 1)
+    ax.set_xticks([0, 60, 120, 180, 240, 300, 360])
+    ax.set_yticks([0, 0.25, 0.5, 0.75, 1])
+    ax.set_zticks([0, 0.25, 0.5, 0.75, 1])
+    # ax.grid(False)
+
+    h_list, s_list, l_list = convert_colors(color_array, type)
+
+    for i, (x, y, z) in enumerate(zip(h_list, s_list, l_list)):
+        #Plot dot
+        ax.plot3D(x*360, y, z, 'o', color=colorsys.hsv_to_rgb(x, y, z), markersize=3)
+
+        # Plot line between dots
+        if i > 0:
+            prev_x = h_list[i-1]
+            prev_y = s_list[i-1]
+            prev_z = l_list[i-1]
+            ax.plot3D([prev_x*360, x*360], [prev_y, y], [prev_z, z], color=colorsys.hsv_to_rgb(x, y, z) , linestyle='--', linewidth=1)
+            if i == len(h_list) - 1:
+                ax.text(x*360, y, z, "End", (1, 1, 0),fontsize=8, color="black", fontweight="bold")
+                prev_x = h_list[0]
+                prev_y = s_list[0]
+                prev_z = l_list[0]
+                ax.plot3D([prev_x*360, x*360], [prev_y, y], [prev_z, z], linestyle=':', linewidth=1)
+
+        elif i == 0:
+            ax.text(x*360, y, z, "Start", (1, 1, 0), fontsize=8, color="black", fontweight="bold")
+
+    ax.view_init(45, -90)
+
+
+def plot(palette, color_type, plot_type):
+    color_type = color_type.lower()
+    plot_type = plot_type.lower()
+    assert color_type in ['rgb', 'hex', 'hsl']
+    assert plot_type in ['2d', '3d', 'both']
     
-    if action == 'amplitude':
-        if slide_pos.fun is cos:
-            fun = 'cos'
-        else:
-            fun = 'sin'
-        n_str = f'{round(slide_pos.a, 2)}{fun}({round(slide_pos.m, 2)}α + {round(slide_pos.fi/pi, 2)}π)'
-        text = tag + ' ' + n_str if tag else n_str
-        tag_text = font.render(text, True, white)
-        screen.blit(tag_text, ((width)/2, y - slider_spacing/2))
 
+    if plot_type == 'both':
+        fig = make_figure(2)
+        ax = fig.add_subplot(1, 2, 1)
+        plot_colors(palette, ax, color_type)
+        ax = fig.add_subplot(1, 2, 2, projection='3d')
+        plot_colors_3d(palette, ax, color_type)
+    else:
+        fig = make_figure(1)
+        if plot_type == '2d':
+            ax = fig.add_subplot(1, 1, 1)
+            plot_colors(palette, ax, color_type)
+        elif plot_type == '3d':
+            ax = fig.add_subplot(1, 1, 1, projection='3d')
+            plot_colors_3d(palette, ax, color_type)
+    plt.show()
 
-def main():
-    pygame.init()
-    pygame.font.init()
-    display = pygame.display.set_mode((display_width, display_height))
-    clock = pygame.time.Clock()
-    pygame.display.set_caption("Colorspace visualizer")
-    
-    p1 = Slide_pos()
-    p2 = Slide_pos()
-    p3 = Slide_pos()
-    
-    while True:    
-        display.fill(bg_color)
+# Example usage
+import seaborn as sns
+palette = sns.color_palette('Spectral', 300)
+plot(palette, 'rgb', 'both')
 
-        # Red
-        for i in range(square_amount):
-            pygame.draw.rect(display, pygame.Color(red), 
-            (left_shift + i*plot_line_thickness, 
-            plot_top_shift - map_red(i/factor, p1.m, p1.fi, p1.a, p1.fun)*plot_height, 
-            plot_line_thickness+1, 
-            plot_line_thickness+1)
-            )
-        # Green
-        for i in range(square_amount):
-            pygame.draw.rect(display, pygame.Color(green), 
-            (left_shift + i*plot_line_thickness, 
-            plot_top_shift - map_green(i/factor, p2.m, p2.fi, p2.a, p2.fun)*plot_height, 
-            plot_line_thickness+1, 
-            plot_line_thickness+1)
-            )
-        # Blue
-        for i in range(square_amount):
-            pygame.draw.rect(display, pygame.Color(blue), 
-            (left_shift + i*plot_line_thickness, 
-            plot_top_shift - map_blue(i/factor, p3.m, p3.fi, p3.a, p3.fun)*plot_height, 
-            plot_line_thickness+1, 
-            plot_line_thickness+1)
-            )
+import matplotlib
+from colorspace import specplot
+res = map(lambda x: matplotlib.colors.to_hex(x), palette)
+palette = list(res)
+specplot(palette, rgb=True)
 
-        # Color Spectrum
-        for i in range(square_amount):
-            color = (
-                map_red(i/factor, p1.m, p1.fi, p1.a, p1.fun)*plot_height,
-                map_green(i/factor, p2.m, p2.fi, p2.a, p2.fun)*plot_height,
-                map_blue(i/factor, p3.m, p3.fi, p3.a, p3.fun)*plot_height
-            )
-            pygame.draw.rect(display, pygame.Color(color, a=255), (left_shift + i*square_width, top_shift, square_width+1, square_height))
-
-        # Red Sliders
-        draw_slider(left_shift, slider_top_shift, square_amount, 4, red, p1, p1.a_slider, display, action='amplitude', tag='Red')
-        draw_slider(left_shift, slider_top_shift + slider_spacing, square_amount, 4, red, p1, p1.m_slider, display, action='multiplier')
-        draw_slider(left_shift, slider_top_shift + 2*slider_spacing, square_amount, 4, red, p1, p1.fi_slider, display, action='fi')
-        # Green Sliders
-        draw_slider(left_shift, slider_top_shift + 3*slider_spacing, square_amount, 4, green, p2, p2.a_slider, display, action='amplitude', tag='Green')
-        draw_slider(left_shift, slider_top_shift + 4*slider_spacing, square_amount, 4, green, p2, p2.m_slider, display, action='multiplier')
-        draw_slider(left_shift, slider_top_shift + 5*slider_spacing, square_amount, 4, green, p2, p2.fi_slider, display, action='fi')
-        # Blue Sliders
-        draw_slider(left_shift, slider_top_shift + 6*slider_spacing, square_amount, 4, blue, p3, p3.a_slider, display, action='amplitude', tag='Blue')
-        draw_slider(left_shift, slider_top_shift + 7*slider_spacing, square_amount, 4, blue, p3, p3.m_slider, display, action='multiplier')
-        draw_slider(left_shift, slider_top_shift + 8*slider_spacing, square_amount, 4, blue, p3, p3.fi_slider, display, action='fi')     
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                exit(0)
-        
-
-        pygame.display.update()
-        clock.tick(fps)
-
-
-def map_red(a, m=1/2, fi=pi/2, amplitude=1, fun=cos):
-    return abs(amplitude*fun(m*a + fi))
-
-def map_green(a, m=1/2, fi=pi/2, amplitude=1, fun=cos):
-    return abs(amplitude*fun(m*a + fi))
-
-def map_blue(a, m=1/2, fi=pi/2, amplitude=1, fun=cos):
-    return abs(amplitude*fun(m*a + fi))
-
-    
-if __name__ == '__main__':
-    main()
+## Info
+# # green line = luminance?
+# # blue line = chroma?
+# # red line = hue
