@@ -4,7 +4,7 @@ This is a rewritten version in TypeScript of my previous Spotify Visualizer, ori
 
 **Note**: This is an underway project (Check <a href="#todos">TODOs</a>)
 
-<sub>Original project inspired from [here](https://github.com/lukefredrickson/spotify-led-visualizer), credits to [lukefredrickson](https://github.com/daydroidmuchiri).</sub>
+<sub>Original project inspired from [here](https://github.com/lukefredrickson/spotify-led-visualizer).</sub>
 
 <details>
   <summary>Table of Contents</summary>
