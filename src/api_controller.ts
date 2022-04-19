@@ -6,6 +6,10 @@ import State from "./state";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import querystring from 'query-string';
 
+/*
+* Many methods were borrowed from 
+* https://github.com/lukefredrickson/spotify-led-visualizer
+*/
 
 export enum ApiResponse {
     Ok, // Next Ping
