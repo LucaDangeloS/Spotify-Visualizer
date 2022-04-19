@@ -2,6 +2,11 @@ import { APIFetcherI, ApiResponse} from './api_controller';
 import { trackProgressTickRate, beatConfidence } from './config/config.json';
 import State from './state';
 
+/*
+* Many methods were borrowed and inspired 
+* from https://github.com/lukefredrickson/spotify-led-visualizer
+*/
+
 export class TrackController {
 
     private beatLoop: ReturnType<typeof setTimeout> = null;
