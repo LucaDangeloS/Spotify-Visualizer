@@ -1,4 +1,4 @@
-<div align="center"> <h1><strong>Spotify Visualizer</strong></h1> </div>
+<div align="center"> <h1><strong>🎵 Spotify Visualizer 🎵</strong></h1> </div>
 
 This is a rewritten version in TypeScript of my previous Spotify Visualizer, originally written in pure JavaScript.
 
