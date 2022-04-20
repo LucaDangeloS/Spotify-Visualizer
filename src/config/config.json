@@ -6,5 +6,5 @@
     "sectionsConfidence": 0.10,
     "pingDelay": 3000,
     "syncOffsetThreshold": 60,
-    "trackProgressTickRate" : 5
+    "trackProgressTickRate" : 10
 }

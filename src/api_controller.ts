@@ -46,10 +46,10 @@ export async function waitForToken(state: State, timeout: number = 10000): Promi
     return await waitForToken(state, timeout - sleep_time);
 }
 
-// TODO change to boolean in the future
-export async function refreshToken(state: State): Promise<void> {
-    let refresh_token = readFileSync('./token.txt', 'utf-8');
-    let refresh_url = token_url;
+export async function refreshToken(state: State): Promise<boolean> {
+    let refresh_token: string = readFileSync('./token.txt', 'utf-8');
+    let refresh_url: string = token_url;
+    let ret: boolean = false;
     let refresh_body = {
         grant_type: "refresh_token",
         refresh_token: refresh_token,
@@ -59,8 +59,8 @@ export async function refreshToken(state: State): Promise<void> {
             Authorization: `Basic ${Buffer.from(process.env.CLIENT_ID + ":" + process.env.CLIENT_SECRET).toString('base64')}`,
             "Content-Type": "application/x-www-form-urlencoded"
         }
-    };
-    state.headers = headers;
+    }
+    
     if (state.verbose) {
         console.log("Refreshing token..." + headers);
     }
@@ -68,10 +68,13 @@ export async function refreshToken(state: State): Promise<void> {
         .then((res: AxiosResponse) => {
             let data: refreshTokenResponseI = res.data as refreshTokenResponseI;
             state.setAccessToken(data);
+            ret = true;
         })
         .catch((err: AxiosError) => {
             throw new Error(err.message);
         })
+
+    return ret;
 }
 
 /**
@@ -124,13 +127,13 @@ export async function fetchCurrentlyPlaying(state: State): Promise<ApiResponse> 
  */
 async function processResponse(state: State, { track, playing, progress }) : Promise<ApiResponse>{
     let songsInSync =
-        JSON.stringify(state.visualizer.currentlyPlaying) ===
+        JSON.stringify(state.trackInfo.currentlyPlaying) ===
         JSON.stringify(track);
     
     let progressStats = {
-        client: state.visualizer.trackProgress,
+        client: state.trackInfo.trackProgress,
         server: progress,
-        error: state.visualizer.trackProgress - progress
+        error: state.trackInfo.trackProgress - progress
     };
 
     let ret: ApiResponse = null;
@@ -141,7 +144,7 @@ async function processResponse(state: State, { track, playing, progress }) : Pro
         console.log(`Sync error: ${Math.round(progressStats.error)}ms\n`);
     }
 
-    let aux: number = playing + state.visualizer.active;
+    let aux: number = playing + state.trackInfo.active;
 
     switch (true) {
         // no track detected
@@ -164,7 +167,7 @@ async function processResponse(state: State, { track, playing, progress }) : Pro
             break;
 
         // track has resumed
-        case (aux == 1 && !state.visualizer.active):
+        case (aux == 1 && !state.trackInfo.active):
             if (songsInSync)
                 ret = {status: ApiStatusCode.VizOff, data: null};
             else 
@@ -207,9 +210,9 @@ async function fetchTrackData(state: State, { track, progress }): Promise<ApiRes
                 analysis.beats === undefined ||
                 analysis.beats.length == 0
             ) {
-                state.visualizer.hasAnalysis = false;
+                state.trackInfo.hasAnalysis = false;
             } else {
-                state.visualizer.hasAnalysis = true;
+                state.trackInfo.hasAnalysis = true;
                 normalizeIntervals(state, { track, analysis });
             }
             // account for time to call api in initial timestamp

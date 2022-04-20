@@ -8,7 +8,7 @@ import { analysisI, beatI, trackI } from "./types";
  * Then convert all time data to ms.
  */
 export function normalizeIntervals (state: State, { track, analysis }: { track: trackI, analysis: analysisI }): void {
-    if (state.visualizer.hasAnalysis) {
+    if (state.trackInfo.hasAnalysis) {
         const beats = analysis["beats"];
         const sections = analysis["sections"];
         /** Ensure first interval of each type starts at zero. */

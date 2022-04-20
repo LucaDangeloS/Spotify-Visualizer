@@ -2,10 +2,12 @@ import SocketIO from 'socket.io';
 import { analysisI, beatI, refreshTokenResponseI, sectionI, trackI } from './types';
 
 export default class State {
-    visualizer: VisualizerInfo = new VisualizerInfo();
-    visualizerSocket: SocketIO.Server = null;
+    trackInfo: TrackInfo = new TrackInfo();
+    loops: Loops = new Loops();
+    beatCallback: Function;
     verbose : boolean;
     headers = {};
+
     private _accessToken: string = null;
     private _expireTimestamp: Date = null;
 
@@ -26,16 +28,14 @@ export default class State {
         return this._expireTimestamp;
     }
 
-    constructor(verbose: boolean = false) {
+    constructor(verbose: boolean = false, beatCallback: Function = () => {}) {
         this.verbose = verbose;
+        this.beatCallback = beatCallback;
     }
 
-    addSocket(socket: SocketIO.Server): boolean {
-        this.visualizerSocket = socket;
-        return true;
-    }
 }
-class VisualizerInfo {
+
+class TrackInfo {
     sections = Array<sectionI>();
     
     activeSection: sectionI;
@@ -57,4 +57,9 @@ class VisualizerInfo {
     trackProgress: number = 0;
 
     active = false;
+}
+
+class Loops {
+    beatLoop: ReturnType<typeof setTimeout> = null;
+    trackProgressLoop: ReturnType<typeof setTimeout> = null;
 }

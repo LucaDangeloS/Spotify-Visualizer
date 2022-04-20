@@ -1,4 +1,4 @@
-import { TrackController } from './track_controller';
+import * as TrackController from './track_controller';
 import { pingDelay } from './config/config.json';
 import * as api from './api_controller';
 import State from './state';
@@ -9,14 +9,13 @@ export default class Synchronizer {
     private verbose: boolean = false;
     private pingLoop: ReturnType<typeof setTimeout> = null;
 
-    constructor(private trackController: TrackController, private state: State, verbose?: boolean) {
-        this.trackController = trackController;
+    constructor(private state: State, verbose?: boolean) {
         this.state = state;
         this.verbose = verbose;
     }
 
     // -- Public methods -- //
-    public initialize() {
+    public initialize(): void {
         if (this.verbose) {
             console.log("Initializing synchronizer");
         }
@@ -25,8 +24,8 @@ export default class Synchronizer {
 
     public terminate() {
         this.stopPingLoop();
-        this.trackController.stopVisualizer();
-        this.state.visualizer.active = false;
+        TrackController.stopVisualizer(this.state);
+        this.state.trackInfo.active = false;
         if (this.verbose) {
             console.log("\n\t==========\n\tTERMINATED\n\t==========\n");
         }
@@ -50,11 +49,11 @@ export default class Synchronizer {
         if (this.pingLoop !== null) {
             clearTimeout(this.pingLoop);
         }
-        this.trackController.stopVisualizer();
-        this.state.visualizer.active = false;
+        TrackController.stopVisualizer(this.state);
+        this.state.trackInfo.active = false;
     }
 
-    private processResponse(res: ApiResponse) {
+    private processResponse(res: ApiResponse): void {
         if (this.verbose) {
             console.log("status: " + res.status);
         }
@@ -63,24 +62,24 @@ export default class Synchronizer {
                 break;
             }
             case ApiStatusCode.VizOff: {
-                this.trackController.startVisualizer(this.state);
+                TrackController.startVisualizer(this.state);
                 break;
             }
 
             case ApiStatusCode.NoPlayback: {
-                this.trackController.stopVisualizer();
-                this.state.visualizer.active = false;
+                TrackController.stopVisualizer(this.state);
+                this.state.trackInfo.active = false;
                 break;
             }
 
             case ApiStatusCode.ChangedPlayback: {
                 let data: trackInfoI = res.data as trackInfoI;
-                this.trackController.syncTrackProgress(
+                TrackController.syncTrackProgress(
                     this.state,
                     data.progress,
                     data.initialTimestamp
                 );
-                this.trackController.setCurrentlyPlaying(
+                TrackController.setCurrentlyPlaying(
                     this.state,
                     data.track,
                     data.analysis
@@ -90,13 +89,13 @@ export default class Synchronizer {
 
             case ApiStatusCode.DeSynced: {
                 let data: progressInfoI = res.data as progressInfoI;
-                this.trackController.stopBeatLoop();
-                this.trackController.syncTrackProgress(
+                TrackController.stopBeatLoop(this.state);
+                TrackController.syncTrackProgress(
                     this.state,
                     data.progress,
                     data.initialTimestamp
                 );
-                this.trackController.syncBeats(this.state);
+                TrackController.syncBeats(this.state);
                 break;
             }
 
