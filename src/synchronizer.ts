@@ -1,19 +1,18 @@
-import { APIFetcherI, ApiResponse } from './api_controller';
 import { TrackController } from './track_controller';
 import { pingDelay } from './config/config.json';
-import { delay } from './utils';
+import * as api from './api_controller';
 import State from './state';
+import { ApiResponse, ApiStatusCode, trackInfoI, progressInfoI } from './types';
 
 
 export default class Synchronizer {
     private verbose: boolean = false;
     private pingLoop: ReturnType<typeof setTimeout> = null;
 
-    constructor(private api: APIFetcherI, private trackController: TrackController, private state: State, verbose?: boolean) {
-        this.api = api;
+    constructor(private trackController: TrackController, private state: State, verbose?: boolean) {
         this.trackController = trackController;
-        this.verbose = verbose;
         this.state = state;
+        this.verbose = verbose;
     }
 
     // -- Public methods -- //
@@ -27,6 +26,7 @@ export default class Synchronizer {
     public terminate() {
         this.stopPingLoop();
         this.trackController.stopVisualizer();
+        this.state.visualizer.active = false;
         if (this.verbose) {
             console.log("\n\t==========\n\tTERMINATED\n\t==========\n");
         }
@@ -37,7 +37,7 @@ export default class Synchronizer {
      * Establishes ping loop to query current track progress 
      */
     private async ping(): Promise<void> {
-        let res = await this.api.fetchCurrentlyPlaying(this.state);
+        let res = await api.fetchCurrentlyPlaying(this.state);
         this.processResponse(res);
         this.pingLoop = setTimeout(() => { this.ping() }, pingDelay);
     }
@@ -51,54 +51,61 @@ export default class Synchronizer {
             clearTimeout(this.pingLoop);
         }
         this.trackController.stopVisualizer();
+        this.state.visualizer.active = false;
     }
 
-    private processResponse(res: {status: ApiResponse, data?: any}) {
+    private processResponse(res: ApiResponse) {
         if (this.verbose) {
             console.log("status: " + res.status);
         }
         switch (res.status) {
-            case ApiResponse.Ok: {
+            case ApiStatusCode.Ok: {
                 break;
             }
-            case ApiResponse.VizOff: {
-                this.trackController.startVisualizer();
+            case ApiStatusCode.VizOff: {
+                this.trackController.startVisualizer(this.state);
                 break;
             }
 
-            case ApiResponse.NoTrack: {
+            case ApiStatusCode.NoPlayback: {
                 this.trackController.stopVisualizer();
+                this.state.visualizer.active = false;
                 break;
             }
 
-            case ApiResponse.NoPlayback: {
-                this.trackController.stopVisualizer();
-                break;
-            }
-
-            case ApiResponse.WrongPlayback: {
+            case ApiStatusCode.ChangedPlayback: {
+                let data: trackInfoI = res.data as trackInfoI;
                 this.trackController.syncTrackProgress(
-                    res.data.progress,
-                    res.data.initialTimestamp
+                    this.state,
+                    data.progress,
+                    data.initialTimestamp
                 );
                 this.trackController.setCurrentlyPlaying(
-                    res.data.track,
-                    res.data.analysis
+                    this.state,
+                    data.track,
+                    data.analysis
                 );
                 break;
             }
 
-            case ApiResponse.DeSynced: {
+            case ApiStatusCode.DeSynced: {
+                let data: progressInfoI = res.data as progressInfoI;
                 this.trackController.stopBeatLoop();
                 this.trackController.syncTrackProgress(
-                    res.data.progress,
-                    res.data.initialTimestamp
+                    this.state,
+                    data.progress,
+                    data.initialTimestamp
                 );
-                this.trackController.syncBeats();
+                this.trackController.syncBeats(this.state);
                 break;
             }
 
-            case ApiResponse.Error: {
+            case ApiStatusCode.Unauthorized: {
+                api.refreshToken(this.state);
+                break;
+            }
+
+            case ApiStatusCode.Error: {
                 console.error(res.data);
                 // process.exit(1);
                 break;

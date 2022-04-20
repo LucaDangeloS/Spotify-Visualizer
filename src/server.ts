@@ -7,7 +7,6 @@ import querystring from "query-string";
 import { baseUrl, frontEndPort, auth_url, token_url } from "./config/network-info.json";
 import fs from "fs";
 import axios, { AxiosError, AxiosResponse } from "axios";
-import { APIFetcherI } from "./api_controller";
 // import { serialize } from "./utils";
 
 
@@ -17,13 +16,13 @@ export default class Server {
     private verbose: boolean = false;
     public server: http.Server = null;
 
-    constructor(public readonly port: number, client_id: string, client_secret: string, apiHook: APIFetcherI, verbose?: boolean) {
+    constructor(public readonly port: number, client_id: string, client_secret: string, tokenCallback: Function, verbose?: boolean) {
         this.verbose = verbose;
         this.port = port;
         this.app = express()
             .use(cookieParser())
             .use(cors())
-            .use(FlowRouter.get(client_id, client_secret, (token: any) => { apiHook.accessToken = token; }))
+            .use(FlowRouter.get(client_id, client_secret, tokenCallback))
             .use(express.static(__dirname + "/public"));
     }
 
@@ -45,7 +44,7 @@ export default class Server {
             });
     }
 
-    static init(port: number, client_id: string, client_secret: string, apiHook: APIFetcherI, verbose?: boolean): Server { 
+    static init(port: number, client_id: string, client_secret: string, apiHook: Function, verbose?: boolean): Server { 
         return new Server(port, client_id, client_secret, apiHook, verbose);
     }
 

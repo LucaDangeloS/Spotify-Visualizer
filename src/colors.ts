@@ -13,6 +13,3 @@ function complementary(color) : string {
 function analogous(color, a) : string {
     return chroma(color).set('hsl.h', a).hex();
 }
-
-// #808000
-// #b4b400

@@ -1,10 +1,9 @@
 import Server from './server';
 import State from './state';
-import { APIFetcher } from './api_controller';
 import { frontEndPort, visualizerPort } from "./config/network-info.json";
 import { TrackController } from './track_controller';
 import Synchronizer from './synchronizer';
-import { delay } from './utils';
+import * as api from './api_controller';
 require('dotenv').config();
 
 
@@ -12,16 +11,15 @@ main();
 
 
 async function main() {
-    const state = new State();
-    const api = new APIFetcher(process.env.CLIENT_ID, process.env.CLIENT_SECRET);
-    const server = Server.init(frontEndPort, process.env.CLIENT_ID, process.env.CLIENT_SECRET, api);
-    const controller = new TrackController(state, api);
-    const sync = new Synchronizer(api, controller, state, true);
+    const state = new State(true);
+    const server = Server.init(frontEndPort, process.env.CLIENT_ID, process.env.CLIENT_SECRET, state.setAccessToken, true);
+    const controller = new TrackController();
+    const sync = new Synchronizer(controller, state, true);
     
-    await api.waitForToken();
+    await api.waitForToken(state);
     sync.initialize();
-    await delay(8000);
-    sync.terminate();
+    // await delay(8000);
+    // sync.terminate();
     
     // setTimeout(()=>{ sync.terminate(); }, 8000);
 }

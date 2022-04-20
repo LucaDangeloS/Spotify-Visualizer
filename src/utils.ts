@@ -1,12 +1,5 @@
 import State from "./state";
-// export function serialize(obj) {
-//     let str = [];
-//     for (let p in obj)
-//     if (obj.hasOwnProperty(p)) {
-//         str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
-//     }
-//     return str.join("&");
-// }
+import { analysisI, beatI, trackI } from "./types";
 
 /**
  * Method borrowed from https://github.com/zachwinter/kaleidosync
@@ -14,7 +7,7 @@ import State from "./state";
  * We must make sure the first beat starts at 0, and the last ends at the end of the track
  * Then convert all time data to ms.
  */
-export function normalizeIntervals (state: State, { track, analysis }) {
+export function normalizeIntervals (state: State, { track, analysis }: { track: trackI, analysis: analysisI }): void {
     if (state.visualizer.hasAnalysis) {
         const beats = analysis["beats"];
         const sections = analysis["sections"];
@@ -27,11 +20,11 @@ export function normalizeIntervals (state: State, { track, analysis }) {
             track.duration_ms / 1000 - beats[beats.length - 1].start;
 
         /** Convert every time value to milliseconds for our later convenience. */
-        beats.forEach(interval => {
+        beats.forEach((interval: beatI) => {
             interval.start = interval.start * 1000;
             interval.duration = interval.duration * 1000;
         });
-        sections.forEach(interval => {
+        sections.forEach((interval: beatI) => {
             interval.start = interval.start * 1000;
             interval.duration = interval.duration * 1000;
         });
