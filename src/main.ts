@@ -21,7 +21,7 @@ async function main() {
     // await delay(8000);
     // sync.terminate();
 
-    let c = colors.generateColorPalette(["red", "purple", "blue", "cyan", "green", "orange"], 60);
-    colors.pc(c)
+    let c = colors.generateColorPalette(["red", "purple", "blue", "cyan", "green", "orange"]);
+    colors.pc(c.colors(60))
     
 }

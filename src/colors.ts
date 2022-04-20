@@ -1,7 +1,7 @@
 import chroma from 'chroma-js';
 // https://gka.github.io/chroma.js/#color-scales
 
-export function generateColorPalette(colors : (string | chroma.Color)[], amount) : string[] {
+export function generateColorPalette(colors : (string | chroma.Color)[]) : chroma.Scale {
     if (colors === undefined || colors === null) return null;
     let lab_interpolation = false;
     let hues: number[] = [];
@@ -27,7 +27,7 @@ export function generateColorPalette(colors : (string | chroma.Color)[], amount)
         }
     }
 
-    return chroma.scale(colors).mode(lab_interpolation ? 'lab' : 'lrgb').colors(amount);
+    return chroma.scale(colors).mode(lab_interpolation ? 'lab' : 'lrgb');
 }
 
 export function complementary(color: (string | chroma.Color | number)) : string {
