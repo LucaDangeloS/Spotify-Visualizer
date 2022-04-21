@@ -1,5 +1,5 @@
 import State from "./state";
-import { analysisI, beatI, trackI } from "./types";
+import { analysisI, beatI, trackI } from "./state";
 
 /**
  * Method borrowed from https://github.com/zachwinter/kaleidosync

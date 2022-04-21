@@ -2,15 +2,33 @@ import { token_url, trackAnalysis_url, currentlyPlaying_url } from "./config/net
 import { syncOffsetThreshold } from "./config/config.json";
 import { delay, normalizeIntervals } from "./utils";
 import { readFileSync } from "fs";
-import State from "./state";
+import State, { progressInfoI, trackInfoI } from "./state";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import querystring from 'query-string';
-import { analysisI, ApiResponse, ApiStatusCode, refreshTokenResponseI, trackI } from './types';
-
+import { analysisI, trackI } from './state';
 /*
 * Many methods were borrowed from 
 * https://github.com/lukefredrickson/spotify-led-visualizer
 */
+
+export interface refreshTokenResponseI {
+    access_token: string, 
+    expires_in: number;
+}
+
+export enum ApiStatusCode {
+    Ok, // Next Ping
+    VizOff, // Start Viz
+    NoPlayback, // Stop Viz
+    ChangedPlayback, // SyncTrackProgress | track, analysis, progress, initialTimestamp
+    DeSynced, // SyncTrackProgress | progress, initialTimestamp
+    Unauthorized, // RefreshToken
+    Error, // Error
+};
+export interface ApiResponse {
+    status: ApiStatusCode,
+    data: trackInfoI | progressInfoI | AxiosResponse
+}
 
 // Spotify API Fetcher
 export async function testToken(state: State): Promise<boolean> {
@@ -125,7 +143,7 @@ export async function fetchCurrentlyPlaying(state: State): Promise<ApiResponse> 
 /**
  * figure out what to do, according to state and track data
  */
-async function processResponse(state: State, { track, playing, progress }) : Promise<ApiResponse>{ // TODO Add typing
+async function processResponse(state: State, { track, playing, progress }: {track: trackI, playing: boolean, progress: number}) : Promise<ApiResponse>{ 
     let songsInSync =
         JSON.stringify(state.trackInfo.currentlyPlaying) ===
         JSON.stringify(track);
@@ -144,7 +162,7 @@ async function processResponse(state: State, { track, playing, progress }) : Pro
         console.log(`Sync error: ${Math.round(progressStats.error)}ms\n`);
     }
 
-    let aux: number = playing + state.trackInfo.active;
+    let aux: number = Number(playing) + Number(state.trackInfo.active);
 
     switch (true) {
         // no track detected
@@ -154,7 +172,7 @@ async function processResponse(state: State, { track, playing, progress }) : Pro
 
         // track has changed
         case (aux == 2 && !songsInSync):
-            ret = await fetchTrackData(state, { track, progress });
+            ret = await fetchTrackData(state, { track: track, progress: progress });
             break;
 
         // track fell out of sync
@@ -171,7 +189,7 @@ async function processResponse(state: State, { track, playing, progress }) : Pro
             if (songsInSync)
                 ret = {status: ApiStatusCode.VizOff, data: null};
             else 
-                ret = await fetchTrackData(state, { track, progress });
+                ret = await fetchTrackData(state, { track: track, progress: progress });
             break;
 
         // track is stopped
@@ -192,7 +210,7 @@ async function processResponse(state: State, { track, playing, progress }) : Pro
 /**
  * gets the song analysis (beat intervals, etc) for the current song from the spotify API
  */
-async function fetchTrackData(state: State, { track, progress }): Promise<ApiResponse>{ // TODO Add typing
+async function fetchTrackData(state: State, { track, progress }: {track: trackI, progress: number}): Promise<ApiResponse>{
     // fetch the current time
     let timestamp = Date.now();
     let headers: any = {
@@ -213,7 +231,7 @@ async function fetchTrackData(state: State, { track, progress }): Promise<ApiRes
                 state.trackInfo.hasAnalysis = false;
             } else {
                 state.trackInfo.hasAnalysis = true;
-                normalizeIntervals(state, { track, analysis });
+                normalizeIntervals(state, { track: track, analysis });
             }
             // account for time to call api in initial timestamp
             var initialTimestamp = Date.now() - (Date.now() - timestamp);

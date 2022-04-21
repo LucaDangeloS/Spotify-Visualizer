@@ -1,6 +1,6 @@
 import { trackProgressTickRate, beatConfidence } from './config/config.json';
 import State from './state';
-import { analysisI, trackI } from './types';
+import { analysisI, trackI } from './state';
 
 /*
 * Many methods were borrowed and inspired 
@@ -49,7 +49,6 @@ export function stopVisualizer(state: State): void {
     stopTrackProgressLoop(state);
     // stop the beat loop if it's running
     stopBeatLoop(state);
-    // TODO send a reset signal to visualizers_sockets
 }
 
 /**

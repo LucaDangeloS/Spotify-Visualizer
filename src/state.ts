@@ -1,5 +1,44 @@
 import SocketIO from 'socket.io';
-import { analysisI, beatI, refreshTokenResponseI, sectionI, trackI } from './types';
+import { refreshTokenResponseI  } from './api_controller';
+
+export interface trackI {
+    id: string,
+    name: string,
+    duration_ms: number,
+    album: {
+        artists: {
+            name: string
+        }
+    }
+}
+
+export interface beatI {
+    confidence: number,
+    start: number, 
+    duration: number
+}
+
+export interface sectionI {
+    start: number,
+    duration: number,
+}
+
+export interface analysisI {
+    beats: Array<beatI>,
+    sections: Array<sectionI>
+}
+
+export interface trackInfoI {
+    progress: number,
+    initialTimestamp: number,
+    track: trackI,
+    analysis: analysisI
+}
+
+export interface progressInfoI {
+    progress: number,
+    initialTimestamp: number,
+}
 
 export default class State {
     trackInfo: TrackInfo = new TrackInfo();
