@@ -38,6 +38,11 @@ export function analogous(color: (string | chroma.Color | number), a: number) : 
     return chroma(color).set('hsl.h', a).hex();
 }
 
+// TODO Create a function that given a time and tickrate, shifts the color palette
+
+// TODO Create a function that returns the nearest entry point on the color cycle given a color
+
+// TODO Create a function that returns color sequence based on time and tickrate
 
 // Aux function for debugging
 export function pc(colors: (string)[]) {
