@@ -50,7 +50,7 @@ class TrackInfo {
 
     currentlyPlaying: trackI;
     trackAnalysis: analysisI;
-    hasAnalysis: boolean;
+    hasAnalysis: boolean = true;
 
     initialTimestamp: number = 0;
     initialTrackProgress: number = 0;

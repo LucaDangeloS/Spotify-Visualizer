@@ -125,7 +125,7 @@ export async function fetchCurrentlyPlaying(state: State): Promise<ApiResponse> 
 /**
  * figure out what to do, according to state and track data
  */
-async function processResponse(state: State, { track, playing, progress }) : Promise<ApiResponse>{
+async function processResponse(state: State, { track, playing, progress }) : Promise<ApiResponse>{ // TODO Add typing
     let songsInSync =
         JSON.stringify(state.trackInfo.currentlyPlaying) ===
         JSON.stringify(track);
@@ -192,7 +192,7 @@ async function processResponse(state: State, { track, playing, progress }) : Pro
 /**
  * gets the song analysis (beat intervals, etc) for the current song from the spotify API
  */
-async function fetchTrackData(state: State, { track, progress }): Promise<ApiResponse>{
+async function fetchTrackData(state: State, { track, progress }): Promise<ApiResponse>{ // TODO Add typing
     // fetch the current time
     let timestamp = Date.now();
     let headers: any = {
