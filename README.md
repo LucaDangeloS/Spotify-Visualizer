@@ -78,7 +78,7 @@ tsc
 - [ ] Implement color cycling
 - [ ] Optimize beat steps to omit the beats lower that then confidence threshold
 - [ ] Implement socket communication
-- [ ] Implement token refresh in mid-playback
+- [x] Implement token refresh in mid-playback
 - [ ] Standardize the message exchanges from server to visualizers
 - [ ] Add support for multiple visualizers
 - [ ] Make the webapp for parameters tweaking

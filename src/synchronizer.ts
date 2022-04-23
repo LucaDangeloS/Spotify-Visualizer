@@ -105,7 +105,8 @@ export default class Synchronizer {
             }
 
             case ApiStatusCode.Error: {
-                console.error(res.data);
+                if (this.verbose)
+                    console.error(res.data);
                 // process.exit(1);
                 break;
             }
