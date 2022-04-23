@@ -1,12 +1,13 @@
+import { baseUrl, frontEndPort, auth_url, token_url } from "./config/network-info.json";
 import express, { Router, Request, Response } from 'express';
-import * as http from "http";
-import cors from 'cors'
-import crypto from 'crypto';
+import axios, { AxiosError, AxiosResponse } from "axios";
+import { refreshTokenResponseI } from "./api_controller";
 import cookieParser from "cookie-parser";
 import querystring from "query-string";
-import { baseUrl, frontEndPort, auth_url, token_url } from "./config/network-info.json";
+import * as http from "http";
+import crypto from 'crypto';
+import cors from 'cors'
 import fs from "fs";
-import axios, { AxiosError, AxiosResponse } from "axios";
 // import { serialize } from "./utils";
 
 
@@ -125,16 +126,16 @@ class FlowRouter {
                 axios.post(token_url, querystring.stringify(body), {headers: headers})
                     .then((response: AxiosResponse) => {
                         if (response.status == 200) {
-                            let access_token = response.data.access_token;
+                            let tokenInfo: refreshTokenResponseI = response.data;
                             let refresh_token = response.data.refresh_token;
             
                             fs.writeFile('./token.txt', refresh_token, err => {
                                 if (err) { console.error("Error writing refresh_token to file: " + err); }
                             })
 
-                            accessTokenCallback(response.data);
+                            accessTokenCallback(tokenInfo);
                         
-                            res.redirect("/");
+                            res.redirect("/panel");
                         } else {
                             res.redirect(
                                 "/#" + querystring.stringify({ error: "invalid_token" })
@@ -143,7 +144,9 @@ class FlowRouter {
                     })
                     .catch((err: AxiosError) => {
                         console.log(err);
-                    })
+                    });
+
+                res.redirect("/panel");
             }
         });
     }

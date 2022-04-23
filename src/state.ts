@@ -67,7 +67,7 @@ export default class State {
         return this._expireTimestamp;
     }
 
-    constructor(verbose: boolean = false, beatCallback: Function = () => {}) {
+    constructor(beatCallback: Function = () => {}, verbose: boolean = false) {
         this.verbose = verbose;
         this.beatCallback = beatCallback;
     }

@@ -1,6 +1,6 @@
 import { trackProgressTickRate, beatConfidence } from './config/config.json';
-import State from './state';
-import { analysisI, trackI } from './state';
+import State, { analysisI, trackI } from './state';
+import { pingDelay } from './config/config.json';
 
 /*
 * Many methods were borrowed and inspired 
@@ -177,6 +177,7 @@ function calculateTrackProgress(state: State): void {
 }
 
 function calculateTimeUntilNextBeat(state: State): number {
+    if (state.trackInfo.activeBeat === null) return pingDelay/2;
     let activeBeatStart = state.trackInfo.activeBeat.start;
     let activeBeatDuration = state.trackInfo.activeBeat.duration;
     // console.log("Beat conf. " + state.trackInfo.activeBeat.confidence)

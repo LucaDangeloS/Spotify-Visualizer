@@ -4,7 +4,7 @@ import * as api from '../src/api_controller';
 require('dotenv').config();
 
 async function main() {
-    const state: State = new State(false,  () => {});
+    const state: State = new State(() => {}, false);
     let songs = [
         'Birthday',
         '11dFghVXANMlKmJXsNCbNl',
@@ -21,7 +21,9 @@ async function main() {
         'Outerbody',
         '6kLaAYcRc5x5AFrhALbxQN',
         'Apocalypse',
-        '0yc6Gst2xkRu0eMLeRMGCX'
+        '0yc6Gst2xkRu0eMLeRMGCX',
+        'Foggy Night',
+        '0pmeGyka9QOKtXhFtTZCFY'
     ];
     await api.waitForToken(state);
     let data = {};

@@ -13,15 +13,21 @@ main();
 
 
 async function main() {
-    const state = new State(true,  (state: State) => { console.log("BEAT - " + state.trackInfo.activeBeat.confidence + " " + state.trackInfo.activeBeatIndex) });
-    const server = Server.init(frontEndPort, process.env.CLIENT_ID, process.env.CLIENT_SECRET, state.setAccessToken, true);
-    const sync = new Synchronizer(state, true);
+    let verbose = false;
+    const state = new State((state: State) => {logBeat(state)} , verbose);
+    const server = Server.init(frontEndPort, process.env.CLIENT_ID, process.env.CLIENT_SECRET, state.setAccessToken, verbose);
+    const sync = new Synchronizer(state, verbose);
+    server.start();
     await api.waitForToken(state);
     sync.initialize();
     // await delay(8000);
     // sync.terminate();
 
-    let c = colors.generateColorPalette(["red", "purple", "blue", "cyan", "green", "orange"]);
-    colors.pc(c.colors(60))
+    // let c = colors.generateColorPalette(["red", "purple", "blue", "cyan", "green", "orange"]);
+    // colors.pc(c.colors(60))
     
+}
+
+function logBeat(state: State) {
+    console.log("BEAT - " + state.trackInfo.activeBeat?.confidence + " " + Math.floor(state.trackInfo.trackProgress / 1000));
 }

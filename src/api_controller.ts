@@ -56,11 +56,16 @@ export async function waitForToken(state: State, timeout: number = 10000): Promi
     }
     if (timeout <= 0) return false;
     if (!(await testToken(state))) {
-        await refreshToken(state);
-        await delay(sleep_time);
+        if (await refreshToken(state) == false) {
+            if (state.verbose)
+                console.log("The app needs manual authentication...")
+            await delay(sleep_time * 2);
+            return await waitForToken(state, timeout);
+        }
     } else {
         return true;
     }
+    await delay(sleep_time);
     return await waitForToken(state, timeout - sleep_time);
 }
 
@@ -80,7 +85,7 @@ export async function refreshToken(state: State): Promise<boolean> {
     }
     
     if (state.verbose) {
-        console.log("Refreshing token..." + headers);
+        console.log("Refreshing token...");
     }
     await axios.post(refresh_url, querystring.stringify(refresh_body), headers)
         .then((res: AxiosResponse) => {
@@ -89,7 +94,7 @@ export async function refreshToken(state: State): Promise<boolean> {
             ret = true;
         })
         .catch((err: AxiosError) => {
-            throw new Error(err.message);
+            ret = false;
         })
 
     return ret;
@@ -122,8 +127,8 @@ export async function fetchCurrentlyPlaying(state: State): Promise<ApiResponse> 
                 aux = {
                     track: response.data.item as trackI,
                     playing: response.data.is_playing,
-                    // account for time to call api in progress
-                    progress: response.data.progress_ms + (Date.now() - timestamp)
+                    // account for time to call api in progress (+)
+                    progress: response.data.progress_ms + (Date.now() - timestamp) // TODO Check
                 };
             }
         }).catch((err: AxiosError) => {
@@ -233,8 +238,8 @@ async function fetchTrackData(state: State, { track, progress }: {track: trackI,
                 state.trackInfo.hasAnalysis = true;
                 normalizeIntervals(state, { track: track, analysis });
             }
-            // account for time to call api in initial timestamp
-            var initialTimestamp = Date.now() - (Date.now() - timestamp);
+            // account for time to call api in initial timestamp (-)
+            var initialTimestamp = Date.now() - (Date.now() - timestamp); // TODO Check
 
             ret = {status: ApiStatusCode.ChangedPlayback, 
                 data: {
