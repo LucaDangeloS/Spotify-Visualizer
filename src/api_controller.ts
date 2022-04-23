@@ -36,7 +36,7 @@ export async function testToken(state: State): Promise<boolean> {
         headers: state.headers,
         json: true
     };
-    var s = -1;
+    let s = -1;
     // request the currently playing song from spotify API
     await axios.get(currentlyPlaying_url, headers)
         .then((response: AxiosResponse) => {
@@ -105,7 +105,7 @@ export async function refreshToken(state: State): Promise<boolean> {
  */
 export async function fetchCurrentlyPlaying(state: State): Promise<ApiResponse> {
     // grab the current time
-    var timestamp = Date.now();
+    let timestamp = Date.now();
     let headers: any = {
         headers: state.headers,
         json: true
@@ -128,7 +128,7 @@ export async function fetchCurrentlyPlaying(state: State): Promise<ApiResponse> 
                     track: response.data.item as trackI,
                     playing: response.data.is_playing,
                     // account for time to call api in progress (+)
-                    progress: response.data.progress_ms + (Date.now() - timestamp) // TODO Check
+                    progress: response.data.progress_ms + (Date.now() - timestamp)/2
                 };
             }
         }).catch((err: AxiosError) => {
@@ -182,7 +182,7 @@ async function processResponse(state: State, { track, playing, progress }: {trac
 
         // track fell out of sync
         case (aux == 2 && songsInSync && Math.abs(progressStats.error) > syncOffsetThreshold):
-            var initialTimestamp = Date.now();
+            let initialTimestamp = Date.now();
             ret = {
                 status: ApiStatusCode.DeSynced, 
                 data: {progress: progress, initialTimestamp: initialTimestamp}
@@ -239,8 +239,8 @@ async function fetchTrackData(state: State, { track, progress }: {track: trackI,
                 normalizeIntervals(state, { track: track, analysis });
             }
             // account for time to call api in initial timestamp (-)
-            var initialTimestamp = Date.now() - (Date.now() - timestamp); // TODO Check
-
+            let initialTimestamp = Date.now() - (Date.now() - timestamp)/2;
+            
             ret = {status: ApiStatusCode.ChangedPlayback, 
                 data: {
                     track: track,

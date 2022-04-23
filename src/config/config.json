@@ -5,6 +5,7 @@
     "modeConfidence": 0.23,
     "sectionsConfidence": 0.10,
     "pingDelay": 1000,
-    "syncOffsetThreshold": 50,
-    "trackProgressTickRate" : 10
+    "beatDelay": 0,
+    "syncOffsetThreshold": 20,
+    "trackProgressTickRate" : 5
 }

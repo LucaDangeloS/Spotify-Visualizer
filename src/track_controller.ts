@@ -89,9 +89,9 @@ export function stopBeatLoop(state: State): void {
         state.trackInfo.activeSectionIndex = 0;
 
         // grab state vars
-        var trackProgress = state.trackInfo.trackProgress;
-        var beats = state.trackInfo.trackAnalysis["beats"];
-        var sections = state.trackInfo.trackAnalysis["sections"]
+        let trackProgress = state.trackInfo.trackProgress;
+        let beats = state.trackInfo.trackAnalysis["beats"];
+        let sections = state.trackInfo.trackAnalysis["sections"]
         
         for (var i = 0; i < sections.length - 2; i++) {
             if (
