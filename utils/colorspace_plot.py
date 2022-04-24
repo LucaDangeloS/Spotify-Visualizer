@@ -74,13 +74,13 @@ def plot_colors(color_array, ax, type="hsl"):
             line_color = invert_rgb_color(*colorsys.hsv_to_rgb(h, s, 1))
             ax.plot([prev_h*360, h*360], [prev_s, s], color=line_color , linestyle='--', linewidth=1)
             if i == len(h_list) - 1:
-                ax.text(h*360, s, "End", fontsize=8, color="white", fontweight="bold")
+                ax.text(h*360 + 5, s + 0.1, "End", fontsize=8, color="white", fontweight="bold")
                 prev_h = h_list[0]
                 prev_s = s_list[0]
-                ax.plot([prev_h*360, h*360], [prev_s, s], linestyle=':', linewidth=1)
+                ax.plot([prev_h*360 - 5, h*360], [prev_s, s], linestyle=':', linewidth=1)
                 
         elif i == 0:
-            ax.text(h*360, s, "Start", fontsize=8, color="white", fontweight="bold")
+            ax.text(h*360 - 5, s - 0.1, "Start", fontsize=8, color="white", fontweight="bold")
 
 
 def plot_colors_3d(color_array, ax, type="hsl"):
@@ -109,14 +109,14 @@ def plot_colors_3d(color_array, ax, type="hsl"):
             prev_z = l_list[i-1]
             ax.plot3D([prev_x*360, x*360], [prev_y, y], [prev_z, z], color=colorsys.hsv_to_rgb(x, y, z) , linestyle='--', linewidth=1)
             if i == len(h_list) - 1:
-                ax.text(x*360, y, z, "End", (1, 1, 0),fontsize=8, color="black", fontweight="bold")
+                ax.text(x*360 + 5, y+0.1, z, "End", (1, 1, 0),fontsize=8, color="black", fontweight="bold")
                 prev_x = h_list[0]
                 prev_y = s_list[0]
                 prev_z = l_list[0]
                 ax.plot3D([prev_x*360, x*360], [prev_y, y], [prev_z, z], linestyle=':', linewidth=1)
 
         elif i == 0:
-            ax.text(x*360, y, z, "Start", (1, 1, 0), fontsize=8, color="black", fontweight="bold")
+            ax.text(x*360 - 5, y-0.1, z, "Start", (1, 1, 0), fontsize=8, color="black", fontweight="bold")
 
     ax.view_init(45, -90)
 
@@ -148,66 +148,106 @@ def plot(palette, color_type, plot_type):
 import seaborn as sns
 # palette = sns.color_palette('Spectral', 300)
 palette = [
-"#ff0000" ,
-"#f50029" ,
-"#eb003a" ,
-"#e00047" ,
-"#d50052" ,
-"#c9005b" ,
-"#bc0064" ,
-"#ae006c" ,
-"#a00073" ,
-"#8f007a" ,
-"#7f0083" ,
-"#780095" ,
-"#7100a5" ,
-"#6900b3" ,
-"#6100c0" ,
-"#5800cd" ,
-"#4e00d9" ,
-"#4300e4" ,
-"#3500ee" ,
-"#2100f8" ,
-"#002fff" ,
-"#005eff" ,
-"#007cff" ,
-"#0094ff" ,
-"#00a9ff" ,
-"#00bcff" ,
-"#00cdff" ,
-"#00dcff" ,
-"#00ebff" ,
-"#00f8ff" ,
-"#00faf8" ,
-"#00f0eb" ,
-"#00e5dc" ,
-"#00dacd" ,
-"#00cfbc" ,
-"#00c2a9" ,
-"#00b594" ,
-"#00a77c" ,
-"#00985e" ,
-"#00862f" ,
-"#428300" ,
-"#698700" ,
-"#858b00" ,
-"#9c8f00" ,
-"#b09300" ,
-"#c29600" ,
-"#d29a00" ,
-"#e19e00" ,
-"#efa100" ,
-"#fda400" ,
-"#ff9e00" ,
-"#ff9500" ,
-"#ff8b00" ,
-"#ff8100" ,
-"#ff7600" ,
-"#ff6900" ,
-"#ff5b00" ,
-"#ff4a00" ,
-"#ff3500" ,
-"#ff0000"
+"#193737",
+"#1b383b",
+"#1c393e",
+"#1e3a41",
+"#1f3b44",
+"#213c47",
+"#223d4a",
+"#233e4d",
+"#243f50",
+"#264052",
+"#274155",
+"#284257",
+"#294359",
+"#2a435c",
+"#2b445e",
+"#2c4560",
+"#2d4662",
+"#2e4764",
+"#2f4866",
+"#304868",
+"#31496a",
+"#324a6c",
+"#334b6e",
+"#344c70",
+"#344c72",
+"#394d72",
+"#454b70",
+"#50496e",
+"#59486b",
+"#614669",
+"#694466",
+"#704363",
+"#774161",
+"#7d3f5e",
+"#843d5b",
+"#893b58",
+"#8f3955",
+"#943752",
+"#9a354e",
+"#9f324b",
+"#a33047",
+"#a82d44",
+"#ad2b3f",
+"#b1283b",
+"#b62536",
+"#ba2131",
+"#be1d2b",
+"#c21925",
+"#c6141d",
+"#ca0c11",
+"#cd1706",
+"#cf2808",
+"#d03309",
+"#d23c0a",
+"#d4440b",
+"#d54b0c",
+"#d7520d",
+"#d9580e",
+"#da5d0f",
+"#dc630f",
+"#dd6810",
+"#df6c11",
+"#e17111",
+"#e27512",
+"#e47a13",
+"#e57e13",
+"#e78214",
+"#e88614",
+"#ea8915",
+"#eb8d15",
+"#ed9116",
+"#ee9416",
+"#f09817",
+"#f19b17",
+"#f39e18",
+"#ef9d19",
+"#ea9a1b",
+"#e5971d",
+"#e0941f",
+"#db9120",
+"#d58e22",
+"#d08b23",
+"#ca8725",
+"#c48426",
+"#be8127",
+"#b87d28",
+"#b1792a",
+"#aa762b",
+"#a3722c",
+"#9c6e2d",
+"#94692e",
+"#8c652f",
+"#836130",
+"#7a5c31",
+"#6f5732",
+"#645133",
+"#584c34",
+"#494535",
+"#373f36",
+"#193737",
 ]
 plot(palette, 'hex', 'both')
 

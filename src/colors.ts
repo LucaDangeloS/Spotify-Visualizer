@@ -96,10 +96,13 @@ export function makeDistanceTransitionOffset(palette: (string)[], color: string,
 }
 
 // Aux function for debugging
-export function pc(colors: (string)[]) {
+export function pc(colors: (string)[], python_mode: boolean = false) : string {
     if (colors === undefined || colors === null) return null;
     for (let i = 0; i < colors.length; i++) {
-        console.log(colors[i]);
+        if (python_mode)
+            console.log(`"${colors[i]}",`);
+        else
+            console.log(colors[i]);
     }
 }
 

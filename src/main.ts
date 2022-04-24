@@ -21,33 +21,11 @@ async function main() {
     // sync.initialize();
     // await delay(8000);
     // sync.terminate();
-    let c = colors.generateColorPalette(["purple", "darkred", "darkblue", "red"]);
-    let cs: string[] = c.colors(50);
+    let c = colors.generateColorPalette(["#193737", "#354D73", "#CC0605", "#F39F18"]);
+    let cs: string[] = c.colors(100);
     // colors.pc(cs)
     
-    let idx = Math.random();
-    let idxW = Math.round(idx * cs.length);
-
-    let shiftedColor: string = colors.complementary(c(idx));
-    let interpolation;
-
-    let startTime = performance.now();
-    console.log("Distance Transition")
-    for (let i = 0; i < 900; i++) {
-        interpolation = colors.makeDistanceTransitionOffset(cs, shiftedColor, idxW, i);
-        console.log(interpolation.length);
-    }
-    console.log("Time transition")
-    for (let i = 0; i < 3000; i++) {
-        interpolation = colors.makeTimeTransitionOffset(cs, shiftedColor, idxW, i, 5);
-        console.log(interpolation.length);  
-    }
-    
-    let endTime = performance.now();
-
-    console.log(`Call took ${endTime - startTime} milliseconds`)
-    // colors.getChroma(interpolation);
-    // console.log("\n\n");
+    colors.pc(cs)
 }
 
 function logBeat(state: State) {
