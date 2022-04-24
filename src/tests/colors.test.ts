@@ -97,7 +97,7 @@ describe('Color palette manipulation', function() {
         let offsetColor = colorPalette[idx + 1]
 
         let transition = colors.makeDistanceTransitionOffset(colorPalette, splitColor, idx, 180);
-        expect(transition.length).toEqual(2);
+        expect(transition.length).toBeLessThanOrEqual(2);
         expect(colorPalette[0]).toEqual(offsetColor);
         
         transition = colors.makeDistanceTransitionOffset(colorPalette, splitColor, idx, 5);
@@ -106,4 +106,30 @@ describe('Color palette manipulation', function() {
         expect(transition[transition.length - 1]).toEqual(colorPalette[colorPalette.length - 1]);
     });
 
+
+    test('Exhaustive Time Shift', () => {
+        let c = colors.generateColorPalette(["purple", "darkred", "darkblue", "red"]);
+        let cs: string[] = c.colors(50);
+        let idx = Math.random();
+        let idxW = Math.round(idx * cs.length);
+        let shiftedColor: string = colors.complementary(c(idx));
+        let interpolation;
+
+        for (let i = 0; i < 3000; i++) {
+            interpolation = colors.makeTimeTransitionOffset(cs, shiftedColor, idxW, i, 5);
+        }
+    });
+
+    test('Exhaustive Distance Shift', () => {
+        let c = colors.generateColorPalette(["purple", "darkred", "darkblue", "red"]);
+        let cs: string[] = c.colors(50);
+        let idx = Math.random();
+        let idxW = Math.round(idx * cs.length);
+        let shiftedColor: string = colors.complementary(c(idx));
+        let interpolation;
+
+        for (let i = 0; i < 900; i++) {
+            interpolation = colors.makeDistanceTransitionOffset(cs, shiftedColor, idxW, i);
+        }
+    });
 });

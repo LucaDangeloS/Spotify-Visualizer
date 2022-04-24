@@ -24,7 +24,6 @@ export function generateColorPalette(colors : (string | chroma.Color)[], loop: b
             let diff: number = Math.abs(hues[i] - hues[i + 1]);
             if (Math.abs(diff - 180) < 20) {
                 lab_interpolation = true;
-                console.log("Using LAB interpolation");
                 break;
             }
         }
@@ -62,6 +61,8 @@ export function sequence(palette: (string)[], index: number, time: number, tickr
 // given a palette and a color, offsets the palette and gives the color rotation for a smooth entry point at the index 0 of the palette,
 // taking time * timeFactor for the transition to complete
 export function makeTimeTransitionOffset(palette: (string)[], color: string, index: number, time: number, tickrate: number, timeFactor: number = 0.6) : string[] {
+    if (tickrate <= 0)
+        tickrate = 5;
     let steps: number = Math.round((time * timeFactor) / tickrate);
     let new_index: number;
     // if (Math.abs((steps % palette.length) - index) <= 0.1*palette.length)
@@ -80,10 +81,10 @@ export function makeTimeTransitionOffset(palette: (string)[], color: string, ind
 // given a palette and a color, offsets the palette and gives the color rotation for a smooth entry point at the index 0 of the palette,
 // taking n steps based on the distance of the colors
 export function makeDistanceTransitionOffset(palette: (string)[], color: string, index: number, colorSteps: number = null): string[] {
-    if (colorSteps === null){
+    if (colorSteps === null || colorSteps <= 0){
         colorSteps = Math.round(chroma.distance(palette[index], palette[(index + 1) % palette.length]));
     }
-    let steps: number = Math.round(chroma.distance(palette[index], color) / colorSteps);
+    let steps: number = Math.floor(chroma.distance(palette[index], color) / colorSteps);
     let new_index: number = (index + steps) % palette.length;
     let transition: string[] = generateColorPalette([color, palette[new_index]], false).colors(steps);
 
