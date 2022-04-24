@@ -35,7 +35,9 @@ def convert_colors(color_array, c_type):
         if c_type == 'rgb':
             h[i], s[i], v[i] = colorsys.rgb_to_hsv(color[0]*255, color[1]*255, color[2]*255)
         elif c_type == 'hex':
-            h[i], s[i], v[i] = colorsys.hex_to_hsv(color)
+            color = color.strip('#')
+            (r ,g ,b) = tuple(int(color[i:i+2], 16) for i in (0, 2, 4))
+            h[i], s[i], v[i] = colorsys.rgb_to_hsv(r, g, b)
         elif c_type == 'hsl':
             h[i], s[i], v[i] = color
         
@@ -144,13 +146,75 @@ def plot(palette, color_type, plot_type):
 
 # Example usage
 import seaborn as sns
-palette = sns.color_palette('Spectral', 300)
-plot(palette, 'rgb', 'both')
+# palette = sns.color_palette('Spectral', 300)
+palette = [
+"#ff0000" ,
+"#f50029" ,
+"#eb003a" ,
+"#e00047" ,
+"#d50052" ,
+"#c9005b" ,
+"#bc0064" ,
+"#ae006c" ,
+"#a00073" ,
+"#8f007a" ,
+"#7f0083" ,
+"#780095" ,
+"#7100a5" ,
+"#6900b3" ,
+"#6100c0" ,
+"#5800cd" ,
+"#4e00d9" ,
+"#4300e4" ,
+"#3500ee" ,
+"#2100f8" ,
+"#002fff" ,
+"#005eff" ,
+"#007cff" ,
+"#0094ff" ,
+"#00a9ff" ,
+"#00bcff" ,
+"#00cdff" ,
+"#00dcff" ,
+"#00ebff" ,
+"#00f8ff" ,
+"#00faf8" ,
+"#00f0eb" ,
+"#00e5dc" ,
+"#00dacd" ,
+"#00cfbc" ,
+"#00c2a9" ,
+"#00b594" ,
+"#00a77c" ,
+"#00985e" ,
+"#00862f" ,
+"#428300" ,
+"#698700" ,
+"#858b00" ,
+"#9c8f00" ,
+"#b09300" ,
+"#c29600" ,
+"#d29a00" ,
+"#e19e00" ,
+"#efa100" ,
+"#fda400" ,
+"#ff9e00" ,
+"#ff9500" ,
+"#ff8b00" ,
+"#ff8100" ,
+"#ff7600" ,
+"#ff6900" ,
+"#ff5b00" ,
+"#ff4a00" ,
+"#ff3500" ,
+"#ff0000"
+]
+plot(palette, 'hex', 'both')
 
 import matplotlib
 from colorspace import specplot
-res = map(lambda x: matplotlib.colors.to_hex(x), palette)
-palette = list(res)
+# res = map(lambda x: matplotlib.colors.to_hex(x), palette)
+# palette = list(res)
 specplot(palette, rgb=True)
 
 ## Info
