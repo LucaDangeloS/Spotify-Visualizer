@@ -75,10 +75,10 @@ tsc
 ```
 
 # TODOs
-- [ ] Implement color cycling
+- [x] Implement color cycling
+- [x] Implement token refresh in mid-playback
 - [ ] Optimize beat steps to omit the beats lower that then confidence threshold
 - [ ] Implement socket communication
-- [x] Implement token refresh in mid-playback
 - [ ] Standardize the message exchanges from server to visualizers
 - [ ] Add support for multiple visualizers
 - [ ] Make the webapp for parameters tweaking
