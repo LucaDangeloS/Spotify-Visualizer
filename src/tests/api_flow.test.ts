@@ -1,6 +1,5 @@
-import State from 'state';
-import { ApiStatusCode } from 'types';
-import * as api from 'api_controller';
+import State from '../state';
+import * as api from '../api_controller';
 import fs  from 'fs';
 
 require('dotenv').config();
@@ -20,6 +19,6 @@ describe('API flow tests', function() {
       let res = null
       res = await api.fetchCurrentlyPlaying(state);
       expect(res).not.toBeNull();
-      expect(res).not.toBe({status: ApiStatusCode.Error, data: null});
+      expect(res).not.toBe({status: api.ApiStatusCode.Error, data: null});
     });
   });
