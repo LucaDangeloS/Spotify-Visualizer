@@ -50,7 +50,7 @@ Also looking forward to adding HUE support in a future.
 <br><br/>
 ## Dependencies
 Install all node dependencies executing this in the root directory
-```
+```console
 npm install
 ```
 <br><br/>
@@ -65,12 +65,12 @@ You can get them [here](https://developer.spotify.com/dashboard/applications), c
 <br><br/>
 ## Usage
 The server can be executed with:
-```
+```console
 npm start
 ```
 
 Or compiled with:
-```
+```console
 tsc
 ```
 
