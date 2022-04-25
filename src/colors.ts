@@ -1,6 +1,12 @@
 import chroma from 'chroma-js';
 // https://gka.github.io/chroma.js/#color-scales
 
+/**
+ * Generates a color palette
+ * @param {string | chroma.Color} colors - colors to be used to generate the palette
+ * @param {boolean} loop - If palette should be looped
+ * @returns {chroma.Scale} A chroma scale palette
+ */
 export function generateColorPalette(colors : (string | chroma.Color)[], loop: boolean = true) : chroma.Scale {
     if (colors === undefined || colors === null) 
         throw new Error("No valid color provided");
@@ -17,8 +23,8 @@ export function generateColorPalette(colors : (string | chroma.Color)[], loop: b
         }
         
         // collect the hues of the colors
-        colors.forEach(color => { hues.push(chroma(color).hsl()[0]); });
-
+        hues.map(color => { return chroma(color).hsl()[0] });
+        
         // check if any color makes a near 180 degrees rotation in the hue wheel
         for (let i = 0; i < hues.length - 1; i++) {
             let diff: number = Math.abs(hues[i] - hues[i + 1]);
@@ -31,11 +37,22 @@ export function generateColorPalette(colors : (string | chroma.Color)[], loop: b
     return chroma.scale(colors).mode(lab_interpolation ? 'lab' : 'lrgb');
 }
 
+/**
+ * Generate the complementary color in hex of a given color
+ * @param {string | chroma.Color | number} color 
+ * @returns {string} Complementary color
+ */
 export function complementary(color: (string | chroma.Color | number)) : string {
     if (color === undefined || color === null) return null;
     return chroma(color).set('hsl.h', '+180').hex();
 }
 
+/**
+ * Generate 2 analogous colors (left and right) in hex of a given color
+ * @param {string | chroma.Color | number} color 
+ * @param {number} a - Angle 
+ * @returns {left: string, right: string} Analogous colors
+ */
 export function analogous(color: (string | chroma.Color | number), a: number) : {left: string, right: string} {
     if (color === undefined || color === null) return null;
     let c = chroma(color);
@@ -44,7 +61,15 @@ export function analogous(color: (string | chroma.Color | number), a: number) : 
 
 
 
-// given a time and tickrate, shifts the color palette
+/**
+ * 
+ * Given a time and tickrate, shifts the color palette
+ * @param palette 
+ * @param index 
+ * @param time 
+ * @param tickrate 
+ * @returns {number} index
+ */
 export function shift(palette: (string)[], index: number, time: number, tickrate: number) : number {
     if (palette === undefined || palette === null) return null;
     let displacement: number = Math.round(time / tickrate);
@@ -58,8 +83,18 @@ export function sequence(palette: (string)[], index: number, time: number, tickr
     return {rotation: palette.slice(index, new_index), idx: new_index};
 }
 
-// given a palette and a color, offsets the palette and gives the color rotation for a smooth entry point at the index 0 of the palette,
-// taking time * timeFactor for the transition to complete
+
+/**
+ * Given a palette and a color, offsets the palette and gives the color rotation for a smooth entry point at the index 0 of the palette,
+ * taking time * timeFactor for the transition to complete.
+ * @param {string[]} palette - The color palette in hex format
+ * @param {string} color - Color from which to rotate
+ * @param {number} index - Current index at the palette
+ * @param {number} time - Time that the transition will take
+ * @param {number} tickrate - Time at which the time ticks
+ * @param {number} timeFactor - Factor from 0.0 to 1.0 from which the time will be consumed on the transition
+ * @returns {string[]} Color transition array in hex format
+ */
 export function makeTimeTransitionOffset(palette: (string)[], color: string, index: number, time: number, tickrate: number, timeFactor: number = 0.6) : string[] {
     if (tickrate <= 0)
         tickrate = 5;
@@ -73,13 +108,22 @@ export function makeTimeTransitionOffset(palette: (string)[], color: string, ind
 
     // palette modification
     let prev: string[] = palette.splice(0, new_index + 1);
+
     palette.push(...prev);
 
     return transition;
 }
 
-// given a palette and a color, offsets the palette and gives the color rotation for a smooth entry point at the index 0 of the palette,
-// taking n steps based on the distance of the colors
+/**
+ * 
+ * Given a palette and a color, offsets the palette and gives the color rotation for a smooth entry point at the index 0 of the palette,
+ * taking n steps based on the distance of the colors.
+ * @param {string[]} palette - The color palette in hex format
+ * @param {string} color - Color from which to rotate
+ * @param {number} index - Current index at the palette
+ * @param {number} colorSteps - Number of steps to take in the transition 
+ * @returns {string[]} Color transition array in hex format
+ */
 export function makeDistanceTransitionOffset(palette: (string)[], color: string, index: number, colorSteps: number = null): string[] {
     if (colorSteps === null || colorSteps <= 0){
         colorSteps = Math.round(chroma.distance(palette[index], palette[(index + 1) % palette.length]));

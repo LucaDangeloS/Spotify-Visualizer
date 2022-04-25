@@ -241,7 +241,8 @@ async function fetchTrackData(state: State, { track, progress }: {track: trackI,
             // account for time to call api in initial timestamp (-)
             let initialTimestamp = Date.now() - (Date.now() - timestamp)/2;
             
-            ret = {status: ApiStatusCode.ChangedPlayback, 
+            ret = {
+                status: ApiStatusCode.ChangedPlayback, 
                 data: {
                     track: track,
                     analysis: analysis,

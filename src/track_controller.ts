@@ -1,27 +1,29 @@
-import { trackProgressTickRate, beatConfidence } from './config/config.json';
-import State, { analysisI, trackI } from './state';
-import { pingDelay } from './config/config.json';
+import { trackProgressTickRate, beatConfidence } from "./config/config.json";
+import State, { analysisI, trackI } from "./state";
+import { pingDelay } from "./config/config.json";
 
 /*
-* Many methods were borrowed and inspired 
-* from https://github.com/lukefredrickson/spotify-led-visualizer
-*/
+ * Many methods were borrowed and inspired
+ * from https://github.com/lukefredrickson/spotify-led-visualizer
+ */
 
 // -- Public functions -- //
 /**
  * Sets the currently playing song and track analysis in state
  */
-export function setCurrentlyPlaying(state: State, track: trackI, analysis: analysisI): void {
+export function setCurrentlyPlaying(
+    state: State,
+    track: trackI,
+    analysis: analysisI
+): void {
     state.trackInfo.currentlyPlaying = track;
     state.trackInfo.trackAnalysis = analysis;
 
     startVisualizer(state);
-    
-    if (state.verbose){
+
+    if (state.verbose) {
         console.log(
-            `Now playing: ${
-                state.trackInfo.currentlyPlaying.album.artists[0].name
-            } – ${state.trackInfo.currentlyPlaying.name}`
+            `Now playing: ${state.trackInfo.currentlyPlaying.album.artists[0].name} – ${state.trackInfo.currentlyPlaying.name}`
         );
     }
 }
@@ -54,7 +56,11 @@ export function stopVisualizer(state: State): void {
 /**
  * resets any track progress approximation loop currently running and begins a new loop
  */
-export function syncTrackProgress(state: State, initialProgress: number, initialTimestamp: number): void {
+export function syncTrackProgress(
+    state: State,
+    initialProgress: number,
+    initialTimestamp: number
+): void {
     state.trackInfo.initialTimestamp = initialTimestamp;
     // stop the track progress update loop
     stopTrackProgressLoop(state);
@@ -80,7 +86,7 @@ export function stopBeatLoop(state: State): void {
 /**
  * Manages the beat fire loop and detection of the active beat.
  */
-    export function syncBeats(state: State) {
+export function syncBeats(state: State) {
     if (state.trackInfo.hasAnalysis) {
         // reset the active beat
         state.trackInfo.activeBeat = null;
@@ -90,9 +96,9 @@ export function stopBeatLoop(state: State): void {
 
         // grab state vars
         let trackProgress = state.trackInfo.trackProgress;
-        let beats = state.trackInfo.trackAnalysis["beats"];
-        let sections = state.trackInfo.trackAnalysis["sections"]
-        
+        let beats = state.trackInfo.trackAnalysis.beats;
+        let sections = state.trackInfo.trackAnalysis.sections;
+
         for (var i = 0; i < sections.length - 2; i++) {
             if (
                 trackProgress > sections[i].start &&
@@ -136,34 +142,33 @@ function startTrackProgressLoop(state: State): void {
 
 function stageBeat(state: State): void {
     //set the timeout id to a variable in state for convenient loop cancellation.
-    state.loops.beatLoop = setTimeout(
-        () => {
-            state.beatCallback(state)
-            incrementBeat(state);
-        },
-        calculateTimeUntilNextBeat(state)
-    );
+    state.loops.beatLoop = setTimeout(() => {
+        state.beatCallback(state);
+        incrementBeat(state);
+    }, calculateTimeUntilNextBeat(state));
 }
 
 function incrementBeat(state: State) {
-
-    let beats = state.trackInfo.trackAnalysis["beats"];
-    let sections = state.trackInfo.trackAnalysis["sections"]
+    let beats = state.trackInfo.trackAnalysis.beats;
+    let sections = state.trackInfo.trackAnalysis.sections;
     let lastBeatIndex = state.trackInfo.activeBeatIndex;
     let lastSectionIndex = state.trackInfo.activeSectionIndex;
 
-    if (state.trackInfo.activeSectionIndex < sections.length - 1 &&
-        state.trackInfo.trackProgress >= sections[lastSectionIndex].start + sections[lastSectionIndex].duration) 
-        {
-            state.trackInfo.activeSectionIndex += 1;
-            state.trackInfo.activeSection = sections[state.trackInfo.activeSectionIndex]
+    if (
+        state.trackInfo.activeSectionIndex < sections.length - 1 &&
+        state.trackInfo.trackProgress >=
+            sections[lastSectionIndex].start +
+                sections[lastSectionIndex].duration
+    ) {
+        state.trackInfo.activeSectionIndex += 1;
+        state.trackInfo.activeSection =
+            sections[state.trackInfo.activeSectionIndex];
     }
     // if the last beat index is the last beat of the song, stop beat loop
     if (beats.length - 1 !== lastBeatIndex) {
         // stage the beat
         stageBeat(state);
 
-        
         // update the active beat to be the next beat
         state.trackInfo.activeBeatIndex = lastBeatIndex + 1;
         state.trackInfo.activeBeat = beats[state.trackInfo.activeBeatIndex];
@@ -177,7 +182,7 @@ function calculateTrackProgress(state: State): void {
 }
 
 function calculateTimeUntilNextBeat(state: State): number {
-    if (state.trackInfo.activeBeat === null) return pingDelay/2;
+    if (state.trackInfo.activeBeat === null) return pingDelay / 2;
     let activeBeatStart = state.trackInfo.activeBeat.start;
     let activeBeatDuration = state.trackInfo.activeBeat.duration;
     // console.log("Beat conf. " + state.trackInfo.activeBeat.confidence)

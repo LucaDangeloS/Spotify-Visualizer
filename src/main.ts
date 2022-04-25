@@ -22,10 +22,10 @@ async function main() {
     // await delay(8000);
     // sync.terminate();
     let c = colors.generateColorPalette(["#193737", "#354D73", "#CC0605", "#F39F18"]);
-    let cs: string[] = c.colors(100);
+    // let cs: string[] = c.colors(100);
     // colors.pc(cs)
     
-    colors.pc(cs)
+    // colors.pc(cs)
 }
 
 function logBeat(state: State) {
