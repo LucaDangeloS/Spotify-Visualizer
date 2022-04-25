@@ -1,9 +1,9 @@
-import * as TrackController from './track_controller';
-import { pingDelay } from './config/config.json';
-import * as api from './api_controller';
-import State from './state';
-import { ApiResponse, ApiStatusCode } from './api_controller';
-import { trackInfoI, progressInfoI } from './state';
+import * as TrackController from "./track_controller";
+import { pingDelay } from "./config/config.json";
+import * as api from "./api_controller";
+import State from "./state";
+import { ApiResponse, ApiStatusCode } from "./api_controller";
+import { trackInfoI, progressInfoI } from "./state";
 
 export default class Synchronizer {
     private verbose: boolean = false;
@@ -33,16 +33,20 @@ export default class Synchronizer {
 
     // -- Private methods -- //
     /**
-     * Establishes ping loop to query current track progress 
+     * Establishes ping loop to query current track progress
      */
     private async ping(): Promise<void> {
         let res = await api.fetchCurrentlyPlaying(this.state);
         this.processResponse(res);
-        this.pingLoop = setTimeout(() => { this.ping() }, pingDelay);
+        this.pingLoop = setTimeout(() => {
+            this.ping();
+        }, pingDelay);
     }
 
     private startPingLoop(): void {
-        this.pingLoop = setTimeout(() => { this.ping() }, pingDelay);
+        this.pingLoop = setTimeout(() => {
+            this.ping();
+        }, pingDelay);
     }
 
     private stopPingLoop(): void {
@@ -105,8 +109,7 @@ export default class Synchronizer {
             }
 
             case ApiStatusCode.Error: {
-                if (this.verbose)
-                    console.error(res.data);
+                if (this.verbose) console.error(res.data);
                 // process.exit(1);
                 break;
             }

@@ -10,6 +10,9 @@ import { pingDelay } from "./config/config.json";
 // -- Public functions -- //
 /**
  * Sets the currently playing song and track analysis in state
+ * @param {State} state Current application state
+ * @param {trackI} track Track to set in state
+ * @param {analysisI} analysis Analysis of the current song
  */
 export function setCurrentlyPlaying(
     state: State,
@@ -42,6 +45,7 @@ export function startVisualizer(state: State): void {
 
 /**
  * sets visualizer to inactive, terminates beat loop, and turns off led strip
+ * @param {State} state
  */
 export function stopVisualizer(state: State): void {
     if (state.verbose) {
