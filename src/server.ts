@@ -1,23 +1,33 @@
-import { baseUrl, frontEndPort, auth_url, token_url } from "./config/network-info.json";
-import express, { Router, Request, Response } from 'express';
+import {
+    baseUrl,
+    frontEndPort,
+    auth_url,
+    token_url,
+} from "./config/network-info.json";
+import express, { Router, Request, Response } from "express";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { refreshTokenResponseI } from "./api_controller";
 import cookieParser from "cookie-parser";
 import querystring from "query-string";
 import * as http from "http";
-import crypto from 'crypto';
-import cors from 'cors'
+import crypto from "crypto";
+import cors from "cors";
 import fs from "fs";
 // import { serialize } from "./utils";
 
-
 // Main Front-End Server with auth flow
 export default class Server {
-    private app : express.Application;
+    private app: express.Application;
     private verbose: boolean = false;
     public server: http.Server = null;
 
-    constructor(public readonly port: number, client_id: string, client_secret: string, tokenCallback: Function, verbose?: boolean) {
+    constructor(
+        public readonly port: number,
+        client_id: string,
+        client_secret: string,
+        tokenCallback: Function,
+        verbose?: boolean
+    ) {
         this.verbose = verbose;
         this.port = port;
         this.app = express()
@@ -31,7 +41,7 @@ export default class Server {
         if (this.server == null)
             this.server = this.app.listen(this.port, () => {
                 if (this.verbose) {
-                    console.log("Server started on port " + this.port)
+                    console.log("Server started on port " + this.port);
                 }
             });
     }
@@ -40,41 +50,50 @@ export default class Server {
         if (this.server != null)
             this.server.close(() => {
                 if (this.verbose) {
-                    console.log("Server closed")
+                    console.log("Server closed");
                 }
             });
     }
 
-    static init(port: number, client_id: string, client_secret: string, apiHook: Function, verbose?: boolean): Server { 
+    static init(
+        port: number,
+        client_id: string,
+        client_secret: string,
+        apiHook: Function,
+        verbose?: boolean
+    ): Server {
         return new Server(port, client_id, client_secret, apiHook, verbose);
     }
-
 }
 
 // FlowRouter from Front-End server
 class FlowRouter {
-    public router : Router;
+    public router: Router;
 
-    constructor(client_id: string, client_secret: string, accessTokenCallback: Function) {
+    constructor(
+        client_id: string,
+        client_secret: string,
+        accessTokenCallback: Function
+    ) {
         this.router = Router();
         const stateKey = "spotify_auth_state";
-        const redirect_uri: string =  `${baseUrl}:${frontEndPort}/callback`;
+        const redirect_uri: string = `${baseUrl}:${frontEndPort}/callback`;
 
         this.router.get("/", (req: Request, res: Response) => {
             res.sendFile(__dirname + "/public/index.html");
         });
 
-        this.router.get("/login", (req: Request , res: Response) => {
+        this.router.get("/login", (req: Request, res: Response) => {
             //initialize random state ID and store in cookie
             let state = crypto.randomBytes(16).toString("hex");
             res.cookie(stateKey, state);
 
             // your application requests authorization
             let scope = "user-read-currently-playing";
-        
+
             // whether the user must reauthorize upon every login
             let showDialog = true;
-        
+
             //redirect to spotify authorization page
             res.redirect(
                 auth_url +
@@ -84,17 +103,17 @@ class FlowRouter {
                         scope: scope,
                         redirect_uri: redirect_uri,
                         state: state,
-                        show_dialog: showDialog
+                        show_dialog: showDialog,
                     })
             );
         });
 
-        this.router.get("/callback", (req: Request , res: Response) => {
+        this.router.get("/callback", (req: Request, res: Response) => {
             //get authorization code contained in Spotify's callback request
             let code = req.query.code || null;
             let state = req.query.state || null;
             let storedState = req.cookies ? req.cookies[stateKey] : null;
-            
+
             //check that state contained in Spotify's callback matches original request state
             //this prevents cross-site request forgery
             //if state doesn't match, redirect to error page
@@ -103,7 +122,7 @@ class FlowRouter {
                     "/#" + querystring.stringify({ error: "state_mismatch" })
                 );
             }
-        
+
             //if state matches, continue on!
             else {
                 //clear the state cookie
@@ -114,31 +133,51 @@ class FlowRouter {
                 let body = {
                     code: code,
                     redirect_uri: redirect_uri,
-                    grant_type: "authorization_code"
+                    grant_type: "authorization_code",
                 };
                 let headers = {
                     //authorization header is encoded in base64
                     "Content-Type": "application/x-www-form-urlencoded",
-                    Authorization: "Basic " + Buffer.from(client_id + ":" + client_secret).toString("base64"),
-                    json: true
+                    Authorization:
+                        "Basic " +
+                        Buffer.from(client_id + ":" + client_secret).toString(
+                            "base64"
+                        ),
+                    json: true,
                 };
-        
-                axios.post(token_url, querystring.stringify(body), {headers: headers})
+
+                axios
+                    .post(token_url, querystring.stringify(body), {
+                        headers: headers,
+                    })
                     .then((response: AxiosResponse) => {
                         if (response.status == 200) {
-                            let tokenInfo: refreshTokenResponseI = response.data;
+                            let tokenInfo: refreshTokenResponseI =
+                                response.data;
                             let refresh_token = response.data.refresh_token;
-            
-                            fs.writeFile('./token.txt', refresh_token, err => {
-                                if (err) { console.error("Error writing refresh_token to file: " + err); }
-                            })
+
+                            fs.writeFile(
+                                "./token.txt",
+                                refresh_token,
+                                (err) => {
+                                    if (err) {
+                                        console.error(
+                                            "Error writing refresh_token to file: " +
+                                                err
+                                        );
+                                    }
+                                }
+                            );
 
                             accessTokenCallback(tokenInfo);
-                        
+
                             res.redirect("/panel");
                         } else {
                             res.redirect(
-                                "/#" + querystring.stringify({ error: "invalid_token" })
+                                "/#" +
+                                    querystring.stringify({
+                                        error: "invalid_token",
+                                    })
                             );
                         }
                     })
@@ -151,8 +190,12 @@ class FlowRouter {
         });
     }
 
-    static get(client_id: string, client_secret: string, accessTokenCallback: Function): Router {
-        return new FlowRouter(client_id, client_secret, accessTokenCallback).router;
+    static get(
+        client_id: string,
+        client_secret: string,
+        accessTokenCallback: Function
+    ): Router {
+        return new FlowRouter(client_id, client_secret, accessTokenCallback)
+            .router;
     }
 }
-

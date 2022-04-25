@@ -7,7 +7,10 @@ import { analysisI, beatI, trackI } from "./state";
  * We must make sure the first beat starts at 0, and the last ends at the end of the track
  * Then convert all time data to ms.
  */
-export function normalizeIntervals (state: State, { track, analysis }: { track: trackI, analysis: analysisI }): void {
+export function normalizeIntervals(
+    state: State,
+    { track, analysis }: { track: trackI; analysis: analysisI }
+): void {
     if (state.trackInfo.hasAnalysis) {
         const beats = analysis["beats"];
         const sections = analysis["sections"];
