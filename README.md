@@ -77,6 +77,7 @@ tsc
 # TODOs
 - [x] Implement color cycling
 - [x] Implement token refresh in mid-playback
+- [ ] Make token refresh based on expiry time
 - [ ] Optimize beat steps to omit the beats lower that then confidence threshold
 - [ ] Implement socket communication
 - [ ] Standardize the message exchanges from server to visualizers
