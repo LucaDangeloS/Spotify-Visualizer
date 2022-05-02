@@ -1,4 +1,5 @@
 .env
+.history/
 .vscode/
 package-lock.json
 node_modules/
