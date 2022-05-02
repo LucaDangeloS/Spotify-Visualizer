@@ -12,16 +12,16 @@ require('dotenv').config();
 main();
 
 async function main() {
-    // let verbose = false;
-    // const state = new State((state: State) => {logBeat(state)} , verbose);
-    // const server = Server.init(frontEndPort, process.env.CLIENT_ID, process.env.CLIENT_SECRET, state.setAccessToken, verbose);
-    // const sync = new Synchronizer(state, verbose);
-    // server.start();
-    // await api.waitForToken(state);
-    // sync.initialize();
+    let verbose = false;
+    const state = new State((state: State) => {logBeat(state)} , verbose);
+    const server = Server.init(frontEndPort, process.env.CLIENT_ID, process.env.CLIENT_SECRET, state.setAccessToken, verbose);
+    const sync = new Synchronizer(state, verbose);
+    server.start();
+    await api.waitForToken(state);
+    sync.initialize();
     // await delay(8000);
     // sync.terminate();
-    let c = colors.generateColorPalette(["#193737", "#354D73", "#CC0605", "#F39F18"]);
+    // let c = colors.generateColorPalette(["#193737", "#354D73", "#CC0605", "#F39F18"]);
     // let cs: string[] = c.colors(100);
     // colors.pc(cs)
     
