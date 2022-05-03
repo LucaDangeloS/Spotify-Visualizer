@@ -2,7 +2,7 @@
   "name": "spotify-visualizer",
   "version": "0.0.1",
   "description": "A spotify visualizer server",
-  "main": "dist/main.ts",
+  "main": "src/main.ts",
   "scripts": {
     "start": "nodemon src/main.ts",
     "test": "jest --runInBand",

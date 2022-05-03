@@ -1,5 +1,5 @@
 import SocketIO from 'socket.io';
-import { refreshTokenResponseI  } from './api_controller';
+import { refreshTokenResponseI  } from './io/api_controller';
 
 export interface trackI {
     id: string,
@@ -42,9 +42,11 @@ export interface progressInfoI {
 
 export default class State {
     trackInfo: TrackInfo = new TrackInfo();
+    colorInfo: ColorInfo = new ColorInfo();
     loops: Loops = new Loops();
     beatCallback: Function;
     verbose : boolean;
+    active : boolean;
     headers = {};
 
     private _accessToken: string = null;
@@ -69,6 +71,7 @@ export default class State {
 
     constructor(beatCallback: Function = () => {}, verbose: boolean = false) {
         this.verbose = verbose;
+        this.active = true;
         this.beatCallback = beatCallback;
     }
 
@@ -101,4 +104,9 @@ class TrackInfo {
 class Loops {
     beatLoop: ReturnType<typeof setTimeout> = null;
     trackProgressLoop: ReturnType<typeof setTimeout> = null;
+}
+
+class ColorInfo {
+    activePalette: string[];
+    availablePalettes: string[][];
 }

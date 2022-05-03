@@ -13,11 +13,8 @@
       // "strict": false,
       "experimentalDecorators": true,
     },
-    "files": [
-      "src/main.ts",
-      "src/server.ts",
-      "src/state.ts",
-      "src/api_controller.ts",
-      "src/utils.ts",
+    "exclude": [
+      "node_modules",
+      "**/*.test.ts",
     ]
 }

@@ -1,11 +1,13 @@
 import { frontEndPort, visualizerPort } from "./config/network-info.json";
 import * as TrackController from './track_controller';
 import Synchronizer from './synchronizer';
-import * as api from './api_controller';
+import * as api from './io/api_controller';
 import * as colors from './colors';
 import { delay } from './utils';
-import Server from './server';
+import Server from './io/server';
+import { createVisualizerSocket } from './io/sockets';
 import State from './state';
+import * as sio from "socket.io";
 require('dotenv').config();
 
 
@@ -14,11 +16,21 @@ main();
 async function main() {
     let verbose = false;
     const state = new State((state: State) => {logBeat(state)} , verbose);
-    const server = Server.init(frontEndPort, process.env.CLIENT_ID, process.env.CLIENT_SECRET, state.setAccessToken, verbose);
+    const server = Server.init(frontEndPort, process.env.CLIENT_ID, process.env.CLIENT_SECRET, state, state.setAccessToken, verbose);
     const sync = new Synchronizer(state, verbose);
-    server.start();
-    await api.waitForToken(state);
-    sync.initialize();
+    // server.start();
+    // await api.waitForToken(state);
+    // sync.initialize();
+
+    let viz_socket: sio.Server = createVisualizerSocket(visualizerPort);
+    viz_socket.on('connection', async (socket: sio.Socket) => {
+        console.log("Connected");
+        socket.emit('beat', "Fire beat");
+        console.log(socket.id)
+        await delay(1000);
+        socket.disconnect();
+    });
+
     // await delay(8000);
     // sync.terminate();
     // let c = colors.generateColorPalette(["#193737", "#354D73", "#CC0605", "#F39F18"]);

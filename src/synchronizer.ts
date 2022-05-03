@@ -1,8 +1,8 @@
 import * as TrackController from './track_controller';
 import { pingDelay } from './config/config.json';
-import * as api from './api_controller';
+import * as api from './io/api_controller';
 import State from './state';
-import { ApiResponse, ApiStatusCode } from './api_controller';
+import { ApiResponse, ApiStatusCode } from './io/api_controller';
 import { trackInfoI, progressInfoI } from './state';
 
 export default class Synchronizer {

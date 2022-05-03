@@ -1,14 +1,16 @@
-import { baseUrl, frontEndPort, auth_url, token_url } from "./config/network-info.json";
+import { baseUrl, frontEndPort, auth_url, token_url } from "../config/network-info.json";
 import express, { Router, Request, Response } from 'express';
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { refreshTokenResponseI } from "./api_controller";
 import cookieParser from "cookie-parser";
 import querystring from "query-string";
+import RestAPI from './rest_api';
 import * as http from "http";
+import State from "../state";
 import crypto from 'crypto';
 import cors from 'cors'
+import path from "path";
 import fs from "fs";
-// import { serialize } from "./utils";
 
 
 // Main Front-End Server with auth flow
@@ -17,14 +19,15 @@ export default class Server {
     private verbose: boolean = false;
     public server: http.Server = null;
 
-    constructor(public readonly port: number, client_id: string, client_secret: string, tokenCallback: Function, verbose?: boolean) {
+    constructor(public readonly port: number, client_id: string, client_secret: string, state: State, tokenCallback: Function, verbose?: boolean) {
         this.verbose = verbose;
         this.port = port;
         this.app = express()
             .use(cookieParser())
             .use(cors())
             .use(FlowRouter.get(client_id, client_secret, tokenCallback))
-            .use(express.static(__dirname + "/public"));
+            .use(RestAPI.get(state))
+            .use(express.static(path.resolve(__dirname, '..') + "/public"));
     }
 
     start(): void {
@@ -45,8 +48,8 @@ export default class Server {
             });
     }
 
-    static init(port: number, client_id: string, client_secret: string, apiHook: Function, verbose?: boolean): Server { 
-        return new Server(port, client_id, client_secret, apiHook, verbose);
+    static init(port: number, client_id: string, client_secret: string, state: State, apiHook: Function, verbose?: boolean): Server { 
+        return new Server(port, client_id, client_secret, state, apiHook, verbose);
     }
 
 }
@@ -54,6 +57,7 @@ export default class Server {
 // FlowRouter from Front-End server
 class FlowRouter {
     public router : Router;
+    private staticFolder: string = path.resolve(__dirname, '..') + "/public";
 
     constructor(client_id: string, client_secret: string, accessTokenCallback: Function) {
         this.router = Router();
@@ -61,7 +65,7 @@ class FlowRouter {
         const redirect_uri: string =  `${baseUrl}:${frontEndPort}/callback`;
 
         this.router.get("/", (req: Request, res: Response) => {
-            res.sendFile(__dirname + "/public/index.html");
+            res.sendFile(`${this.staticFolder}/index.html`);
         });
 
         this.router.get("/login", (req: Request , res: Response) => {
@@ -155,4 +159,3 @@ class FlowRouter {
         return new FlowRouter(client_id, client_secret, accessTokenCallback).router;
     }
 }
-

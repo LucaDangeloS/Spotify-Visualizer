@@ -1,11 +1,11 @@
-import { token_url, trackAnalysis_url, currentlyPlaying_url } from "./config/network-info.json";
-import { syncOffsetThreshold } from "./config/config.json";
-import { delay, normalizeIntervals } from "./utils";
+import { token_url, trackAnalysis_url, currentlyPlaying_url } from "../config/network-info.json";
+import { syncOffsetThreshold } from "../config/config.json";
+import { delay, normalizeIntervals } from "../utils";
 import { readFileSync } from "fs";
-import State, { progressInfoI, trackInfoI } from "./state";
+import State, { progressInfoI, trackInfoI } from "../state";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import querystring from 'query-string';
-import { analysisI, trackI } from './state';
+import { analysisI, trackI } from '../state';
 /*
 * Many methods were borrowed from 
 * https://github.com/lukefredrickson/spotify-led-visualizer
