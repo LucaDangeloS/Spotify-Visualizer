@@ -1,4 +1,4 @@
-import Server from '../server';
+import Server from '../io/server';
 import State from '../state';
 import { baseUrl, frontEndPort, visualizerPort } from "../config/network-info.json";
 import axios, { AxiosError, AxiosResponse } from 'axios';
@@ -7,7 +7,7 @@ require('dotenv').config();
 const state = new State();
 
 describe('Front-end server tests', () => {
-    const server = Server.init(frontEndPort, process.env.CLIENT_ID, process.env.CLIENT_SECRET, state.setAccessToken);
+    const server = Server.init(frontEndPort, process.env.CLIENT_ID, process.env.CLIENT_SECRET, state, state.setAccessToken, false);
 
     test('Server start', () => {
         expect(server).toBeInstanceOf(Server);

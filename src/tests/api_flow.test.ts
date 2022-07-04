@@ -1,5 +1,5 @@
 import State from '../state';
-import * as api from '../api_controller';
+import * as api from '../io/api_controller';
 import fs  from 'fs';
 
 require('dotenv').config();
@@ -16,7 +16,7 @@ describe('API flow tests', function() {
     });
 
     test('Request Song Playing', async () =>{
-      let res = null
+      let res:(api.ApiResponse|null) = null
       res = await api.fetchCurrentlyPlaying(state);
       expect(res).not.toBeNull();
       expect(res).not.toBe({status: api.ApiStatusCode.Error, data: null});

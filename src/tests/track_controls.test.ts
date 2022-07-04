@@ -1,8 +1,8 @@
-import Server from '../server';
+import Server from '../io/server';
 import State from '../state';
 import { frontEndPort, visualizerPort } from '../config/network-info.json';
 import Synchronizer from '../synchronizer';
-import * as api from '../api_controller';
+import * as api from '../io/api_controller';
 import * as TrackController from '../track_controller';
 import { delay } from '../utils';
 require('dotenv').config();
