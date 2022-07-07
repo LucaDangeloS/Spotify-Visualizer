@@ -1,7 +1,7 @@
 import { baseUrl, frontEndPort, auth_url, token_url } from "../config/network-info.json";
 import express, { Router, Request, Response } from 'express';
 import axios, { AxiosError, AxiosResponse } from "axios";
-import { refreshTokenResponseI } from "./api_controller";
+import { refreshTokenResponseI } from "./apiController";
 import cookieParser from "cookie-parser";
 import querystring from "query-string";
 import RestAPI from './rest_api';

@@ -1,5 +1,5 @@
 import SocketIO from 'socket.io';
-import { refreshTokenResponseI  } from './io/api_controller';
+import { refreshTokenResponseI  } from './io/apiController';
 
 export interface trackI {
     id: string,

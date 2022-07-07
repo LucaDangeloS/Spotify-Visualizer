@@ -1,5 +1,5 @@
 import State from '../state';
-import * as api from '../io/api_controller';
+import * as api from '../io/apiController';
 import fs  from 'fs';
 
 require('dotenv').config();

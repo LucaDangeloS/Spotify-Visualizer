@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
 import State from "../src/state";
-import * as api from '../src/api_controller';
+import * as api from '../src/io/apiController';
 require('dotenv').config();
 
 async function main() {
