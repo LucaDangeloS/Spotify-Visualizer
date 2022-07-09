@@ -3,18 +3,21 @@
       "target": "es6",
       "rootDir": "src",
       "outDir": "dist",
-      "module": "commonjs",
+      "module": "CommonJS",
       "preserveConstEnums": true,
       "sourceMap": true,
       "resolveJsonModule": true,
       "esModuleInterop": true,
       "strictPropertyInitialization": false,
       "isolatedModules": false,
+      "moduleResolution": "node",
+      "baseUrl": "./",
       // "strict": false,
       "experimentalDecorators": true,
     },
     "exclude": [
       "node_modules",
       "**/*.test.ts",
+      "utils/**",
     ]
 }

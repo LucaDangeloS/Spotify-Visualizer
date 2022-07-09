@@ -1,6 +1,7 @@
-import { trackProgressTickRate, beatConfidence } from "./config/config.json";
-import State, { analysisI, trackI } from "./state";
-import { pingDelay } from "./config/config.json";
+import { trackProgressTickRate, beatConfidence } from "../config/config.json";
+import State from "../models/state";
+import { analysisI, trackI } from "../models/spotifyApiInterfaces";
+import { pingDelay } from "../config/config.json";
 
 /*
  * Many methods were borrowed and inspired
@@ -142,10 +143,11 @@ function startTrackProgressLoop(state: State): void {
 
 function stageBeat(state: State): void {
     //set the timeout id to a variable in state for convenient loop cancellation.
+    let delay = calculateTimeUntilNextBeat(state) + state.globalDelay;
     state.loops.beatLoop = setTimeout(() => {
         state.beatCallback(state);
         incrementBeat(state);
-    }, calculateTimeUntilNextBeat(state));
+    }, delay > 0 ? delay : 0);
 }
 
 function incrementBeat(state: State) {

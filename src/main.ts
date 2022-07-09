@@ -1,13 +1,14 @@
+import { createVisualizerServer, manageConnection } from './visualizerService/sockets';
 import { frontEndPort, visualizerPort } from "./config/network-info.json";
-import * as TrackController from './track_controller';
-import Synchronizer from './synchronizer';
-import * as api from './io/api_controller';
+import { PaletteInfo } from "./models/visualizerInfo/visualizerInfo";
+import * as TrackController from './spotifyIO/trackController';
+import Synchronizer from './spotifyIO/synchronizer';
+import * as api from './spotifyIO/apiController';
+import Server from './webserver/server';
+import State from './models/state';
 import * as colors from './colors';
-import { delay } from './utils';
-import Server from './io/server';
-import { createVisualizerSocket } from './io/sockets';
-import State from './state';
 import * as sio from "socket.io";
+import { delay } from './utils';
 require('dotenv').config();
 
 
@@ -16,19 +17,38 @@ main();
 async function main() {
     let verbose = false;
     const state = new State((state: State) => {logBeat(state)} , verbose);
+    let c = colors.generateColorPalette(["purple", "darkred", "darkblue", "red"]);
+    // let cs: string[] = c.colors(50);
+    // let paletteInfo: PaletteInfo = {
+    //     name: "default",
+    //     id: "123",
+    //     genColors: ["purple", "darkred", "darkblue", "red"]
+    // };
+    // state.addPalette(paletteInfo);
     const server = Server.init(frontEndPort, process.env.CLIENT_ID, process.env.CLIENT_SECRET, state, state.setAccessToken, verbose);
     const sync = new Synchronizer(state, verbose);
-    // server.start();
-    // await api.waitForToken(state);
-    // sync.initialize();
+    server.start();
+    await api.waitForToken(state);
+    sync.initialize();
 
-    let viz_socket: sio.Server = createVisualizerSocket(visualizerPort);
-    viz_socket.on('connection', async (socket: sio.Socket) => {
-        console.log("Connected");
-        socket.emit('beat', "Fire beat");
-        console.log(socket.id)
-        await delay(1000);
-        socket.disconnect();
+    let vizServer: sio.Server = createVisualizerServer(visualizerPort);
+    console.log(state.visualizers);
+    state.clearVisualizers();
+    console.log(state.visualizers);
+    vizServer.on('connection', (socket: sio.Socket) => {
+    //     console.log("Connected");
+    //     socket.emit('beat', "Fire beat");
+    //     console.log(vizServer.sockets.adapter.rooms)
+    //     await delay(1000);
+    //     socket.join('0');
+    //     console.log(vizServer.sockets.adapter.rooms)
+    //     await delay(2000);
+    //     socket.leave('0');
+    //     socket.join('200');
+    //     vizServer.to("200").emit('beat', "Fire beat");
+    //     console.log(vizServer.sockets.adapter.rooms)
+    //     socket.disconnect();
+        manageConnection(state, socket); 
     });
 
     // await delay(8000);

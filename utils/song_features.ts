@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
-import State from "../src/state";
-import * as api from '../src/io/apiController';
+import State from "../src/models/state";
+import * as api from '../src/spotifyIO/apiController';
 require('dotenv').config();
 
 async function main() {

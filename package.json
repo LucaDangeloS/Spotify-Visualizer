@@ -4,8 +4,10 @@
   "description": "A spotify visualizer server",
   "main": "src/main.ts",
   "scripts": {
-    "start": "nodemon src/main.ts",
+    "dev": "nodemon --ignore data/*.json src/main.ts ",
+    "start": "ts-node src/main.ts",
     "test": "jest --runInBand",
+    "build": "tsc --module ES2015",
     "coverage": "jest --coverage --runInBand"
   },
   "author": "Luca D'angelo",

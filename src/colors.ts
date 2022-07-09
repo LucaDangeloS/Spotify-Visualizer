@@ -66,7 +66,7 @@ export function analogous(color: (string | chroma.Color | number), a: number) : 
  * Given a time and tickrate, shifts the color palette
  * @param palette 
  * @param index 
- * @param time 
+ * @param time (in ms)
  * @param tickrate 
  * @returns {number} index
  */
@@ -76,7 +76,7 @@ export function shift(palette: (string)[], index: number, time: number, tickrate
     return (index + displacement) % palette.length;
 }
 
-// returns a color sequence based on time and tickrate
+// Returns a color sequence based on time and tickrate
 export function sequence(palette: (string)[], index: number, time: number, tickrate: number) : {rotation: string[], idx: number} {
     if (palette === undefined || palette === null) return null;
     let new_index: number = shift(palette, index, time, tickrate);
@@ -86,11 +86,11 @@ export function sequence(palette: (string)[], index: number, time: number, tickr
 
 /**
  * Given a palette and a color, offsets the palette and gives the color rotation for a smooth entry point at the index 0 of the palette,
- * taking time * timeFactor for the transition to complete.
+ * taking time (in ms) * timeFactor for the transition to complete.
  * @param {string[]} palette - The color palette in hex format
  * @param {string} color - Color from which to rotate
  * @param {number} index - Current index at the palette
- * @param {number} time - Time that the transition will take
+ * @param {number} time - Time (in ms) that the transition will take
  * @param {number} tickrate - Time at which the time ticks
  * @param {number} timeFactor - Factor from 0.0 to 1.0 from which the time will be consumed on the transition
  * @returns {string[]} Color transition array in hex format
@@ -98,6 +98,9 @@ export function sequence(palette: (string)[], index: number, time: number, tickr
 export function makeTimeTransitionOffset(palette: (string)[], color: string, index: number, time: number, tickrate: number, timeFactor: number = 0.6) : string[] {
     if (tickrate <= 0)
         tickrate = 5;
+    if (timeFactor < 0 || timeFactor > 1) {
+        timeFactor = 0.6;
+    }
     let steps: number = Math.round((time * timeFactor) / tickrate);
     let new_index: number;
     // if (Math.abs((steps % palette.length) - index) <= 0.1*palette.length)

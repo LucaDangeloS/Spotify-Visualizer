@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import State from "../state";
+import State from "../models/state";
 
 
 

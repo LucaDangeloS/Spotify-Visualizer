@@ -1,5 +1,5 @@
-import State from '../state';
-import * as api from '../io/apiController';
+import State from '../models/state';
+import * as api from '../spotifyIO/apiController';
 import fs  from 'fs';
 
 require('dotenv').config();

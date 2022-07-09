@@ -5,5 +5,7 @@
     "pingDelay": 5000,
     "beatDelay": 0,
     "syncOffsetThreshold": 20,
-    "trackProgressTickRate" : 5
+    "trackProgressTickRate" : 5,
+    "colorPaletteSize": 300,
+    "palettesPath": "data/palettes.json"
 }

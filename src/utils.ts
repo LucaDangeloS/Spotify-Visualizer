@@ -1,5 +1,5 @@
-import State from "./state";
-import { analysisI, beatI, trackI } from "./state";
+import State from "./models/state";
+import { analysisI, beatI, trackI } from "./models/spotifyApiInterfaces";
 
 /**
  * Method borrowed from https://github.com/zachwinter/kaleidosync
@@ -33,4 +33,10 @@ export function normalizeIntervals (state: State, { track, analysis }: { track: 
 
 export function delay(time: number): Promise<void> {
     return new Promise<void>((resolve) => setTimeout(resolve, time));
+}
+
+export function generateIdFromColors(colors: string[]): string {
+    let ret: string = colors.join('');
+    
+    return ret;
 }

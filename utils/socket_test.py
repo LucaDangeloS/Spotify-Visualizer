@@ -8,6 +8,7 @@ HOST = 'http://localhost'
 PORT = 5000
 
 sio = socketio.Client()
+# sio2 = socketio.Client()
 
 @sio.on('beat')
 def message(data):
@@ -19,3 +20,4 @@ def on_connect():
 
 
 sio.connect(f"{HOST}:{PORT}")
+# sio2.connect(f"{HOST}:{PORT}")

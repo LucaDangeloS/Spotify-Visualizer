@@ -1,9 +1,9 @@
-import Server from '../io/server';
-import State from '../state';
+import Server from '../webserver/server';
+import State from '../models/state';
 import { frontEndPort, visualizerPort } from '../config/network-info.json';
-import Synchronizer from '../synchronizer';
-import * as api from '../io/apiController';
-import * as TrackController from '../trackController';
+import Synchronizer from '../spotifyIO/synchronizer';
+import * as api from '../spotifyIO/apiController';
+import * as TrackController from '../spotifyIO/trackController';
 import { delay } from '../utils';
 require('dotenv').config();
 

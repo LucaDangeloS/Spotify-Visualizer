@@ -1,9 +1,9 @@
 import * as TrackController from './trackController';
-import { pingDelay } from './config/config.json';
-import * as api from './io/apiController';
-import State from './state';
-import { ApiResponse, ApiStatusCode } from './io/apiController';
-import { trackInfoI, progressInfoI } from './state';
+import { pingDelay } from '../config/config.json';
+import * as api from './apiController';
+import State from '../models/state';
+import { ApiResponse, ApiStatusCode } from './apiController';
+import { trackInfoI, progressInfoI } from '../models/spotifyApiInterfaces';
 
 export default class Synchronizer {
     private verbose: boolean = false;

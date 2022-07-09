@@ -1,12 +1,12 @@
 import { baseUrl, frontEndPort, auth_url, token_url } from "../config/network-info.json";
 import express, { Router, Request, Response } from 'express';
 import axios, { AxiosError, AxiosResponse } from "axios";
-import { refreshTokenResponseI } from "./apiController";
+import { refreshTokenResponseI } from "../spotifyIO/apiController";
 import cookieParser from "cookie-parser";
 import querystring from "query-string";
-import RestAPI from './rest_api';
+import RestAPI from '../restService/restService';
 import * as http from "http";
-import State from "../state";
+import State from "../models/state";
 import crypto from 'crypto';
 import cors from 'cors'
 import path from "path";
@@ -48,7 +48,7 @@ export default class Server {
             });
     }
 
-    static init(port: number, client_id: string, client_secret: string, state: State, apiHook: Function, verbose?: boolean): Server { 
+    static init(port: number, client_id: string | undefined, client_secret: string | undefined, state: State, apiHook: Function, verbose?: boolean): Server {
         return new Server(port, client_id, client_secret, state, apiHook, verbose);
     }
 

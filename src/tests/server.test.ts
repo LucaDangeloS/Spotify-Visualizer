@@ -1,5 +1,5 @@
-import Server from '../io/server';
-import State from '../state';
+import Server from '../webserver/server';
+import State from '../models/state';
 import { baseUrl, frontEndPort, visualizerPort } from "../config/network-info.json";
 import axios, { AxiosError, AxiosResponse } from 'axios';
 
