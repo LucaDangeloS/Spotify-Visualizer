@@ -1,6 +1,6 @@
 import { newVisualizer } from '../models/visualizerInfo/visualizerInfo';
 import { Server, Socket } from 'socket.io';
-import State from 'src/models/state';
+import State from '../models/state';
 import 'socket.io';
 
 
@@ -12,5 +12,5 @@ export function createVisualizerServer(port: number): Server {
 
 export function manageConnection(state: State, socket: Socket) {
     state.addVisualizer(newVisualizer(state.visualizers.length, state.colorInfo.defaultPalette, socket));
-    console.log(state.visualizers);
+    console.log(state.visualizers.length + " visualizers connected");
 }

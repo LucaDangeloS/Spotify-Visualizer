@@ -1,6 +1,6 @@
 import { createVisualizerServer, manageConnection } from './visualizerService/sockets';
 import { frontEndPort, visualizerPort } from "./config/network-info.json";
-import { PaletteInfo } from "./models/visualizerInfo/visualizerInfo";
+import { PaletteInfo, VisualizerInfo, VisualizerState } from "./models/visualizerInfo/visualizerInfo";
 import * as TrackController from './spotifyIO/trackController';
 import Synchronizer from './spotifyIO/synchronizer';
 import * as api from './spotifyIO/apiController';
@@ -16,8 +16,8 @@ main();
 
 async function main() {
     let verbose = false;
-    const state = new State((state: State) => {logBeat(state)} , verbose);
-    let c = colors.generateColorPalette(["purple", "darkred", "darkblue", "red"]);
+    const state = new State((state: State) => {logBeat(state);} , verbose);
+    // let c = colors.generateColorPalette(["purple", "darkred", "darkblue", "red"]);
     // let cs: string[] = c.colors(50);
     // let paletteInfo: PaletteInfo = {
     //     name: "default",
@@ -63,4 +63,13 @@ async function main() {
 function logBeat(state: State) {
     console.log("BEAT - " + state.trackInfo.activeBeat?.confidence + " " + Math.floor(state.trackInfo.trackProgress / 1000));
     // console.log("       " + state.trackInfo.initialTrackProgress/1000 + " " + new Date(state.trackInfo.initialTimestamp));
+    state.visualizers.forEach(visualizer => {
+        visualizer.socket.emit('beat', "Fire beat");
+        if (visualizer.state == VisualizerState.on) {
+            if (state.trackInfo.activeBeat.confidence >= visualizer.minBeatConf
+                && state.trackInfo.activeBeat.confidence <= visualizer.maxBeatConf) {
+                    visualizer.socket.emit('beat', "Fire beat");
+            }
+        }
+    });
 }

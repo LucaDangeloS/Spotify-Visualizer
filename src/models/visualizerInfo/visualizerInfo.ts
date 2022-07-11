@@ -17,7 +17,7 @@ export interface VisualizerInfo {
 export enum VisualizerState {
     off,
     cycle,
-    visualize
+    on
 }
 
 export interface PaletteInfo {

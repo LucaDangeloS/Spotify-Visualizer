@@ -1,6 +1,6 @@
-import { PaletteInfo, VisualizerInfo, VisualizerState } from "src/models/visualizerInfo/visualizerInfo";
-import { colorPaletteSize } from "src/config/config.json";
-import { generateColorPalette } from "src/colors";
+import { PaletteInfo, VisualizerInfo, VisualizerState } from "../models/visualizerInfo/visualizerInfo";
+import { colorPaletteSize } from "../config/config.json";
+import { generateColorPalette } from "../colors";
 import { NoPaletteDefinedError, NullNameError, NullPaletteError, ValueOutOfBoundsError } from "./visualizerErrors";
 
 

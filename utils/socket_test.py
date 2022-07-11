@@ -20,4 +20,5 @@ def on_connect():
 
 
 sio.connect(f"{HOST}:{PORT}")
+sio.wait()
 # sio2.connect(f"{HOST}:{PORT}")
