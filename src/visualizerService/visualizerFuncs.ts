@@ -85,7 +85,8 @@ export function generateScale(viz: VisualizerInfo): void {
 export function generateHexColors(viz: VisualizerInfo): void {
     if (viz.palette.scale == null && viz.palette != null) {
         generateScale(viz);
-    } else if (viz.palette.scale != null) {
+    }
+    if (viz.palette.scale != null) {
         viz.palette.hexColors = viz.palette.scale.colors(colorPaletteSize + viz.cycleModifier);
     } else {
         throw new NoPaletteDefinedError(viz);

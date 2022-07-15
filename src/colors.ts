@@ -48,7 +48,7 @@ export function complementary(color: (string | chroma.Color | number)) : string 
 }
 
 /**
- * Generate 2 analogous colors (left and right) in hex of a given color
+ * Generate 2 analogous colors (left and right) in hex for a given color
  * @param {string | chroma.Color | number} color 
  * @param {number} a - Angle 
  * @returns {left: string, right: string} Analogous colors
@@ -62,22 +62,30 @@ export function analogous(color: (string | chroma.Color | number), a: number) : 
 
 
 /**
- * 
+ * Testing function.
  * Given a time and tickrate, shifts the color palette
- * @param palette 
- * @param index 
- * @param time (in ms)
- * @param tickrate 
+ * @param {string[]} palette 
+ * @param {number} index 
+ * @param {number} time (in ms)
+ * @param {number} tickrate 
  * @returns {number} index
  */
-export function shift(palette: (string)[], index: number, time: number, tickrate: number) : number {
+export function shift(palette: (string)[], index: number, time: number, tickrate: number = 5) : number {
     if (palette === undefined || palette === null) return null;
     let displacement: number = Math.round(time / tickrate);
     return (index + displacement) % palette.length;
 }
 
-// Returns a color sequence based on time and tickrate
-export function sequence(palette: (string)[], index: number, time: number, tickrate: number) : {rotation: string[], idx: number} {
+/**
+ * Testing function.
+ * Returns a color sequence based on time and tickrate
+ * @param {string[]} palette 
+ * @param {number} index 
+ * @param {number} time (in ms)
+ * @param {number} tickrate 
+ * @returns {rotation: string[], idx: number} rotation color array and index
+ * */ 
+export function sequence(palette: (string)[], index: number, time: number, tickrate: number = 5) : {rotation: string[], idx: number} {
     if (palette === undefined || palette === null) return null;
     let new_index: number = shift(palette, index, time, tickrate);
     return {rotation: palette.slice(index, new_index), idx: new_index};
@@ -95,18 +103,18 @@ export function sequence(palette: (string)[], index: number, time: number, tickr
  * @param {number} timeFactor - Factor from 0.0 to 1.0 from which the time will be consumed on the transition
  * @returns {string[]} Color transition array in hex format
  */
-export function makeTimeTransitionOffset(palette: (string)[], color: string, index: number, time: number, tickrate: number, timeFactor: number = 0.6) : string[] {
-    if (tickrate <= 0)
+export function makeTimeTransitionOffset(palette: (string)[], color: string, index: number, time: number, tickrate: number = 5, timeFactor: number = 0.6) : string[] {
+    if (tickrate <= 0) {
         tickrate = 5;
-    if (timeFactor < 0 || timeFactor > 1) {
+    }
+    if (timeFactor <= 0 || timeFactor > 1) {
         timeFactor = 0.6;
     }
     let steps: number = Math.round((time * timeFactor) / tickrate);
-    let new_index: number;
-    // if (Math.abs((steps % palette.length) - index) <= 0.1*palette.length)
-    //     new_index = (index + palette.length/2) % palette.length;
-    // else
-    new_index = (index + steps) % palette.length;
+    if (steps > palette.length) {
+        steps = palette.length;
+    }
+    let new_index: number = (index + steps) % palette.length;
     let transition: string[] = generateColorPalette([color, palette[new_index]], false).colors(steps);
 
     // palette modification
@@ -118,7 +126,6 @@ export function makeTimeTransitionOffset(palette: (string)[], color: string, ind
 }
 
 /**
- * 
  * Given a palette and a color, offsets the palette and gives the color rotation for a smooth entry point at the index 0 of the palette,
  * taking n steps based on the distance of the colors.
  * @param {string[]} palette - The color palette in hex format

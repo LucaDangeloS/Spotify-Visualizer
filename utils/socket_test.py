@@ -3,22 +3,68 @@
 
 import asyncio
 import socketio
+import pygame
 
 HOST = 'http://localhost'
 PORT = 5000
+FPS = 30
+DISPLAY_WIDTH = 600
+DISPLAY_HEIGHT = 600
+sio = socketio.Client(logger=False, engineio_logger=False)
 
-sio = socketio.Client()
-# sio2 = socketio.Client()
+class Colors():
+    transition = []
+    colors = ['#ffffff']
 
-@sio.on('beat')
-def message(data):
-    print(f"{data} from socket {sio.sid} {sio.get_sid()}")
+    @classmethod
+    def message(cls, data):
+        # print(f"{data} from socket {sio.sid} {sio.get_sid()}")
+        cls.transition = data['transition']
+        cls.colors = data['colors']
 
-@sio.on('connect')
-def on_connect():
-    print('connected')
+    @classmethod
+    def getTransitionColor(cls):
+        return cls.transition.pop(0)
 
 
-sio.connect(f"{HOST}:{PORT}")
-sio.wait()
-# sio2.connect(f"{HOST}:{PORT}")
+async def main():
+    colors = Colors()
+    idx = 0
+    pygame.init()
+
+    @sio.on('connect')
+    def on_connect():
+        print('connected')
+
+    @sio.on('beat')
+    def getTransitionColor(data):
+        # print("Received data")
+        colors.message(data)
+
+    sio.connect(f"{HOST}:{PORT}")
+
+    display = pygame.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
+    clock = pygame.time.Clock()
+
+    while True:
+        if (colors.transition):
+            pygame.draw.rect(display, pygame.Color(colors.transition.pop(0)), (0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT))
+        else:
+            pygame.draw.rect(display, pygame.Color(colors.colors[idx]), (0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT))
+            idx = (idx + 1) % len(colors.colors)
+            
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sio.disconnect()
+                exit(0)
+        
+        pygame.display.update()
+        clock.tick(FPS)
+
+
+if __name__ == '__main__':
+    try:
+        asyncio.run(main())
+    except Exception as e:
+        print(e)
+        exit(1)

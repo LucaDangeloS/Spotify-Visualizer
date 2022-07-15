@@ -5,12 +5,13 @@ import { savePalette, loadPalette } from './palette/paletteDAO';
 import { palettesPath } from '../config/config.json';
 import fs from "fs";
 import SocketIO from 'socket.io';
+import { generateHexColors } from 'src/visualizerService/visualizerFuncs';
 
 export default class State {
+    syncSocketRoom: string = "sync";
     trackInfo: TrackInfo = new TrackInfo();
     colorInfo: ColorInfo = new ColorInfo();
     visualizers: VisualizerInfo[] = [];
-    socketsDelay: Array<number> = [];
     globalDelay: number = 0;
     loops: Loops = new Loops();
     beatCallback: Function;
@@ -64,8 +65,15 @@ export default class State {
 
     public clearVisualizers() {
         this.visualizers.forEach((v, index, arr) => {
-            v.socket.disconnect();
+            if (v.socket)
+                v.socket.disconnect();
             arr.splice(index, 1);
+        });
+    }
+
+    public syncVisualizers() {
+        this.visualizers.forEach(v => {
+            generateHexColors(v);
         });
     }
 

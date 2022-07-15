@@ -77,12 +77,16 @@ tsc
 # TODOs
 - [x] Implement color cycling
 - [x] Implement token refresh in mid-playback
+- [x] Figure out a way to delegate the song interpretation to the server
+- [x] Implement socket communication
+- [x] Standardize the message exchanges from server to visualizers
+- [x] Add support for multiple visualizers
+- [ ] Implement individual visualizer customization
+- [ ] Make color jump related to song volume
+- [ ] Fine tune palette sizes
+- [ ] Find a way for the server to know how many colors have been consumed in visualizer
 - [ ] Optimize beat steps to omit the beats lower that then confidence threshold
-- [ ] Implement socket communication
-- [ ] Standardize the message exchanges from server to visualizers
-- [ ] Add support for multiple visualizers
 - [ ] Make the webapp for parameters tweaking
-- [ ] Figure out a way to delegate the song interpretation to the server
 - [ ] Code clean-up (duh)
 
 
