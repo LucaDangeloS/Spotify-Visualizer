@@ -1,0 +1,9 @@
+{
+    "colorDelay": 33,
+    "delay": 0,
+    "transitionModifier": 0,
+    "cycleModifier": 0,
+    "loudnessSensibility": 0,
+    "minBeatConf": 0,
+    "maxBeatConf": 1
+}

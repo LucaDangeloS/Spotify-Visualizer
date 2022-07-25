@@ -1,5 +1,5 @@
 import State from "./models/state";
-import { analysisI, beatI, trackI } from "./models/spotifyApiInterfaces";
+import { analysisI, beatI, sectionI, trackI } from "./models/spotifyApiInterfaces";
 
 /**
  * Method borrowed from https://github.com/zachwinter/kaleidosync
@@ -24,7 +24,7 @@ export function normalizeIntervals (state: State, { track, analysis }: { track: 
             interval.start = interval.start * 1000;
             interval.duration = interval.duration * 1000;
         });
-        sections.forEach((interval: beatI) => {
+        sections.forEach((interval: sectionI) => {
             interval.start = interval.start * 1000;
             interval.duration = interval.duration * 1000;
         });

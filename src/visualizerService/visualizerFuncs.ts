@@ -1,7 +1,8 @@
-import { PaletteInfo, VisualizerInfo, VisualizerState } from "../models/visualizerInfo/visualizerInfo";
+import { VisualizerInfo, VisualizerState } from "../models/visualizerInfo/visualizerInfo";
 import { colorPaletteSize } from "../config/config.json";
 import { generateColorPalette } from "../colors";
 import { NoPaletteDefinedError, NullNameError, NullPaletteError, ValueOutOfBoundsError } from "./visualizerErrors";
+import { PaletteDAO } from "src/models/palette/paletteDAO";
 
 
 export function updateDelay(viz: VisualizerInfo, delay: number): void {
@@ -64,7 +65,7 @@ export function updateName(viz: VisualizerInfo, name: string): void {
     }
 }
 
-export function updatePalette(viz: VisualizerInfo, palette: PaletteInfo): void {
+export function updatePalette(viz: VisualizerInfo, palette: PaletteDAO): void {
     if (palette != null) {
         viz.palette.info = palette;
         viz.palette.scale = null;
@@ -76,7 +77,8 @@ export function updatePalette(viz: VisualizerInfo, palette: PaletteInfo): void {
 
 export function generateScale(viz: VisualizerInfo): void {
     if (viz.palette.info != null) {
-        viz.palette.scale = generateColorPalette(viz.palette.info.genColors, true);
+        let genColorsParsed = viz.palette.info.genColors;
+        viz.palette.scale = generateColorPalette(genColorsParsed, true);
     } else {
         throw new NoPaletteDefinedError(viz);
     }

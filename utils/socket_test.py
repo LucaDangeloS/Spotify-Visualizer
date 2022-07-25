@@ -4,6 +4,7 @@
 import asyncio
 import socketio
 import pygame
+import timeit
 
 HOST = 'http://localhost'
 PORT = 5000
@@ -34,7 +35,7 @@ async def main():
 
     @sio.on('connect')
     def on_connect():
-        print('connected')
+        print('Connected')
 
     @sio.on('beat')
     def getTransitionColor(data):
@@ -52,6 +53,7 @@ async def main():
         else:
             pygame.draw.rect(display, pygame.Color(colors.colors[idx]), (0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT))
             idx = (idx + 1) % len(colors.colors)
+    
             
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

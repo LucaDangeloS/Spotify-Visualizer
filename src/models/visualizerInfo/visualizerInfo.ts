@@ -1,11 +1,14 @@
 import { Socket } from "socket.io"
+import * as def from "../../config/defaultVisualizer.json";
+import { PaletteDAO } from "../palette/paletteDAO";
 
 export interface VisualizerInfo {
     name: string,
     socket: Socket,
+    colorDelay: number,
     id: string,
     state: VisualizerState,
-    palette: {info: PaletteInfo, scale: chroma.Scale, hexColors: string[]},
+    palette: {info: PaletteDAO, scale: chroma.Scale, hexColors: string[]},
     delay: number,
     transitionModifier: number,
     cycleModifier: number,
@@ -20,28 +23,23 @@ export enum VisualizerState {
     on
 }
 
-export interface PaletteInfo {
-    name: string,
-    id: string,
-    genColors: Array<string>
-}
-
-export function newVisualizer(number: number, defaultPalette: PaletteInfo, socket: Socket): VisualizerInfo {
+export function newVisualizer(number: number, defaultPalette: PaletteDAO, socket: Socket): VisualizerInfo {
     return {
         name: "Visualizer " + number,
         id: socket.id,
         socket: socket,
         state: VisualizerState.off,
+        colorDelay: def.colorDelay,
         palette: {
             info: defaultPalette,
             scale: null,
             hexColors: null
         },
-        delay: 0,
-        transitionModifier: 0,
-        cycleModifier: 0,
-        loudnessSensibility: 0,
-        minBeatConf: 0,
-        maxBeatConf: 1
+        delay: def.delay,
+        transitionModifier: def.transitionModifier,
+        cycleModifier: def.cycleModifier,
+        loudnessSensibility: def.loudnessSensibility,
+        minBeatConf: def.minBeatConf,
+        maxBeatConf: def.maxBeatConf
     };
 }

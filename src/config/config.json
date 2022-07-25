@@ -6,6 +6,5 @@
     "beatDelay": 0,
     "syncOffsetThreshold": 20,
     "trackProgressTickRate" : 5,
-    "colorPaletteSize": 200,
-    "palettesPath": "data/palettes.json"
+    "colorPaletteSize": 200
 }

@@ -17,6 +17,7 @@ export interface beatI {
 
 export interface sectionI {
     start: number,
+    loudness: number,
     duration: number,
 }
 

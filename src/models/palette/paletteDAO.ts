@@ -1,30 +1,58 @@
-import { PaletteInfo } from '../visualizerInfo/visualizerInfo';
-import { palettesPath } from '../../config/config.json';
-import fs from "fs";
+import { Palette, PrismaClient } from "@prisma/client";
 
-// For now it's just saved on a json file
-
-export interface paletteObject {
-    palettes: PaletteInfo[],
-    defaultPalette: PaletteInfo
+export interface PaletteDAO {
+    name: string,
+    genColors: string[],
 }
 
-export function savePalette(paletteObject: paletteObject): void {
-    let jsonObj = {
-        palettes: paletteObject.palettes,
-        default: paletteObject.defaultPalette
+function DAOToModel(dao: PaletteDAO) {
+    return {
+        name: dao.name,
+        genColors: dao.genColors.join(',')
     }
-    fs.writeFileSync(palettesPath, JSON.stringify(jsonObj));
 }
 
-export function loadPalette(): paletteObject {
-    try {
-        let info = JSON.parse(fs.readFileSync(palettesPath).toString());
-        return {
-            palettes: info.palettes,
-            defaultPalette: info.default
+function ModelToDAO(model: Palette): PaletteDAO {
+    return {
+        name: model.name,
+        genColors: model.genColors.split(',')
+    }
+}
+
+export function savePalette(paletteObject: PaletteDAO): void {
+    const prisma = new PrismaClient();
+    
+    prisma.palette.create({
+        data: DAOToModel(paletteObject)
+    }).then(palette => {
+        console.log(palette);
+    }).catch(err => {
+        console.log(err);
+    });
+}
+
+export async function loadPalettes(): Promise<PaletteDAO[]> {
+        const prisma = new PrismaClient();
+        let retPalettes: Palette[] = [];
+        await prisma.palette.findMany().then(palettes => {
+            retPalettes = palettes;
+        }).catch(err => {
+            console.log(err);
+        });
+        return retPalettes.map(p => ModelToDAO(p));
+}
+
+export function removePalette(genColors: string) : void {
+    const prisma = new PrismaClient();
+    prisma.palette.deleteMany({
+        where: {
+            genColors: {
+                equals: genColors
+            }
         }
-    } catch (e) { // IO exception
-        console.error(e);
-    }
+    }).then(palette => {
+        console.log(palette);
+    }).catch(err => {
+        console.log(err);
+    });
 }

@@ -1,14 +1,18 @@
 {
   "name": "spotify-visualizer",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A spotify visualizer server",
   "main": "src/main.ts",
   "scripts": {
+    "init": "npx prisma migrate dev --name initialize && npx prisma db seed",
     "dev": "nodemon --ignore data/*.json src/main.ts ",
     "start": "ts-node src/main.ts",
     "test": "jest --runInBand",
     "build": "tsc --module ES2015",
     "coverage": "jest --coverage --runInBand"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   },
   "author": "Luca D'angelo",
   "licence": "GPL-3.0-or-later",
@@ -17,6 +21,7 @@
     "src"
   ],
   "dependencies": {
+    "@prisma/client": "^4.1.0",
     "@types/chroma-js": "^2.1.3",
     "@types/cookie-parser": "^1.4.2",
     "@types/cors": "^2.8.12",
@@ -42,6 +47,7 @@
     "@babel/preset-typescript": "^7.16.7",
     "@types/jest": "^27.4.1",
     "babel-jest": "^27.5.1",
-    "jest": "^27.5.1"
+    "jest": "^27.5.1",
+    "prisma": "^4.1.0"
   }
 }

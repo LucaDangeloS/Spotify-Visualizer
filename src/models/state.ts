@@ -1,11 +1,8 @@
-import { PaletteInfo, VisualizerInfo } from './visualizerInfo/visualizerInfo';
+import { VisualizerInfo } from './visualizerInfo/visualizerInfo';
 import { TrackInfo } from './spotifyApiInterfaces';
 import { refreshTokenResponseI  } from '../spotifyIO/apiController';
-import { savePalette, loadPalette } from './palette/paletteDAO';
-import { palettesPath } from '../config/config.json';
-import fs from "fs";
-import SocketIO from 'socket.io';
-import { generateHexColors } from 'src/visualizerService/visualizerFuncs';
+import { savePalette, loadPalettes, removePalette, PaletteDAO } from './palette/paletteDAO';
+import { generateHexColors } from '../visualizerService/visualizerFuncs';
 
 export default class State {
     syncSocketRoom: string = "sync";
@@ -23,31 +20,24 @@ export default class State {
     private _expireTimestamp: Date = null;
 
     // Palette functions
-    public loadPaletteFile(): void {
-        let data = loadPalette();
-        this.colorInfo.palettes = data.palettes
-        this.colorInfo.defaultPalette = data.defaultPalette;
-        this.colorInfo.paletteFile = JSON.parse(fs.readFileSync(palettesPath).toString())
+    public async loadPalettes(): Promise<void> { // TODO: Add int/boolean return type
+        let data = await loadPalettes();
+        this.colorInfo.palettes = data
+        this.colorInfo.defaultPalette = data[0];
     }
 
-    public savePaletteFile(): void {
-        savePalette({
-            palettes: this.colorInfo.palettes, 
-            defaultPalette: this.colorInfo.defaultPalette
-        });
+    public async addPalette(palette: PaletteDAO): Promise<void> { // TODO: Add int/boolean return type
+        this.colorInfo.palettes.push(palette);
+        this.savePalette(palette);
     }
 
-    public addPalette(genColors: PaletteInfo) {
-        this.colorInfo.palettes.push(genColors);
-        this.savePaletteFile();
+    private async savePalette(palette: PaletteDAO): Promise<void> { // TODO: Add int/boolean return type
+        savePalette(palette);
     }
 
-    public removePalette(id: string) {
-        let index = this.colorInfo.palettes.findIndex(p => p.id === id);
-        if (index > -1) {
-            this.colorInfo.palettes.splice(index, 1);
-            this.savePaletteFile();
-        }
+    public async removePalette(id: string): Promise<void> { // TODO: Add int/boolean return type
+        removePalette(id);
+        await this.loadPalettes();
     }
 
     // Visualizers functions
@@ -98,7 +88,7 @@ export default class State {
         this.verbose = verbose;
         this.active = true;
         this.beatCallback = beatCallback;
-        this.loadPaletteFile();
+        this.loadPalettes();
     }
 
 }
@@ -109,7 +99,7 @@ class Loops {
 }
 
 class ColorInfo {
-    palettes: Array<PaletteInfo> = [];
-    defaultPalette: PaletteInfo = null;
+    palettes: Array<PaletteDAO> = [];
+    defaultPalette: PaletteDAO = null;
     paletteFile = null;
 }
