@@ -19,40 +19,52 @@ function ModelToDAO(model: Palette): PaletteDAO {
     }
 }
 
-export function savePalette(paletteObject: PaletteDAO): void {
+export async function savePalette(paletteObject: PaletteDAO): Promise<PaletteDAO> {
     const prisma = new PrismaClient();
-    
-    prisma.palette.create({
+    let retPalette: PaletteDAO;
+
+    await prisma.palette.create({
         data: DAOToModel(paletteObject)
     }).then(palette => {
-        console.log(palette);
+        retPalette = ModelToDAO(palette);
     }).catch(err => {
         console.log(err);
     });
+
+    return retPalette;
 }
 
 export async function loadPalettes(): Promise<PaletteDAO[]> {
-        const prisma = new PrismaClient();
-        let retPalettes: Palette[] = [];
-        await prisma.palette.findMany().then(palettes => {
-            retPalettes = palettes;
-        }).catch(err => {
-            console.log(err);
-        });
+    const prisma = new PrismaClient();
+    let retPalettes: Palette[] | void = [];
+
+    retPalettes = await prisma.palette.findMany().catch(err => {
+        console.log(err);
+    });
+
+    if (retPalettes) {
         return retPalettes.map(p => ModelToDAO(p));
+    } else {
+        return null;
+    }
 }
 
-export function removePalette(genColors: string) : void {
+export async function removePalette(genColors: string) : Promise<boolean> {
     const prisma = new PrismaClient();
-    prisma.palette.deleteMany({
+    let ret: boolean;
+
+    await prisma.palette.deleteMany({
         where: {
             genColors: {
                 equals: genColors
             }
         }
-    }).then(palette => {
-        console.log(palette);
+    }).then( palettes => {
+        ret = true;
     }).catch(err => {
         console.log(err);
+        ret = false;
     });
+
+    return ret;
 }

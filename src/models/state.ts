@@ -20,24 +20,45 @@ export default class State {
     private _expireTimestamp: Date = null;
 
     // Palette functions
-    public async loadPalettes(): Promise<void> { // TODO: Add int/boolean return type
-        let data = await loadPalettes();
-        this.colorInfo.palettes = data
-        this.colorInfo.defaultPalette = data[0];
+    public async loadPalettes(): Promise<boolean> {
+        try {
+            let data = await loadPalettes();
+            this.colorInfo.palettes = data
+            this.colorInfo.defaultPalette = data[0];
+        } catch (err) {
+            console.log(err);
+            return false;
+        }
+        return true;
     }
 
-    public async addPalette(palette: PaletteDAO): Promise<void> { // TODO: Add int/boolean return type
-        this.colorInfo.palettes.push(palette);
-        this.savePalette(palette);
+    public async addPalette(palette: PaletteDAO): Promise<boolean> {
+        try {
+            this.colorInfo.palettes.push(palette);
+            this.savePalette(palette);
+        } catch (err) {
+            console.log(err);
+            return false;
+        }
+        return true;
     }
 
-    private async savePalette(palette: PaletteDAO): Promise<void> { // TODO: Add int/boolean return type
-        savePalette(palette);
+    private async savePalette(palette: PaletteDAO): Promise<boolean> {
+        if (await savePalette(palette)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    public async removePalette(id: string): Promise<void> { // TODO: Add int/boolean return type
-        removePalette(id);
-        await this.loadPalettes();
+    public async removePalette(id: string): Promise<boolean> {
+        let ret = removePalette(id);
+        if (ret) {
+            await this.loadPalettes();
+            return true;
+        } else {
+            return false;
+        }
     }
 
     // Visualizers functions
