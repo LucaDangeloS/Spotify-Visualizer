@@ -143,11 +143,12 @@ function startTrackProgressLoop(state: State): void {
 
 function stageBeat(state: State): void {
     //set the timeout id to a variable in state for convenient loop cancellation.
-    let baseDelay = calculateTimeUntilNextBeat(state) + state.globalDelay;
+    let baseDelay = (calculateTimeUntilNextBeat(state) + state.globalDelay);
+    let delay = baseDelay > 0 ? baseDelay : 0;
     state.loops.beatLoop = setTimeout(() => {
         state.beatCallback(state);
         incrementBeat(state);
-    }, baseDelay > 0 ? baseDelay : 0);
+    }, delay);
 }
 
 function incrementBeat(state: State) {
@@ -192,6 +193,6 @@ function calculateTimeUntilNextBeat(state: State): number {
     let trackProgress = state.trackInfo.trackProgress;
     let timeUntilNextBeat =
         activeBeatDuration - (trackProgress - activeBeatStart);
-
+    console.log(activeBeatDuration)
     return timeUntilNextBeat;
 }

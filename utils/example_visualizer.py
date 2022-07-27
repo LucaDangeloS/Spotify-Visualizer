@@ -50,6 +50,7 @@ async def main():
     while True:
         if (colors.transition):
             pygame.draw.rect(display, pygame.Color(colors.transition.pop(0)), (0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT))
+            print(len(colors.transition))
         else:
             pygame.draw.rect(display, pygame.Color(colors.colors[idx]), (0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT))
             idx = (idx + 1) % len(colors.colors)

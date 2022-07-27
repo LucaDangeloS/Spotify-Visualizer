@@ -70,7 +70,7 @@ export function analogous(color: (string | chroma.Color | number), a: number) : 
  * @param {number} tickrate 
  * @returns {number} index
  */
-export function shift(palette: (string)[], index: number, time: number, tickrate: number = 5) : number {
+export function shift(palette: (string)[], index: number, time: number, tickrate: number = 33) : number {
     if (palette === undefined || palette === null) return null;
     let displacement: number = Math.round(time / tickrate);
     return (index + displacement) % palette.length;
@@ -85,7 +85,7 @@ export function shift(palette: (string)[], index: number, time: number, tickrate
  * @param {number} tickrate 
  * @returns {rotation: string[], idx: number} rotation color array and index
  * */ 
-export function sequence(palette: (string)[], index: number, time: number, tickrate: number = 5) : {rotation: string[], idx: number} {
+export function sequence(palette: (string)[], index: number, time: number, tickrate: number = 33) : {rotation: string[], idx: number} {
     if (palette === undefined || palette === null) return null;
     let new_index: number = shift(palette, index, time, tickrate);
     return {rotation: palette.slice(index, new_index), idx: new_index};
@@ -103,12 +103,12 @@ export function sequence(palette: (string)[], index: number, time: number, tickr
  * @param {number} timeFactor - Factor from 0.0 to 1.0 from which the time will be consumed on the transition
  * @returns {string[]} Color transition array in hex format
  */
-export function makeTimeTransitionOffset(palette: (string)[], color: string, index: number, time: number, tickrate: number = 5, timeFactor: number = 0.6) : string[] {
+export function makeTimeTransitionOffset(palette: (string)[], color: string, index: number, time: number, tickrate: number = 33, timeFactor: number = 0.8) : string[] {
     if (tickrate <= 0) {
         tickrate = 5;
     }
     if (timeFactor <= 0 || timeFactor > 1) {
-        timeFactor = 0.6;
+        timeFactor = 0.8;
     }
     let steps: number = Math.round((time * timeFactor) / tickrate);
     if (steps > palette.length) {

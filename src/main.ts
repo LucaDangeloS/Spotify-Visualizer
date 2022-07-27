@@ -33,10 +33,6 @@ async function main() {
         console.log("Ready");
     }
 
-    vizServer.engine.on("connection_error", (err: any) => {
-        console.log("Connection error: " + err);
-    })
-
     vizServer.on('connection', (socket: sio.Socket) => {
         manageConnection(state, socket); 
     });
@@ -50,8 +46,9 @@ function fireBeat(state: State) {
     // console.log("       " + state.trackInfo.initialTrackProgress/1000 + " " + new Date(state.trackInfo.initialTimestamp));
     console.log("BEAT - " + state.trackInfo.activeBeat?.confidence + " " + Math.floor(state.trackInfo.trackProgress / 1000));
     state.visualizers.forEach(visualizer => {
-        let color = colors.complementary(visualizer.palette.hexColors[0]);
-        let trans = colors.makeTimeTransitionOffset(visualizer.palette.hexColors, color, 0, 200);
+        let color = colors.analogous(visualizer.palette.hexColors[0], 30).right;
+        // TODO: Predict the color the visualizer will be based on the last beat sent
+        let trans = colors.makeTimeTransitionOffset(visualizer.palette.hexColors, color, 0, state.trackInfo.activeBeat.duration);
         console.log(`${state.trackInfo.activeSection ? state.trackInfo.activeSection.loudness : null}`)
         visualizer.socket.emit('beat', {transition: trans, colors: visualizer.palette.hexColors});
         // if (visualizer.state == VisualizerState.on) {
