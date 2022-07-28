@@ -23,7 +23,6 @@ class Colors():
         # print(f"{data} from socket {sio.sid} {sio.get_sid()}")
         cls.transition = data['transition']
         cls.colors = data['colors']
-        print(str(data['time']) + "   " + str(time.time() * 1000))
 
     @classmethod
     def getTransitionColor(cls):
