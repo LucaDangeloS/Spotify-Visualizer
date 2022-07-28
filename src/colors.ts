@@ -54,7 +54,7 @@ export function complementary(color: (string | chroma.Color | number)) : string 
  * @returns {left: string, right: string} Analogous colors
  */
 export function analogous(color: (string | chroma.Color | number), a: number) : {left: string, right: string} {
-    if (color === undefined || color === null) return null;
+    if (color === undefined || color === null) throw new Error("No valid color provided");
     let c = chroma(color);
     return {left: c.set('hsl.h', `-${a}`).hex(), right: c.set('hsl.h', `+${a}`).hex()};
 }
@@ -105,7 +105,7 @@ export function sequence(palette: (string)[], index: number, time: number, tickr
  */
 export function makeTimeTransitionOffset(palette: (string)[], color: string, index: number, time: number, tickrate: number = 33, timeFactor: number = 0.8) : string[] {
     if (tickrate <= 0) {
-        tickrate = 5;
+        tickrate = 33;
     }
     if (timeFactor <= 0 || timeFactor > 1) {
         timeFactor = 0.8;
