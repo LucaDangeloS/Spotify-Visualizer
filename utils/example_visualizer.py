@@ -2,6 +2,7 @@
 # and send a message
 
 import asyncio
+import time
 import socketio
 import pygame
 import timeit
@@ -22,6 +23,7 @@ class Colors():
         # print(f"{data} from socket {sio.sid} {sio.get_sid()}")
         cls.transition = data['transition']
         cls.colors = data['colors']
+        print(str(data['time']) + "   " + str(time.time() * 1000))
 
     @classmethod
     def getTransitionColor(cls):
@@ -41,6 +43,7 @@ async def main():
     def getTransitionColor(data):
         # print("Received data")
         colors.message(data)
+        print(colors.colors[0])
 
     sio.connect(f"{HOST}:{PORT}")
 
@@ -50,7 +53,7 @@ async def main():
     while True:
         if (colors.transition):
             pygame.draw.rect(display, pygame.Color(colors.transition.pop(0)), (0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT))
-            print(len(colors.transition))
+            # print(len(colors.transition))
         else:
             pygame.draw.rect(display, pygame.Color(colors.colors[idx]), (0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT))
             idx = (idx + 1) % len(colors.colors)
