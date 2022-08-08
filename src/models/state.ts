@@ -2,14 +2,19 @@ import { VisualizerInfo } from './visualizerInfo/visualizerInfo';
 import { TrackInfo } from './spotifyApiInterfaces';
 import { refreshTokenResponseI  } from '../spotifyIO/apiController';
 import { savePalette, loadPalettes, removePalette, PaletteDAO } from './palette/paletteDAO';
-import { generateHexColors } from '../visualizerService/visualizerFuncs';
+import { beatDelay, colorPaletteSize } from '../config/config.json';
+import { colorTickRate } from '../config/defaultVisualizer.json';
+import { generateColorPalette } from '../colors';
+import {Server} from "socket.io";
+
 
 export default class State {
-    syncSocketRoom: string = "sync";
+    sync: SyncSharedData = new SyncSharedData();
     trackInfo: TrackInfo = new TrackInfo();
     colorInfo: ColorInfo = new ColorInfo();
+    visualizerServerSocket: Server = null;
     visualizers: VisualizerInfo[] = [];
-    globalDelay: number = 0;
+    globalDelay: number = beatDelay;
     loops: Loops = new Loops();
     beatCallback: Function;
     verbose: boolean;
@@ -52,18 +57,24 @@ export default class State {
     }
 
     public async removePalette(id: string): Promise<boolean> {
+        if (this.colorInfo.palettes.length === 1) {
+            return false; // TODO: Raise exception
+        }
         let ret = removePalette(id);
         if (ret) {
             await this.loadPalettes();
             return true;
         } else {
-            return false;
+            return false; // TODO: Raise exception
         }
     }
 
     // Visualizers functions
     public addVisualizer(visualizer: VisualizerInfo) {
         this.visualizers.push(visualizer);
+        if (this.sync.isSynced) {
+            this.sync.tickrate = this.visualizers.reduce((acc, v) => acc + v.colorTickRate, 0) / this.visualizers.length;
+        }
     }
 
     public removeVisualizer(id: string) {
@@ -71,6 +82,14 @@ export default class State {
         if (index > -1) {
             this.visualizers[index].socket.disconnect();
             this.visualizers.splice(index, 1);
+            if (this.sync.isSynced) {
+                if (this.visualizers.length > 0) {
+                    this.sync.tickrate = this.visualizers.reduce((acc, v) => acc + v.colorTickRate, 0) / this.visualizers.length;
+                }
+                else {
+                    this.sync.tickrate = colorTickRate;
+                }
+            }
         }
     }
 
@@ -82,10 +101,17 @@ export default class State {
         });
     }
 
+    // sync
     public syncVisualizers() {
-        this.visualizers.forEach(v => {
-            generateHexColors(v);
-        });
+        this.sync.isSynced = true;
+        this.sync.colorArray = generateColorPalette(this.colorInfo.defaultPalette.genColors, true).colors(colorPaletteSize);
+        // calculate mean of visualizer delays
+        this.sync.tickrate = this.visualizers.reduce((acc, v) => acc + v.colorTickRate, 0) / this.visualizers.length;
+    }
+
+    // TODO: desync
+    public desyncVisualizers() {
+        this.sync.isSynced = false;
     }
 
     public setAccessToken(accessToken: refreshTokenResponseI) {
@@ -122,5 +148,12 @@ class Loops {
 class ColorInfo {
     palettes: Array<PaletteDAO> = [];
     defaultPalette: PaletteDAO = null;
-    paletteFile = null;
+}
+
+class SyncSharedData {
+    isSynced: boolean = false;
+    syncSocketRoom: string = "sync";
+    colorArray: string[] = null;
+    lastBeatTimestamp: number = Date.now();
+    tickrate: number = colorTickRate;
 }

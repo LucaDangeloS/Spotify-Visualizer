@@ -5,7 +5,8 @@ import { PaletteDAO } from "../palette/paletteDAO";
 export interface VisualizerInfo {
     name: string,
     socket: Socket,
-    colorDelay: number,
+    colorTickRate: number // Time in ms that takes for the visualizer to change a color,
+    lastBeatTimestamp: number,
     id: string,
     state: VisualizerState,
     palette: {info: PaletteDAO, scale: chroma.Scale, hexColors: string[]},
@@ -28,8 +29,9 @@ export function newVisualizer(number: number, defaultPalette: PaletteDAO, socket
         name: "Visualizer " + number,
         id: socket.id,
         socket: socket,
-        state: VisualizerState.off,
-        colorDelay: def.colorDelay,
+        state: VisualizerState.on,
+        colorTickRate: def.colorTickRate,
+        lastBeatTimestamp: Date.now(),
         palette: {
             info: defaultPalette,
             scale: null,

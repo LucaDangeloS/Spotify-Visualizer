@@ -78,9 +78,9 @@ tsc
 - [x] Implement color cycling
 - [x] Implement token refresh in mid-playback
 - [x] Figure out a way to delegate the song interpretation to the server
-- [x] Implement socket communication
-- [x] Standardize the message exchanges from server to visualizers
-- [x] Add support for multiple visualizers
+- [ ] Implement (raw) socket communication
+- [ ] Standardize the message exchanges from server to visualizers
+- [ ] Add support for multiple visualizers
 - [ ] Implement individual visualizer customization
 - [ ] Make color jump related to song volume
 - [ ] Fine tune palette sizes

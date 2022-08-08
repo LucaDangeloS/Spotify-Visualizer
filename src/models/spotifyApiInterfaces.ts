@@ -44,6 +44,8 @@ export class TrackInfo {
     activeSection: sectionI;
     activeSectionIndex: number = -1;
     lastSectionIndex: number = -1;
+    maxDb: number = 0;
+    minDb: number = 0;
 
     beats = Array<beatI>(0);
 

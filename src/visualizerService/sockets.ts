@@ -6,7 +6,7 @@ import { generateHexColors } from './visualizerFuncs';
 
 
 export function createVisualizerServer(port: number): Server {
-    let server = new Server();
+    let server = new Server({pingTimeout: 5000});
     server.listen(port);
     return server;
 }
@@ -16,7 +16,7 @@ export function manageConnection(state: State, socket: Socket) {
         console.log("Disconnection of socket " + socket.id);
         state.removeVisualizer(socket.id);
     });
-    socket.join(state.syncSocketRoom);
+    socket.join(state.sync.syncSocketRoom);
     let visualizer: VisualizerInfo = newVisualizer(state.visualizers.length, state.colorInfo.defaultPalette, socket);
     generateHexColors(visualizer);
     state.addVisualizer(visualizer);
