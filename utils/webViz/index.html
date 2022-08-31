@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <script src="./socket.io.min.js"></script>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body>
+        <div id="id">ID</div>
+        
+        <div id="text">test</div>
+        <div id="timings"></div>
+    </body>
+    <style>
+        html {
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            display: grid;
+            margin: 4rem auto;
+            padding: 4rem;
+            align-items: center;
+            height: 100vh;
+            transition: background-color 0.3s linear;
+        }
+        #text,
+        #lasttime {
+            width: 75%;
+            display: flex;
+            flex-wrap: wrap;
+        }
+    </style>
+    <script src="./index.js"></script>
+</html>

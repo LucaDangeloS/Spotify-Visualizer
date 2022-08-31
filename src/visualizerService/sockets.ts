@@ -6,7 +6,7 @@ import { generateHexColors } from './visualizerFuncs';
 
 
 export function createVisualizerServer(port: number): Server {
-    let server = new Server({pingTimeout: 5000});
+    let server = new Server({pingTimeout: 5000, cors:{origin:'*'}});
     server.listen(port);
     return server;
 }
@@ -21,4 +21,15 @@ export function manageConnection(state: State, socket: Socket) {
     generateHexColors(visualizer);
     state.addVisualizer(visualizer);
     console.log(state.visualizers.length + " visualizers connected. Using palette: " + visualizer.palette.info.name);
+}
+
+export function sendData(visualizer: VisualizerInfo, transition: string[], colors: string[], delay: number) {
+    // let time = new Date().getTime();
+    visualizer.socket.emit(
+        "beat",
+        {
+            transition: transition,
+            colors: colors ? colors : visualizer.palette.hexColors,
+        }
+    );
 }
