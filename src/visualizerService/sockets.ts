@@ -4,10 +4,19 @@ import State from '../models/state';
 import 'socket.io';
 import { generateHexColors } from './visualizerFuncs';
 
+// Wrapper interfaces
+export interface VisualizerServer extends Server {
+}
 
-export function createVisualizerServer(port: number): Server {
+export interface VisualizerSocket extends Socket {
+}
+
+export function createVisualizerServer(state: State, port: number): VisualizerServer {
     let server = new Server({pingTimeout: 5000, cors:{origin:'*'}});
     server.listen(port);
+    server.on('connection', (socket: Socket) => {
+        manageConnection(state, socket); 
+    });
     return server;
 }
 

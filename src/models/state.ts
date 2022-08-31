@@ -5,14 +5,14 @@ import { savePalette, loadPalettes, removePalette, PaletteDAO } from './palette/
 import { beatDelay, colorPaletteSize } from '../config/config.json';
 import { colorTickRate } from '../config/defaultVisualizer.json';
 import { generateColorPalette } from '../colors';
-import {Server} from "socket.io";
+import { VisualizerServer } from 'src/visualizerService/sockets';
 
 
 export default class State {
     sync: SyncSharedData = new SyncSharedData();
     trackInfo: TrackInfo = new TrackInfo();
     colorInfo: ColorInfo = new ColorInfo();
-    visualizerServerSocket: Server = null;
+    visualizerServerSocket: VisualizerServer = null;
     visualizers: VisualizerInfo[] = [];
     globalDelay: number = beatDelay;
     loops: Loops = new Loops();

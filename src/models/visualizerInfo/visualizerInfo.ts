@@ -1,10 +1,10 @@
-import { Socket } from "socket.io"
+import { VisualizerSocket } from "src/visualizerService/sockets";
 import * as def from "../../config/defaultVisualizer.json";
 import { PaletteDAO } from "../palette/paletteDAO";
 
 export interface VisualizerInfo {
     name: string,
-    socket: Socket,
+    socket: VisualizerSocket,
     colorTickRate: number // Time in ms that takes for the visualizer to change a color,
     lastBeatTimestamp: number,
     id: string,
@@ -24,7 +24,7 @@ export enum VisualizerState {
     on
 }
 
-export function newVisualizer(number: number, defaultPalette: PaletteDAO, socket: Socket): VisualizerInfo {
+export function newVisualizer(number: number, defaultPalette: PaletteDAO, socket: VisualizerSocket): VisualizerInfo {
     return {
         name: "Visualizer " + number,
         id: socket.id,

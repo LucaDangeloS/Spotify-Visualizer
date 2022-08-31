@@ -1,4 +1,4 @@
-import { createVisualizerServer, manageConnection, sendData } from './visualizerService/sockets';
+import { createVisualizerServer, manageConnection, sendData, VisualizerServer } from './visualizerService/sockets';
 import { frontEndPort, visualizerPort } from "./config/network-info.json";
 import { VisualizerInfo, VisualizerState } from "./models/visualizerInfo/visualizerInfo";
 import * as TrackController from './spotifyIO/trackController';
@@ -7,7 +7,6 @@ import * as api from './spotifyIO/apiController';
 import Server from './webserver/server';
 import State from './models/state';
 import * as colors from './colors';
-import * as sio from "socket.io";
 import { delay } from './utils';
 import { isOptionalChain } from 'typescript';
 import { stat } from 'fs/promises';
@@ -25,7 +24,7 @@ async function main() {
     await api.waitForToken(state);
     sync.initialize(); // The synchronizer needs a working token for it to properly work
 
-    let vizServer: sio.Server = createVisualizerServer(visualizerPort);
+    let vizServer: VisualizerServer = createVisualizerServer(state, visualizerPort);
     state.clearVisualizers();
     await state.loadPalettes();
     console.log(state.colorInfo.palettes);
@@ -35,9 +34,6 @@ async function main() {
         console.log("Ready");
     }
 
-    vizServer.on('connection', (socket: sio.Socket) => {
-        manageConnection(state, socket); 
-    });
     state.syncVisualizers();
     // await delay(8000);
     // sync.terminate();
