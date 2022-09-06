@@ -1,57 +1,57 @@
-import { VisualizerColorInfo, VisualizerInfo } from "src/models/visualizerInfo/visualizerInfo";
+import { VisualizerInfo, VisualizerSocketInfo } from "src/models/visualizerInfo/visualizerInfo";
 
 export class NoPaletteDefinedError extends Error {
-    VisualizerColorInfo: VisualizerColorInfo;
+    VisualizerColorInfo: VisualizerInfo;
 
-    constructor(VisualizerColorInfo: VisualizerColorInfo) {
+    constructor(VisualizerColorInfo: VisualizerInfo) {
         VisualizerColorInfo = VisualizerColorInfo;
         super("No palette defined");
     }
 
-    getVisualizerColorInfo(): VisualizerColorInfo {
+    getVisualizerColorInfo(): VisualizerInfo {
         return this.VisualizerColorInfo;
     }
 }
 
 export class NullNameError extends Error {
-    VisualizerInfo: VisualizerInfo;
+    VisualizerInfo: VisualizerSocketInfo;
 
-    constructor(VisualizerColorInfo: VisualizerInfo) {
+    constructor(VisualizerColorInfo: VisualizerSocketInfo) {
         VisualizerColorInfo = VisualizerColorInfo;
         super("Name cannot be empty");
     }
 
-    getVisualizerColorInfo(): VisualizerInfo {
+    getVisualizerColorInfo(): VisualizerSocketInfo {
         return this.VisualizerInfo;
     }
 }
 
 export class NullPaletteError extends Error {
-    VisualizerColorInfo: VisualizerColorInfo;
+    VisualizerColorInfo: VisualizerInfo;
 
-    constructor(VisualizerColorInfo: VisualizerColorInfo) {
+    constructor(VisualizerColorInfo: VisualizerInfo) {
         VisualizerColorInfo = VisualizerColorInfo;
         super("Palette cannot be empty");
     }
 
-    getVisualizerColorInfo(): VisualizerColorInfo {
+    getVisualizerColorInfo(): VisualizerInfo {
         return this.VisualizerColorInfo;
     }
 }
 
 export class ValueOutOfBoundsError extends Error {
-    VisualizerColorInfo: VisualizerColorInfo;
+    VisualizerColorInfo: VisualizerInfo;
     minBound: number;
     maxBound: number;
 
-    constructor(VisualizerInfo: VisualizerInfo|VisualizerColorInfo, minBound: number, maxBound: number) {
+    constructor(VisualizerInfo: VisualizerSocketInfo|VisualizerInfo, minBound: number, maxBound: number) {
         VisualizerInfo = VisualizerInfo;
         minBound = minBound;
         maxBound = maxBound;
         super("Value out of bounds");
     }
 
-    getVisualizerColorInfo(): VisualizerColorInfo {
+    getVisualizerColorInfo(): VisualizerInfo {
         return this.VisualizerColorInfo;
     }
 

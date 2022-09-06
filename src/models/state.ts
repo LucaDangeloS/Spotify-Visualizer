@@ -1,4 +1,4 @@
-import { VisualizerInfo, VisualizerColorInfo, VisualizerState, newVisualizerColorInfo } from './visualizerInfo/visualizerInfo';
+import { VisualizerSocketInfo, VisualizerInfo, VisualizerState, newVisualizerColorInfo } from './visualizerInfo/visualizerInfo';
 import { TrackInfo } from './spotifyApiInterfaces';
 import { refreshTokenResponseI  } from '../spotifyIO/apiController';
 import { savePalette, loadPalettes, removePalette, PaletteDAO } from './palette/paletteDAO';
@@ -16,7 +16,7 @@ export default class State {
     trackInfo: TrackInfo = new TrackInfo();
     colorInfo: ColorInfo = new ColorInfo();
     visualizerServerSocket: VisualizerServer = null;
-    visualizers: VisualizerInfo[] = [];
+    visualizers: VisualizerSocketInfo[] = [];
     globalDelay: number = beatDelay;
     loops: Loops = new Loops();
     beatCallback: Function;
@@ -73,7 +73,7 @@ export default class State {
     }
 
     // Visualizers functions
-    public addVisualizer(visualizer: VisualizerInfo) {
+    public addVisualizer(visualizer: VisualizerSocketInfo) {
         this.visualizers.push(visualizer);
         if (this.isSynced) {
             this.syncSharedData.colorTickRate = this.visualizers.reduce((acc, v) => acc + v.colorInfo.colorTickRate, 0) / this.visualizers.length;
@@ -156,7 +156,7 @@ class ColorInfo {
     defaultPalette: PaletteDAO = null;
 }
 
-class VisualizerSharedData implements VisualizerColorInfo {
+class VisualizerSharedData implements VisualizerInfo {
     transitionModifier: number;
     loudnessSensibility: number;
     cycleModifier: number;

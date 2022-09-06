@@ -2,16 +2,16 @@ import { VisualizerSocket } from "src/visualizerService/sockets";
 import * as def from "../../config/defaultVisualizer.json";
 import { PaletteDAO } from "../palette/paletteDAO";
 
-export interface VisualizerInfo {
+export interface VisualizerSocketInfo {
     name: string,
     socket: VisualizerSocket,
     id: string,
     delay: number,
-    colorInfo: VisualizerColorInfo
+    colorInfo: VisualizerInfo
 }
 
 
-export interface VisualizerColorInfo {
+export interface VisualizerInfo {
     state: VisualizerState,
     minBeatConf: number,
     maxBeatConf: number,
@@ -29,7 +29,7 @@ export enum VisualizerState {
     on
 }
 
-export function newVisualizerColorInfo(defaultPalette: PaletteDAO): VisualizerColorInfo {
+export function newVisualizerColorInfo(defaultPalette: PaletteDAO): VisualizerInfo {
     return {
         state: VisualizerState.on,
         minBeatConf: def.minBeatConf,
@@ -47,8 +47,8 @@ export function newVisualizerColorInfo(defaultPalette: PaletteDAO): VisualizerCo
     };
 }
 
-export function newVisualizer(number: number, defaultPalette: PaletteDAO, socket: VisualizerSocket): VisualizerInfo {
-    let colorInfo: VisualizerColorInfo = newVisualizerColorInfo(defaultPalette);
+export function newVisualizer(number: number, defaultPalette: PaletteDAO, socket: VisualizerSocket): VisualizerSocketInfo {
+    let colorInfo: VisualizerInfo = newVisualizerColorInfo(defaultPalette);
     return {
         name: "Visualizer " + number,
         id: socket.id,

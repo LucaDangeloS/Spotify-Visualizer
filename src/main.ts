@@ -1,6 +1,6 @@
 import { broadcastData, createVisualizerServer, manageConnection, sendData, VisualizerServer } from './visualizerService/sockets';
 import { frontEndPort, visualizerPort } from "./config/network-info.json";
-import { VisualizerColorInfo, VisualizerInfo, VisualizerState } from "./models/visualizerInfo/visualizerInfo";
+import { VisualizerInfo, VisualizerSocketInfo, VisualizerState } from "./models/visualizerInfo/visualizerInfo";
 import * as TrackController from './spotifyIO/trackController';
 import Synchronizer from './spotifyIO/synchronizer';
 import * as api from './spotifyIO/apiController';
@@ -77,7 +77,7 @@ function fireBeat(state: State) {
     }
 }
 
-function processNextColor(visualizer: VisualizerColorInfo, duration: number): string[] {
+function processNextColor(visualizer: VisualizerInfo, duration: number): string[] {
     let index =
         Math.floor(
             (Date.now() - visualizer.lastBeatTimestamp) /
