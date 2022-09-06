@@ -1,6 +1,6 @@
-import { createVisualizerServer, manageConnection, sendData, VisualizerServer } from './visualizerService/sockets';
+import { broadcastData, createVisualizerServer, manageConnection, sendData, VisualizerServer } from './visualizerService/sockets';
 import { frontEndPort, visualizerPort } from "./config/network-info.json";
-import { VisualizerInfo, VisualizerState } from "./models/visualizerInfo/visualizerInfo";
+import { VisualizerColorInfo, VisualizerInfo, VisualizerState } from "./models/visualizerInfo/visualizerInfo";
 import * as TrackController from './spotifyIO/trackController';
 import Synchronizer from './spotifyIO/synchronizer';
 import * as api from './spotifyIO/apiController';
@@ -49,24 +49,35 @@ function fireBeat(state: State) {
     let activeBeatConf = state.trackInfo.activeBeat.confidence;
     let activeBeatDur = state.trackInfo.activeBeat.duration;
 
-    state.visualizers.forEach((visualizer) => {
-        if (visualizer.state == VisualizerState.on) {
-            if (
-                activeBeatConf >= visualizer.minBeatConf &&
-                activeBeatConf <= visualizer.maxBeatConf
-            ) {
-                let vizDelay = -state.globalDelay - visualizer.delay;
-                let transitionColors = processNextColor( 
-                    visualizer,
-                    activeBeatDur + vizDelay
-                );
-                sendData(visualizer, transitionColors, visualizer.palette.hexColors, vizDelay);
-            }
-        }
-    });
+    if (!state.isSynced) {
+        state.visualizers.forEach((visualizer) => {
+            if (visualizer.colorInfo.state == VisualizerState.on) {
+                if (
+                    activeBeatConf >= visualizer.colorInfo.minBeatConf &&
+                    activeBeatConf <= visualizer.colorInfo.maxBeatConf
+                    ) {
+                        let vizDelay = -state.globalDelay - visualizer.delay;
+                        let transitionColors = processNextColor( 
+                            visualizer.colorInfo,
+                            activeBeatDur + vizDelay
+                            );
+                        sendData(visualizer, transitionColors, visualizer.colorInfo.palette.hexColors, vizDelay);
+                        visualizer.colorInfo.lastBeatTimestamp = Date.now();
+                    }
+                }
+        });
+    } else {
+        let sharedData = state.syncSharedData;
+        let transitionColors = processNextColor( 
+            sharedData,
+            activeBeatDur
+        );
+        broadcastData(sharedData, transitionColors, state.visualizerServerSocket);
+        sharedData.lastBeatTimestamp = Date.now();
+    }
 }
 
-function processNextColor(visualizer: VisualizerInfo, duration: number): string[] {
+function processNextColor(visualizer: VisualizerColorInfo, duration: number): string[] {
     let index =
         Math.floor(
             (Date.now() - visualizer.lastBeatTimestamp) /

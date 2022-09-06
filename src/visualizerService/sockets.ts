@@ -1,4 +1,4 @@
-import { newVisualizer, VisualizerInfo } from '../models/visualizerInfo/visualizerInfo';
+import { newVisualizer, VisualizerColorInfo, VisualizerInfo } from '../models/visualizerInfo/visualizerInfo';
 import { Server, Socket } from 'socket.io';
 import State from '../models/state';
 import 'socket.io';
@@ -25,11 +25,11 @@ export function manageConnection(state: State, socket: Socket) {
         console.log("Disconnection of socket " + socket.id);
         state.removeVisualizer(socket.id);
     });
-    socket.join(state.sync.syncSocketRoom);
+
     let visualizer: VisualizerInfo = newVisualizer(state.visualizers.length, state.colorInfo.defaultPalette, socket);
-    generateHexColors(visualizer);
+    generateHexColors(visualizer.colorInfo);
     state.addVisualizer(visualizer);
-    console.log(state.visualizers.length + " visualizers connected. Using palette: " + visualizer.palette.info.name);
+    console.log(state.visualizers.length + " visualizers connected. Using palette: " + visualizer.colorInfo.palette.info.name);
 }
 
 export function sendData(visualizer: VisualizerInfo, transition: string[], colors: string[], delay: number) {
@@ -38,7 +38,14 @@ export function sendData(visualizer: VisualizerInfo, transition: string[], color
         "beat",
         {
             transition: transition,
-            colors: colors ? colors : visualizer.palette.hexColors,
+            colors: colors ? colors : visualizer.colorInfo.palette.hexColors,
         }
     );
+}
+
+export function broadcastData(sharedData: VisualizerColorInfo, transition: string[], server: VisualizerServer) {
+    server.emit('beat', {
+        transition: transition,
+        colors: sharedData.palette.hexColors,
+    });
 }

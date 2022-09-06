@@ -5,17 +5,22 @@ import { PaletteDAO } from "../palette/paletteDAO";
 export interface VisualizerInfo {
     name: string,
     socket: VisualizerSocket,
-    colorTickRate: number // Time in ms that takes for the visualizer to change a color,
-    lastBeatTimestamp: number,
     id: string,
-    state: VisualizerState,
-    palette: {info: PaletteDAO, scale: chroma.Scale, hexColors: string[]},
     delay: number,
-    transitionModifier: number,
-    cycleModifier: number,
-    loudnessSensibility: number,
+    colorInfo: VisualizerColorInfo
+}
+
+
+export interface VisualizerColorInfo {
+    state: VisualizerState,
     minBeatConf: number,
-    maxBeatConf: number
+    maxBeatConf: number,
+    lastBeatTimestamp: number,
+    palette: {info: PaletteDAO, scale: chroma.Scale, hexColors: string[]},
+    colorTickRate: number // Time in ms that takes for the visualizer to change a color
+    transitionModifier: number,
+    loudnessSensibility: number,
+    cycleModifier: number
 }
 
 export enum VisualizerState {
@@ -24,24 +29,31 @@ export enum VisualizerState {
     on
 }
 
-export function newVisualizer(number: number, defaultPalette: PaletteDAO, socket: VisualizerSocket): VisualizerInfo {
+export function newVisualizerColorInfo(defaultPalette: PaletteDAO): VisualizerColorInfo {
     return {
-        name: "Visualizer " + number,
-        id: socket.id,
-        socket: socket,
         state: VisualizerState.on,
-        colorTickRate: def.colorTickRate,
+        minBeatConf: def.minBeatConf,
+        maxBeatConf: def.maxBeatConf,
         lastBeatTimestamp: Date.now(),
         palette: {
             info: defaultPalette,
             scale: null,
             hexColors: null
         },
-        delay: def.delay,
+        colorTickRate: def.colorTickRate,
         transitionModifier: def.transitionModifier,
-        cycleModifier: def.cycleModifier,
         loudnessSensibility: def.loudnessSensibility,
-        minBeatConf: def.minBeatConf,
-        maxBeatConf: def.maxBeatConf
+        cycleModifier: def.cycleModifier
+    };
+}
+
+export function newVisualizer(number: number, defaultPalette: PaletteDAO, socket: VisualizerSocket): VisualizerInfo {
+    let colorInfo: VisualizerColorInfo = newVisualizerColorInfo(defaultPalette);
+    return {
+        name: "Visualizer " + number,
+        id: socket.id,
+        socket: socket,
+        delay: def.delay,
+        colorInfo: colorInfo
     };
 }

@@ -4,6 +4,6 @@
     "transitionModifier": 0,
     "cycleModifier": 0,
     "loudnessSensibility": 0,
-    "minBeatConf": 0,
+    "minBeatConf": 0.25,
     "maxBeatConf": 1
 }

@@ -1,4 +1,4 @@
-import { VisualizerInfo } from './visualizerInfo/visualizerInfo';
+import { VisualizerInfo, VisualizerColorInfo, VisualizerState, newVisualizerColorInfo } from './visualizerInfo/visualizerInfo';
 import { TrackInfo } from './spotifyApiInterfaces';
 import { refreshTokenResponseI  } from '../spotifyIO/apiController';
 import { savePalette, loadPalettes, removePalette, PaletteDAO } from './palette/paletteDAO';
@@ -6,10 +6,13 @@ import { beatDelay, colorPaletteSize } from '../config/config.json';
 import { colorTickRate } from '../config/defaultVisualizer.json';
 import { generateColorPalette } from '../colors';
 import { VisualizerServer } from 'src/visualizerService/sockets';
+import { Scale, Color } from 'chroma-js';
 
 
 export default class State {
-    sync: SyncSharedData = new SyncSharedData();
+    syncSharedData: VisualizerSharedData = new VisualizerSharedData();
+    isSynced: boolean;
+
     trackInfo: TrackInfo = new TrackInfo();
     colorInfo: ColorInfo = new ColorInfo();
     visualizerServerSocket: VisualizerServer = null;
@@ -20,7 +23,7 @@ export default class State {
     verbose: boolean;
     active: boolean;
     headers = {};
-
+    
     private _accessToken: string = null;
     private _expireTimestamp: Date = null;
 
@@ -72,8 +75,8 @@ export default class State {
     // Visualizers functions
     public addVisualizer(visualizer: VisualizerInfo) {
         this.visualizers.push(visualizer);
-        if (this.sync.isSynced) {
-            this.sync.tickrate = this.visualizers.reduce((acc, v) => acc + v.colorTickRate, 0) / this.visualizers.length;
+        if (this.isSynced) {
+            this.syncSharedData.colorTickRate = this.visualizers.reduce((acc, v) => acc + v.colorInfo.colorTickRate, 0) / this.visualizers.length;
         }
     }
 
@@ -82,12 +85,12 @@ export default class State {
         if (index > -1) {
             this.visualizers[index].socket.disconnect();
             this.visualizers.splice(index, 1);
-            if (this.sync.isSynced) {
+            if (this.isSynced) {
                 if (this.visualizers.length > 0) {
-                    this.sync.tickrate = this.visualizers.reduce((acc, v) => acc + v.colorTickRate, 0) / this.visualizers.length;
+                    this.syncSharedData.colorTickRate = this.visualizers.reduce((acc, v) => acc + v.colorInfo.colorTickRate, 0) / this.visualizers.length;
                 }
                 else {
-                    this.sync.tickrate = colorTickRate;
+                    this.syncSharedData.colorTickRate = colorTickRate;
                 }
             }
         }
@@ -103,15 +106,18 @@ export default class State {
 
     // sync
     public syncVisualizers() {
-        this.sync.isSynced = true;
-        this.sync.colorArray = generateColorPalette(this.colorInfo.defaultPalette.genColors, true).colors(colorPaletteSize);
+        let palette = this.colorInfo.defaultPalette;
+
+        this.isSynced = true;
+        this.syncSharedData = newVisualizerColorInfo(palette);
+        this.syncSharedData.palette.hexColors = generateColorPalette(palette.genColors, true).colors(colorPaletteSize);
         // calculate mean of visualizer delays
-        this.sync.tickrate = this.visualizers.reduce((acc, v) => acc + v.colorTickRate, 0) / this.visualizers.length;
+        // this.syncSharedData.colorTickRate = this.visualizers.reduce((acc, v) => acc + v.colorInfo.colorTickRate, 0) / this.visualizers.length;
     }
 
     // TODO: desync
     public desyncVisualizers() {
-        this.sync.isSynced = false;
+        this.isSynced = false;
     }
 
     public setAccessToken(accessToken: refreshTokenResponseI) {
@@ -150,10 +156,14 @@ class ColorInfo {
     defaultPalette: PaletteDAO = null;
 }
 
-class SyncSharedData {
-    isSynced: boolean = false;
-    syncSocketRoom: string = "sync";
-    colorArray: string[] = null;
+class VisualizerSharedData implements VisualizerColorInfo {
+    transitionModifier: number;
+    loudnessSensibility: number;
+    cycleModifier: number;
+    state: VisualizerState;
+    minBeatConf: number;
+    maxBeatConf: number;
+    palette: { info: PaletteDAO; scale: Scale<Color>; hexColors: string[]; };
+    colorTickRate: number;
     lastBeatTimestamp: number = Date.now();
-    tickrate: number = colorTickRate;
 }

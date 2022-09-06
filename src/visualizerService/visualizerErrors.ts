@@ -1,58 +1,58 @@
-import { VisualizerInfo } from "src/models/visualizerInfo/visualizerInfo";
+import { VisualizerColorInfo, VisualizerInfo } from "src/models/visualizerInfo/visualizerInfo";
 
 export class NoPaletteDefinedError extends Error {
-    visualizerInfo: VisualizerInfo;
+    VisualizerColorInfo: VisualizerColorInfo;
 
-    constructor(visualizerInfo: VisualizerInfo) {
-        visualizerInfo = visualizerInfo;
+    constructor(VisualizerColorInfo: VisualizerColorInfo) {
+        VisualizerColorInfo = VisualizerColorInfo;
         super("No palette defined");
     }
 
-    getVisualizerInfo(): VisualizerInfo {
-        return this.visualizerInfo;
+    getVisualizerColorInfo(): VisualizerColorInfo {
+        return this.VisualizerColorInfo;
     }
 }
 
 export class NullNameError extends Error {
-    visualizerInfo: VisualizerInfo;
+    VisualizerInfo: VisualizerInfo;
 
-    constructor(visualizerInfo: VisualizerInfo) {
-        visualizerInfo = visualizerInfo;
+    constructor(VisualizerColorInfo: VisualizerInfo) {
+        VisualizerColorInfo = VisualizerColorInfo;
         super("Name cannot be empty");
     }
 
-    getVisualizerInfo(): VisualizerInfo {
-        return this.visualizerInfo;
+    getVisualizerColorInfo(): VisualizerInfo {
+        return this.VisualizerInfo;
     }
 }
 
 export class NullPaletteError extends Error {
-    visualizerInfo: VisualizerInfo;
+    VisualizerColorInfo: VisualizerColorInfo;
 
-    constructor(visualizerInfo: VisualizerInfo) {
-        visualizerInfo = visualizerInfo;
+    constructor(VisualizerColorInfo: VisualizerColorInfo) {
+        VisualizerColorInfo = VisualizerColorInfo;
         super("Palette cannot be empty");
     }
 
-    getVisualizerInfo(): VisualizerInfo {
-        return this.visualizerInfo;
+    getVisualizerColorInfo(): VisualizerColorInfo {
+        return this.VisualizerColorInfo;
     }
 }
 
 export class ValueOutOfBoundsError extends Error {
-    visualizerInfo: VisualizerInfo;
+    VisualizerColorInfo: VisualizerColorInfo;
     minBound: number;
     maxBound: number;
 
-    constructor(visualizerInfo: VisualizerInfo, minBound: number, maxBound: number) {
-        visualizerInfo = visualizerInfo;
+    constructor(VisualizerInfo: VisualizerInfo|VisualizerColorInfo, minBound: number, maxBound: number) {
+        VisualizerInfo = VisualizerInfo;
         minBound = minBound;
         maxBound = maxBound;
         super("Value out of bounds");
     }
 
-    getVisualizerInfo(): VisualizerInfo {
-        return this.visualizerInfo;
+    getVisualizerColorInfo(): VisualizerColorInfo {
+        return this.VisualizerColorInfo;
     }
 
     getMinBound(): number {
