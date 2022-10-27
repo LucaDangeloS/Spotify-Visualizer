@@ -1,10 +1,12 @@
 import { VisualizerSocket } from "src/visualizerService/sockets";
 import * as def from "../../config/defaultVisualizer.json";
 import { PaletteDAO } from "../palette/paletteDAO";
+import ip from 'ip';
 
 export interface VisualizerSocketInfo {
     name: string,
     socket: VisualizerSocket,
+    ip: string,
     id: string,
     delay: number,
     colorInfo: VisualizerInfo
@@ -49,9 +51,11 @@ export function newVisualizerColorInfo(defaultPalette: PaletteDAO): VisualizerIn
 
 export function newVisualizer(number: number, defaultPalette: PaletteDAO, socket: VisualizerSocket): VisualizerSocketInfo {
     let colorInfo: VisualizerInfo = newVisualizerColorInfo(defaultPalette);
+    let addr = socket.handshake.address;
     return {
         name: "Visualizer " + number,
         id: socket.id,
+        ip: addr !== '::1' ? addr.slice(addr.lastIndexOf(':') + 1) : ip.address(),
         socket: socket,
         delay: def.delay,
         colorInfo: colorInfo

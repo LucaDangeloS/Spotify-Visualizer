@@ -72,7 +72,7 @@ function fireBeat(state: State) {
             sharedData,
             activeBeatDur
         );
-        broadcastData(sharedData, transitionColors, state.visualizerServerSocket);
+        broadcastData(sharedData, transitionColors, state.udpSocket, state.visualizers);
         sharedData.lastBeatTimestamp = Date.now();
     }
 }

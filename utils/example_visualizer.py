@@ -2,17 +2,26 @@
 # and send a message
 
 import asyncio
+import contextlib
+import json
+import pickle
 import time
 import socketio
 import pygame
 import timeit
+import socket
 
 HOST = 'http://localhost'
 PORT = 5000
+UDPHOST = '192.168.1.5'
+UDPPORT = 5444
 FPS = 30
 DISPLAY_WIDTH = 600
 DISPLAY_HEIGHT = 600
 sio = socketio.Client(logger=False, engineio_logger=False)
+
+udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+udp_socket.setblocking(False)
 
 class Colors():
     transition = []
@@ -28,6 +37,12 @@ class Colors():
     def getTransitionColor(cls):
         return cls.transition.pop(0)
 
+    @classmethod
+    def recv(cls):
+        msg = udp_socket.recv(8128).decode('utf-8')
+        msg = json.loads(msg)
+        cls.transition = msg['transition']
+        cls.colors = msg['colors']
 
 async def main():
     colors = Colors()
@@ -38,6 +53,12 @@ async def main():
     def on_connect():
         print('Connected')
 
+    @sio.on('set_port')
+    def set_port(data):
+        print(f"set_port {data}")
+        UDPPORT = data
+        udp_socket.bind((UDPHOST, UDPPORT))
+
     @sio.on('beat')
     def getTransitionColor(data):
         # print("Received data")
@@ -45,14 +66,17 @@ async def main():
         print(colors.colors[0])
 
     sio.connect(f"{HOST}:{PORT}")
+    # print socket local port
+    # print(sio.eio)
 
     display = pygame.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
     clock = pygame.time.Clock()
 
     while True:
+        with contextlib.suppress(Exception):
+            colors.recv()
         if (colors.transition):
             pygame.draw.rect(display, pygame.Color(colors.transition.pop(0)), (0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT))
-            print(len(colors.transition))
             if (len(colors.transition) == 0):
                 idx = 0
         else:

@@ -5,13 +5,14 @@ import { savePalette, loadPalettes, removePalette, PaletteDAO } from './palette/
 import { beatDelay, colorPaletteSize } from '../config/config.json';
 import { colorTickRate } from '../config/defaultVisualizer.json';
 import { generateColorPalette } from '../colors';
-import { VisualizerServer } from 'src/visualizerService/sockets';
+import { UdpSocket, VisualizerServer } from 'src/visualizerService/sockets';
 import { Scale, Color } from 'chroma-js';
 
 
 export default class State {
     syncSharedData: VisualizerSharedData = new VisualizerSharedData();
     isSynced: boolean;
+    udpSocket: UdpSocket;
 
     trackInfo: TrackInfo = new TrackInfo();
     colorInfo: ColorInfo = new ColorInfo();

@@ -1,11 +1,15 @@
 import { newVisualizer, VisualizerInfo, VisualizerSocketInfo } from '../models/visualizerInfo/visualizerInfo';
 import { Server, Socket } from 'socket.io';
+import dgram, { Socket as dSocket } from 'node:dgram';
 import State from '../models/state';
 import 'socket.io';
 import { generateHexColors } from './visualizerFuncs';
 
 // Wrapper interfaces
 export interface VisualizerServer extends Server {
+}
+
+export interface UdpSocket extends dSocket {
 }
 
 export interface VisualizerSocket extends Socket {
@@ -17,6 +21,7 @@ export function createVisualizerServer(state: State, port: number): VisualizerSe
     server.on('connection', (socket: Socket) => {
         manageConnection(state, socket); 
     });
+    state.udpSocket = dgram.createSocket('udp4');
     return server;
 }
 
@@ -25,7 +30,7 @@ export function manageConnection(state: State, socket: Socket) {
         console.log("Disconnection of socket " + socket.id);
         state.removeVisualizer(socket.id);
     });
-
+    socket.emit('set_port', socket.request.socket.remotePort + 1);
     let visualizer: VisualizerSocketInfo = newVisualizer(state.visualizers.length, state.colorInfo.defaultPalette, socket);
     generateHexColors(visualizer.colorInfo);
     state.addVisualizer(visualizer);
@@ -43,9 +48,11 @@ export function sendData(visualizer: VisualizerSocketInfo, transition: string[],
     );
 }
 
-export function broadcastData(sharedData: VisualizerInfo, transition: string[], server: VisualizerServer) {
-    server.emit('beat', {
-        transition: transition,
-        colors: sharedData.palette.hexColors,
+export function broadcastData(sharedData: VisualizerInfo, transition: string[], server: UdpSocket, visualizers: VisualizerSocketInfo[]) {
+    visualizers.forEach((visualizer) => {
+            server.send(JSON.stringify({
+                transition: transition,
+                colors: sharedData.palette.hexColors,
+            }), visualizer.socket.request.socket.remotePort + 1, visualizer.ip);
     });
 }
