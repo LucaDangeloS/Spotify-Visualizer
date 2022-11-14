@@ -25,13 +25,16 @@ This is a rewritten version in TypeScript of my previous Spotify Visualizer, ori
 </details>
 
 # About the project and goals
-The goal of this project is to provide a centralized, modular and expandable spotify visualizer.
+The goal of this project is to provide a centralized, modular and scalable spotify visualizer.
 
 The API processing is delegated to a central server while multiple custom visualizers can visualize the song interpretation as they see fit (e.g. a ws2812b LED strip connected to a Raspberry Pi, a web page that changes the background color accordingly, etc.)
 
 There would also be a WebApp where parameters and color schemes can be changed for each individual visualizer connected to the server.
 
-Also looking forward to adding HUE support in a future.
+Albeit over network communication is the main goal of this project, I have come up against a brick wall while doing it. Basically due to how slow or unreliable are the frameworks and protocols I have tried for this.
+I am still trying to get it done, but as for now I'm continuing the project with only local visualizers in mind. At least until I come up with a reliable solution for over network visualization. I have thought of some solutions, and all of them boil down to avoiding this to be a real time application to alleviate internet communications.
+
+**TL;DR**: Just localhost connections for now as things get very messy with remote connections.
 <br><br/>
 
 # Features
@@ -78,11 +81,13 @@ tsc
 - [x] Implement color cycling
 - [x] Implement token refresh in mid-playback
 - [x] Figure out a way to delegate the song interpretation to the server
-- [x] Standardize the message exchanges from server to visualizers
 - [x] Add support for multiple visualizers
-- [ ] Make color jump related to song volume
+- [x] Implement socket communication
+- [ ] Implement reliable over network communication
+- [ ] Standardize the message exchanges from server to visualizers
+- [ ] Implement individual visualizer customization
+- [ ] Make color jump related to song attributes
 - [ ] Fine tune palette sizes
-- [ ] Find a way for the server to know how many colors have been consumed in visualizer
 - [ ] Implement individual visualizer customization
 - [ ] Optimize beat steps to omit the beats lower that then confidence threshold
 - [ ] Make the webapp for parameters tweaking
