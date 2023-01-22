@@ -3,7 +3,8 @@
     "delay": 0,
     "transitionModifier": 0,
     "cycleModifier": 0,
-    "loudnessSensibility": 0,
+    "loudnessSensibility": 1.5,
+    "tempoSensibility": 1.5,
     "minBeatConf": 0.25,
     "maxBeatConf": 1
 }

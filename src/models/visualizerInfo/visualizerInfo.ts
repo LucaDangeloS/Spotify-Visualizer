@@ -20,6 +20,7 @@ export interface VisualizerInfo {
     colorTickRate: number // Time in ms that takes for the visualizer to change a color
     transitionModifier: number,
     loudnessSensibility: number,
+    tempoSensibility: number,
     cycleModifier: number
 }
 
@@ -29,20 +30,21 @@ export enum VisualizerState {
     on
 }
 
-export function newVisualizerColorInfo(defaultPalette: PaletteDAO): VisualizerInfo {
+export function newVisualizerColorInfo(palette: PaletteDAO): VisualizerInfo {
     return {
         state: VisualizerState.on,
         minBeatConf: def.minBeatConf,
         maxBeatConf: def.maxBeatConf,
         lastBeatTimestamp: Date.now(),
         palette: {
-            info: defaultPalette,
+            info: palette,
             scale: null,
             hexColors: null
         },
         colorTickRate: def.colorTickRate,
         transitionModifier: def.transitionModifier,
         loudnessSensibility: def.loudnessSensibility,
+        tempoSensibility: def.tempoSensibility, 
         cycleModifier: def.cycleModifier
     };
 }

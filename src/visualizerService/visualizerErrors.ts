@@ -48,7 +48,7 @@ export class ValueOutOfBoundsError extends Error {
         VisualizerInfo = VisualizerInfo;
         minBound = minBound;
         maxBound = maxBound;
-        super("Value out of bounds");
+        super(`Value out of bounds, must be between ${minBound} and ${maxBound}`);
     }
 
     getVisualizerColorInfo(): VisualizerInfo {

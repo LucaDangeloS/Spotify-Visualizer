@@ -100,17 +100,17 @@ export function sequence(palette: (string)[], index: number, time: number, tickr
  * @param {number} index - Current index at the palette
  * @param {number} time - Time (in ms) that the transition will take
  * @param {number} tickrate - Time at which the time ticks
- * @param {number} timeFactor - Factor from 0.0 to 1.0 from which the time will be consumed on the transition
+ * @param {number} timeRatio - Ratio from 0.0 to 1.0 from which the time will be consumed on the transition
  * @returns {string[]} Color transition array in hex format
  */
-export function makeTimeTransitionOffset(palette: (string)[], color: string, index: number, time: number, tickrate: number = 33, timeFactor: number = 0.8) : string[] {
+export function makeTimeTransitionOffset(palette: (string)[], color: string, index: number, time: number, tickrate: number = 33, timeRatio: number = 0.8) : string[] {
     if (tickrate <= 0) {
         tickrate = 33;
     }
-    if (timeFactor <= 0 || timeFactor > 1) {
-        timeFactor = 0.8;
+    if (timeRatio <= 0 || timeRatio > 1) {
+        timeRatio = 0.8;
     }
-    let steps: number = Math.round((time * timeFactor) / tickrate);
+    let steps: number = Math.round((time * timeRatio) / tickrate);
     if (steps > palette.length) {
         steps = palette.length;
     }

@@ -18,12 +18,19 @@ export interface beatI {
 export interface sectionI {
     start: number,
     loudness: number,
+    tempo : number,
     duration: number,
 }
 
 export interface analysisI {
     beats: Array<beatI>,
-    sections: Array<sectionI>
+    sections: Array<sectionI>,
+    track: globalTrackI
+}
+
+export interface globalTrackI {
+    loudness: number,
+    tempo: number
 }
 
 export interface trackInfoI {
@@ -44,8 +51,8 @@ export class TrackInfo {
     activeSection: sectionI;
     activeSectionIndex: number = -1;
     lastSectionIndex: number = -1;
-    maxDb: number = 0;
-    minDb: number = 0;
+    meanLoudness = 0;
+    meanTempo = 0;
 
     beats = Array<beatI>(0);
 
@@ -54,7 +61,6 @@ export class TrackInfo {
     lastBeatIndex: number = -1;
 
     currentlyPlaying: trackI;
-    trackAnalysis: analysisI;
     hasAnalysis: boolean = true;
 
     initialTimestamp: number = 0;

@@ -156,9 +156,10 @@ class ColorInfo {
     defaultPalette: PaletteDAO = null;
 }
 
-class VisualizerSharedData implements VisualizerInfo {
+class VisualizerSharedData implements VisualizerInfo { // TODO not sure how this is initialized
     transitionModifier: number;
     loudnessSensibility: number;
+    tempoSensibility: number;
     cycleModifier: number;
     state: VisualizerState;
     minBeatConf: number;
@@ -166,4 +167,5 @@ class VisualizerSharedData implements VisualizerInfo {
     palette: { info: PaletteDAO; scale: Scale<Color>; hexColors: string[]; };
     colorTickRate: number;
     lastBeatTimestamp: number = Date.now();
+
 }

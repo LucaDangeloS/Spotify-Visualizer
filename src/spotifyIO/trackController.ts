@@ -18,7 +18,10 @@ export function setCurrentlyPlaying(
     analysis: analysisI
 ): void {
     state.trackInfo.currentlyPlaying = track;
-    state.trackInfo.trackAnalysis = analysis;
+    state.trackInfo.beats = analysis.beats;
+    state.trackInfo.sections = analysis.sections;
+    state.trackInfo.meanLoudness = analysis.track.loudness;
+    state.trackInfo.meanTempo = analysis.track.tempo;
 
     startVisualizer(state);
 
@@ -97,8 +100,8 @@ export function syncBeats(state: State) {
 
         // grab state vars
         let trackProgress = state.trackInfo.trackProgress;
-        let beats = state.trackInfo.trackAnalysis.beats;
-        let sections = state.trackInfo.trackAnalysis.sections;
+        let beats = state.trackInfo.beats;
+        let sections = state.trackInfo.sections;
 
         for (var i = 0; i < sections.length - 2; i++) {
             if (
@@ -152,8 +155,8 @@ function stageBeat(state: State): void {
 }
 
 function incrementBeat(state: State) {
-    let beats = state.trackInfo.trackAnalysis.beats;
-    let sections = state.trackInfo.trackAnalysis.sections;
+    let beats = state.trackInfo.beats;
+    let sections = state.trackInfo.sections;
     let lastBeatIndex = state.trackInfo.activeBeatIndex;
     let lastSectionIndex = state.trackInfo.activeSectionIndex;
 

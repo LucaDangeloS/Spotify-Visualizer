@@ -10,8 +10,8 @@ import timeit
 HOST = 'http://localhost'
 PORT = 5000
 FPS = 30
-DISPLAY_WIDTH = 600
-DISPLAY_HEIGHT = 600
+DISPLAY_WIDTH = 1600
+DISPLAY_HEIGHT = 900
 sio = socketio.Client(logger=False, engineio_logger=False)
 
 class Colors():
@@ -42,7 +42,7 @@ async def main():
     def getTransitionColor(data):
         # print("Received data")
         colors.message(data)
-        print(colors.colors[0])
+        # print(colors.colors[0])
 
     sio.connect(f"{HOST}:{PORT}")
 

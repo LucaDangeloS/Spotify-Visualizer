@@ -1,5 +1,6 @@
 import { newVisualizer, VisualizerInfo, VisualizerSocketInfo } from '../models/visualizerInfo/visualizerInfo';
 import { Server, Socket } from 'socket.io';
+import { TransitionData } from './visualizerDTO';
 import State from '../models/state';
 import 'socket.io';
 import { generateHexColors } from './visualizerFuncs';
@@ -34,18 +35,21 @@ export function manageConnection(state: State, socket: Socket) {
 
 export function sendData(visualizer: VisualizerSocketInfo, transition: string[], colors: string[], delay: number) {
     // let time = new Date().getTime();
-    visualizer.socket.emit(
-        "beat",
-        {
-            transition: transition,
-            colors: colors ? colors : visualizer.colorInfo.palette.hexColors,
-        }
+    let data : TransitionData = {
+        transition: transition,
+        colors: colors ? colors : visualizer.colorInfo.palette.hexColors,
+    }
+    visualizer.socket.emit("beat",
+        data
     );
 }
 
 export function broadcastData(sharedData: VisualizerInfo, transition: string[], server: VisualizerServer) {
-    server.emit('beat', {
+    let data : TransitionData = {
         transition: transition,
         colors: sharedData.palette.hexColors,
+    }
+    server.emit('beat', {
+        data
     });
 }
