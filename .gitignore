@@ -12,3 +12,5 @@ prisma/dev.db
 utils/song_features.js
 utils/song_features.js.map
 altColor.ts
+package-lock.json
+pnpm-lock.yaml
