@@ -1,11 +1,11 @@
 import { VisualizerSocketInfo, VisualizerInfo, VisualizerState, newVisualizerColorInfo } from './visualizerInfo/visualizerInfo';
 import { TrackInfo } from './spotifyApiInterfaces';
-import { refreshTokenResponseI  } from '../spotifyIO/apiController';
+import { refreshTokenResponseI  } from '/spotify/apiController';
 import { savePalette, loadPalettes, removePalette, PaletteDAO } from './palette/paletteDAO';
-import { beatDelay, colorPaletteSize } from '../config/config.json';
-import { colorTickRate } from '../config/defaultVisualizer.json';
-import { generateColorPalette } from '../colors';
-import { VisualizerServer } from 'src/visualizerService/sockets';
+import { beatDelay, colorPaletteSize } from 'src/config/config.json';
+import { colorTickRate } from 'src/config/defaultVisualizer.json';
+import { generateColorPalette } from 'src/models/palette/colors';
+import { VisualizerServer } from '/server/visualizer/server';
 import { Scale, Color } from 'chroma-js';
 
 
@@ -123,10 +123,10 @@ export default class State {
     public setAccessToken(accessToken: refreshTokenResponseI) {
         this._accessToken = accessToken.access_token;
         this._expireTimestamp = new Date(Date.now() + accessToken.expires_in * 1000);
-        this.headers = { Authorization: "Bearer " + this._accessToken };
+        this.headers = { Authorization: `Bearer ${this._accessToken}` };
         if (this.verbose) {
-            console.log("access token set " + this._accessToken);
-            console.log("expire timestamp set " + this._expireTimestamp);
+            console.log(`access token set ${this._accessToken}`);
+            console.log(`expire timestamp set ${this._expireTimestamp}`);
         }
     }
     public get accessToken(): string {

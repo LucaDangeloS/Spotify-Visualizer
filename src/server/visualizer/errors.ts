@@ -1,4 +1,4 @@
-import { VisualizerInfo, VisualizerSocketInfo } from "src/models/visualizerInfo/visualizerInfo";
+import { VisualizerInfo, VisualizerSocketInfo } from "/models/visualizerInfo/visualizerInfo";
 
 export class NoPaletteDefinedError extends Error {
     VisualizerColorInfo: VisualizerInfo;

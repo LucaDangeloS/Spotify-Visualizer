@@ -1,16 +1,17 @@
-import { baseUrl, frontEndPort, auth_url, token_url } from "../config/network-info.json";
+import { baseUrl, frontEndPort, auth_url, token_url } from "src/config/network-info.json";
 import express, { Router, Request, Response } from 'express';
 import axios, { AxiosError, AxiosResponse } from "axios";
-import { refreshTokenResponseI } from "../spotifyIO/apiController";
 import cookieParser from "cookie-parser";
 import querystring from "query-string";
-import RestAPI from '../restService/restService';
+import RestAPI from 'src/server/api/rest';
 import * as http from "http";
-import State from "../models/state";
+import State from "/models/state";
 import crypto from 'crypto';
 import cors from 'cors'
 import path from "path";
 import fs from "fs";
+import "path";
+import { refreshTokenResponseI } from "/spotify/apiController";
 
 
 // Main Front-End Server with auth flow
@@ -18,7 +19,7 @@ export default class Server {
     private app : express.Application;
     private verbose: boolean = false;
     public server: http.Server = null;
-
+    
     constructor(public readonly port: number, client_id: string, client_secret: string, state: State, tokenCallback: Function, verbose?: boolean) {
         this.verbose = verbose;
         this.port = port;
@@ -27,14 +28,14 @@ export default class Server {
             .use(cors())
             .use(FlowRouter.get(client_id, client_secret, tokenCallback))
             .use(RestAPI.get(state))
-            .use(express.static(path.resolve(__dirname, '..') + "/public"));
+            .use(express.static(`${path.resolve(__dirname, '.')}/public`));
     }
 
     start(): void {
         if (this.server == null)
             this.server = this.app.listen(this.port, () => {
                 if (this.verbose) {
-                    console.log("Server started on port " + this.port)
+                    console.log(`Server started on port ${this.port}`)
                 }
             });
     }
@@ -57,7 +58,7 @@ export default class Server {
 // FlowRouter from Front-End server
 class FlowRouter {
     public router : Router;
-    private staticFolder: string = path.resolve(__dirname, '..') + "/public";
+    private staticFolder: string = `${path.resolve(__dirname, '.')}/public`;
 
     constructor(client_id: string, client_secret: string, accessTokenCallback: Function) {
         this.router = Router();
@@ -104,7 +105,7 @@ class FlowRouter {
             //if state doesn't match, redirect to error page
             if (state === null || state !== storedState) {
                 res.redirect(
-                    "/#" + querystring.stringify({ error: "state_mismatch" })
+                    `/#${querystring.stringify({ error: "state_mismatch" })}`
                 );
             }
         
@@ -123,18 +124,18 @@ class FlowRouter {
                 let headers = {
                     //authorization header is encoded in base64
                     "Content-Type": "application/x-www-form-urlencoded",
-                    Authorization: "Basic " + Buffer.from(client_id + ":" + client_secret).toString("base64"),
+                    Authorization: `Basic ${Buffer.from(`${client_id}:${client_secret}`).toString("base64")}`,
                     json: true
                 };
         
                 axios.post(token_url, querystring.stringify(body), {headers: headers})
                     .then((response: AxiosResponse) => {
-                        if (response.status == 200) {
+                        if (response.status === 200) {
                             let tokenInfo: refreshTokenResponseI = response.data;
                             let refresh_token = response.data.refresh_token;
             
-                            fs.writeFile('./token.txt', refresh_token, err => {
-                                if (err) { console.error("Error writing refresh_token to file: " + err); }
+                            fs.writeFile('token.txt', refresh_token, err => {
+                                if (err) { console.error(`Error writing refresh_token to file: ${err}`); }
                             })
 
                             accessTokenCallback(tokenInfo);
@@ -142,7 +143,7 @@ class FlowRouter {
                             res.redirect("/panel");
                         } else {
                             res.redirect(
-                                "/#" + querystring.stringify({ error: "invalid_token" })
+                                `/#${querystring.stringify({ error: "invalid_token" })}`
                             );
                         }
                     })

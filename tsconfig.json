@@ -1,7 +1,6 @@
 {
     "compilerOptions": {
       "target": "es6",
-      "rootDir": "src",
       "outDir": "dist",
       "module": "CommonJS",
       "preserveConstEnums": true,
@@ -12,12 +11,30 @@
       "isolatedModules": false,
       "moduleResolution": "node",
       "baseUrl": "./",
+      "paths": {
+        // "@visualizer/*": ["src/server/visualizer/*"],
+        // "@api/*": ["src/server/api/*"],
+        // "@config/*": ["src/config/*"],
+        // "@models/*": ["src/models/*"],
+        // "@spotify/*": ["src/spotify/*"],
+        // "@webserver/*": ["src/server/adminPanel/*"],
+        // "@colors/*": ["src/colors/*"],
+        "/*": ["src/*"],
+        "src/*": ["src/*"]
+      },
       // "strict": false,
       "experimentalDecorators": true,
     },
+    "include": [
+      "node_modules",
+      "src/**/*"
+, "tests"    ],
     "exclude": [
       "node_modules",
       "**/*.test.ts",
       "utils/**",
-    ]
+    ],
+    "ts-node": {
+      "require": ["tsconfig-paths/register"]
+    }
 }

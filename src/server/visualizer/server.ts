@@ -1,15 +1,16 @@
-import { newVisualizer, VisualizerInfo, VisualizerSocketInfo } from '../models/visualizerInfo/visualizerInfo';
+import { newVisualizer, VisualizerInfo, VisualizerSocketInfo } from '/models/visualizerInfo/visualizerInfo';
 import { Server, Socket } from 'socket.io';
-import { TransitionData } from './visualizerDTO';
-import State from '../models/state';
+import { TransitionData } from './DTO';
+import State from '../../models/state';
 import 'socket.io';
-import { generateHexColors } from './visualizerFuncs';
+import { generateHexColors } from './controller';
 
 // Wrapper interfaces
 export interface VisualizerServer extends Server {
 }
 
 export interface VisualizerSocket extends Socket {
+    
 }
 
 export function createVisualizerServer(state: State, port: number): VisualizerServer {
@@ -23,14 +24,14 @@ export function createVisualizerServer(state: State, port: number): VisualizerSe
 
 export function manageConnection(state: State, socket: Socket) {
     socket.on('disconnect', (reason: string) => {
-        console.log("Disconnection of socket " + socket.id);
+        console.log(`Disconnection of socket ${socket.id}`);
         state.removeVisualizer(socket.id);
     });
 
     let visualizer: VisualizerSocketInfo = newVisualizer(state.visualizers.length, state.colorInfo.defaultPalette, socket);
     generateHexColors(visualizer.colorInfo);
     state.addVisualizer(visualizer);
-    console.log(state.visualizers.length + " visualizers connected. Using palette: " + visualizer.colorInfo.palette.info.name);
+    console.log(`${state.visualizers.length} visualizers connected. Using palette: ${visualizer.colorInfo.palette.info.name}`);
 }
 
 export function sendData(visualizer: VisualizerSocketInfo, transition: string[], colors: string[], delay: number) {

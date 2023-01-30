@@ -1,5 +1,5 @@
 import chroma from 'chroma-js';
-import * as colors from '../colors';
+import * as colors from '../src/models/palette/colors';
 
 describe('Color palette manipulation', function() {
     let test_colorset = ["red", "purple", "blue", "cyan", "green", "orange", "red"]

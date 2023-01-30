@@ -1,5 +1,5 @@
-import State from "./models/state";
-import { analysisI, beatI, sectionI, trackI } from "./models/spotifyApiInterfaces";
+import State from "/models/state";
+import { analysisI, beatI, sectionI, trackI } from "/models/spotifyApiInterfaces";
 
 /**
  * Method borrowed from https://github.com/zachwinter/kaleidosync

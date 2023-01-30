@@ -1,12 +1,12 @@
 import { token_url, trackAnalysis_url, currentlyPlaying_url } from "../config/network-info.json";
 import { syncOffsetThreshold } from "../config/config.json";
-import { delay, normalizeIntervals } from "../utils";
+import { delay, normalizeIntervals } from "./utils";
 import { readFileSync } from "fs";
-import State from "../models/state";
-import { progressInfoI, trackInfoI } from "../models/spotifyApiInterfaces";
+import State from "/models/state";
+import { progressInfoI, trackInfoI } from "/models/spotifyApiInterfaces";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import querystring from 'query-string';
-import { analysisI, trackI } from '../models/spotifyApiInterfaces';
+import { analysisI, trackI } from '/models/spotifyApiInterfaces';
 /*
 * Many methods were borrowed from 
 * https://github.com/lukefredrickson/spotify-led-visualizer
@@ -33,7 +33,7 @@ export interface ApiResponse {
 
 // Spotify API Fetcher
 export async function testToken(state: State): Promise<boolean> {
-    let headers: any = {
+    let headers = {
         headers: state.headers,
         json: true
     };
@@ -44,7 +44,7 @@ export async function testToken(state: State): Promise<boolean> {
             s = response.status;
         }).catch((err: AxiosError) => {});
     if (state.verbose) {
-        console.log("Request status: " + s);
+        console.log(`Request status: ${s}`);
     }
     return (s <= 204 && s >= 200);
 }
@@ -57,7 +57,7 @@ export async function waitForToken(state: State, timeout: number = 10000): Promi
     }
     if (timeout <= 0) return false;
     if (!(await testToken(state))) {
-        if (await refreshToken(state) == false) {
+        if (await refreshToken(state) === false) {
             if (state.verbose)
                 console.log("The app needs manual authentication...")
             await delay(sleep_time * 2);
@@ -71,7 +71,8 @@ export async function waitForToken(state: State, timeout: number = 10000): Promi
 }
 
 export async function refreshToken(state: State): Promise<boolean> {
-    let refresh_token: string = readFileSync('./token.txt', 'utf-8');
+    // TODO: try read catch error
+    let refresh_token: string = readFileSync('token.txt', 'utf-8');
     let refresh_url: string = token_url;
     let ret: boolean = false;
     let refresh_body = {
@@ -80,7 +81,7 @@ export async function refreshToken(state: State): Promise<boolean> {
     };
     let headers = {
         headers: {
-            Authorization: `Basic ${Buffer.from(process.env.CLIENT_ID + ":" + process.env.CLIENT_SECRET).toString('base64')}`,
+            Authorization: `Basic ${Buffer.from(`${process.env.CLIENT_ID}:${process.env.CLIENT_SECRET}`).toString('base64')}`,
             "Content-Type": "application/x-www-form-urlencoded"
         }
     }
@@ -107,7 +108,7 @@ export async function refreshToken(state: State): Promise<boolean> {
 export async function fetchCurrentlyPlaying(state: State): Promise<ApiResponse> {
     // grab the current time
     let timestamp = Date.now();
-    let headers: any = {
+    let headers = {
         headers: state.headers,
         json: true
     };
@@ -117,7 +118,7 @@ export async function fetchCurrentlyPlaying(state: State): Promise<ApiResponse> 
     await axios.get(currentlyPlaying_url, headers)
         .then((response: AxiosResponse) => {
             // no device is playing music
-            if (response.status == 204) {
+            if (response.status === 204) {
                 if (state.verbose) 
                     console.log("\nNo playback detected");
                 ret = {status: ApiStatusCode.NoPlayback, data: null};
@@ -133,11 +134,12 @@ export async function fetchCurrentlyPlaying(state: State): Promise<ApiResponse> 
                 };
             }
         }).catch((err: AxiosError) => {
-            console.log("ERROR: " + err)
-            if (err.response!.status == 401) 
+            if (err.response!.status === 401) {
                 ret = {status: ApiStatusCode.Unauthorized, data: null}
-            else
+            }
+            else {
                 ret = {status: ApiStatusCode.Error, data: err.response};
+            }
         });
 
     if (aux === null) return ret;
@@ -172,17 +174,17 @@ async function processResponse(state: State, { track, playing, progress }: {trac
 
     switch (true) {
         // no track detected
-        case (aux == 0 || track === null || track === undefined):
+        case (aux === 0 || track === null || track === undefined):
             ret = {status: ApiStatusCode.Ok, data: null};
             break;
 
         // track has changed
-        case (aux == 2 && !songsInSync):
+        case (aux === 2 && !songsInSync):
             ret = await fetchTrackData(state, { track: track, progress: progress });
             break;
 
         // track fell out of sync
-        case (aux == 2 && songsInSync && Math.abs(progressStats.error) > syncOffsetThreshold):
+        case (aux === 2 && songsInSync && Math.abs(progressStats.error) > syncOffsetThreshold):
             let initialTimestamp = Date.now();
             ret = {
                 status: ApiStatusCode.DeSynced, 
@@ -191,7 +193,7 @@ async function processResponse(state: State, { track, playing, progress }: {trac
             break;
 
         // track has resumed
-        case (aux == 1 && !state.trackInfo.active):
+        case (aux === 1 && !state.trackInfo.active):
             if (songsInSync)
                 ret = {status: ApiStatusCode.VizOff, data: null};
             else 
@@ -199,7 +201,7 @@ async function processResponse(state: State, { track, playing, progress }: {trac
             break;
 
         // track is stopped
-        case (aux == 1 && !playing):
+        case (aux === 1 && !playing):
             ret = {status: ApiStatusCode.NoPlayback, data: null};
             break;
 
@@ -219,7 +221,7 @@ async function processResponse(state: State, { track, playing, progress }: {trac
 async function fetchTrackData(state: State, { track, progress }: {track: trackI, progress: number}): Promise<ApiResponse>{
     // fetch the current time
     let timestamp = Date.now();
-    let headers: any = {
+    let headers = {
         headers: state.headers,
         json: true
     };
@@ -232,7 +234,7 @@ async function fetchTrackData(state: State, { track, progress }: {track: trackI,
             if (
                 analysis === undefined ||
                 analysis.beats === undefined ||
-                analysis.beats.length == 0
+                analysis.beats.length === 0
             ) {
                 state.trackInfo.hasAnalysis = false;
             } else {
@@ -252,10 +254,11 @@ async function fetchTrackData(state: State, { track, progress }: {track: trackI,
                 }};
             
         }).catch((err: AxiosError) => {
-            if (err.response!.status == 401) {
+            if (err.response!.status === 401) {
                 ret = {status: ApiStatusCode.Unauthorized, data: null};
-            } else
-                ret = {status: ApiStatusCode.Error, data: err.response}
+            } else {
+                ret = {status: ApiStatusCode.Error, data: err.response};
+            }
         });
 
     return ret;

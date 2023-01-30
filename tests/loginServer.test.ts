@@ -1,10 +1,11 @@
-import Server from '../webserver/server';
-import State from '../models/state';
-import { baseUrl, frontEndPort, visualizerPort } from "../config/network-info.json";
+import Server from '../src/server/adminPanel/server';
+import State from '../src/models/state';
+import { baseUrl, frontEndPort, visualizerPort } from "../src/config/network-info.json";
 import axios, { AxiosError, AxiosResponse } from 'axios';
 
 require('dotenv').config();
 const state = new State();
+
 
 describe('Front-end server tests', () => {
     const server = Server.init(frontEndPort, process.env.CLIENT_ID, process.env.CLIENT_SECRET, state, state.setAccessToken, false);

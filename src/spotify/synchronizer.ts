@@ -55,7 +55,7 @@ export default class Synchronizer {
 
     private processResponse(res: ApiResponse): void {
         if (this.verbose) {
-            console.log("status: " + res.status);
+            console.log(`status: ${res.status}`);
         }
         switch (res.status) {
             case ApiStatusCode.Ok: {

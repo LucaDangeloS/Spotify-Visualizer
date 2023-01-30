@@ -1,7 +1,7 @@
-import { VisualizerInfo, VisualizerSocketInfo, VisualizerState } from "../models/visualizerInfo/visualizerInfo";
-import { colorPaletteSize } from "../config/config.json";
-import { generateColorPalette } from "../colors";
-import { NoPaletteDefinedError, NullNameError, NullPaletteError, ValueOutOfBoundsError } from "./visualizerErrors";
+import { VisualizerInfo, VisualizerSocketInfo, VisualizerState } from "src/models/visualizerInfo/visualizerInfo";
+import { colorPaletteSize } from "src/config/config.json";
+import { generateColorPalette } from "src/models/palette/colors";
+import { NoPaletteDefinedError, NullNameError, NullPaletteError, ValueOutOfBoundsError } from "./errors";
 import { PaletteDAO } from "src/models/palette/paletteDAO";
 
 

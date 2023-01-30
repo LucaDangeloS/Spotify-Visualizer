@@ -1,6 +1,6 @@
-import { VisualizerSocket } from "src/visualizerService/sockets";
-import * as def from "../../config/defaultVisualizer.json";
-import { PaletteDAO } from "../palette/paletteDAO";
+import { VisualizerSocket } from "src/server/visualizer/server";
+import * as def from 'src/config/defaultVisualizer.json';
+import { PaletteDAO } from "src/models/palette/paletteDAO";
 
 export interface VisualizerSocketInfo {
     name: string,
@@ -52,7 +52,7 @@ export function newVisualizerColorInfo(palette: PaletteDAO): VisualizerInfo {
 export function newVisualizer(number: number, defaultPalette: PaletteDAO, socket: VisualizerSocket): VisualizerSocketInfo {
     let colorInfo: VisualizerInfo = newVisualizerColorInfo(defaultPalette);
     return {
-        name: "Visualizer " + number,
+        name: `Visualizer ${number}`,
         id: socket.id,
         socket: socket,
         delay: def.delay,
