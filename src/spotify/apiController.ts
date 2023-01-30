@@ -52,13 +52,12 @@ export async function testToken(state: State): Promise<boolean> {
 
 // -- Public functions -- //
 export async function waitForToken(state: State): Promise<boolean> {
-    if (!(await testToken(state))) {
-        console.log("The app needs manual authentication...")
-        await events.once(state.setTokenEventHandler, "set_token");
-        return true;
-    } else {
+    if ((await testToken(state)) || (await refreshToken(state)) ) {
         return true;
     }
+    console.log("The app needs manual authentication...")
+    await events.once(state.setTokenEventHandler, "set_token");
+    return (await testToken(state));
 }
 
 export async function refreshToken(state: State): Promise<boolean> {

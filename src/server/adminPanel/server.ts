@@ -140,8 +140,6 @@ class FlowRouter {
                             })
 
                             accessTokenEventCallback.emit('set_token', tokenInfo);
-                        
-                            res.redirect("/panel");
                         } else {
                             res.redirect(
                                 `/#${querystring.stringify({ error: "invalid_token" })}`

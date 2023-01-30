@@ -8,26 +8,25 @@ describe('API flow tests', function() {
   let state = new State();
 
     test('Token refresh', async () => {
-      expect(api.waitForToken(state)).resolves.toBe(true);
+      expect(await api.waitForToken(state)).toBe(true);
     });
 
     test('Refresh token file', () => {
       expect(fs.existsSync('token.txt')).toBe(true);
     });
 
-    test('Request Song Playing', async () =>{
+    test('Request Song Playing', async () => {
       let res:(api.ApiResponse|null) = null;
       await api.fetchCurrentlyPlaying(state).then(
         (data) => {
           res = data;
+          console.log(data);
         }
       ).catch(() => {
         throw new Error('Error fetching currently playing');
       });
-      console.log(state.headers);
       expect(res).not.toBeNull();
       expect(res!.status).not.toBe(api.ApiStatusCode.Error);
       expect(res!.status).not.toBe(api.ApiStatusCode.Unauthorized)
-      console.log(res);
     });
   });
