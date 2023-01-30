@@ -8,7 +8,7 @@ describe('API flow tests', function() {
   let state = new State();
 
     test('Token refresh', async () => {
-      expect(api.waitForToken(state, 10000)).resolves.toBe(true);
+      expect(api.waitForToken(state)).resolves.toBe(true);
     });
 
     test('Refresh token file', () => {

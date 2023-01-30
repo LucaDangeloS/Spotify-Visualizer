@@ -7,6 +7,7 @@ import { progressInfoI, trackInfoI } from "/models/spotifyApiInterfaces";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import querystring from 'query-string';
 import { analysisI, trackI } from '/models/spotifyApiInterfaces';
+import events from "events";
 /*
 * Many methods were borrowed from 
 * https://github.com/lukefredrickson/spotify-led-visualizer
@@ -44,34 +45,23 @@ export async function testToken(state: State): Promise<boolean> {
             s = response.status;
         }).catch((err: AxiosError) => {});
     if (state.verbose) {
-        console.log(`Request status: ${s}`);
+        console.log(`Tested token returned status: ${s}`);
     }
     return (s <= 204 && s >= 200);
 }
 
 // -- Public functions -- //
-export async function waitForToken(state: State, timeout: number = 10000): Promise<boolean> {
-    let sleep_time = 1000;
-    if (state.verbose) {
-        console.log("Testing token...");
-    }
-    if (timeout <= 0) return false;
+export async function waitForToken(state: State): Promise<boolean> {
     if (!(await testToken(state))) {
-        if (await refreshToken(state) === false) {
-            if (state.verbose)
-                console.log("The app needs manual authentication...")
-            await delay(sleep_time * 2);
-            return await waitForToken(state, timeout);
-        }
+        console.log("The app needs manual authentication...")
+        await events.once(state.setTokenEventHandler, "set_token");
+        return true;
     } else {
         return true;
     }
-    await delay(sleep_time);
-    return await waitForToken(state, timeout - sleep_time);
 }
 
 export async function refreshToken(state: State): Promise<boolean> {
-    // TODO: try read catch error
     let refresh_token: string;
     let refresh_url: string = token_url;
     let ret: boolean = false;
