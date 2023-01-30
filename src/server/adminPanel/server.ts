@@ -12,6 +12,7 @@ import path from "path";
 import fs from "fs";
 import "path";
 import { refreshTokenResponseI } from "/spotify/apiController";
+import { EventEmitter } from "stream";
 
 
 // Main Front-End Server with auth flow
@@ -20,13 +21,13 @@ export default class Server {
     private verbose: boolean = false;
     public server: http.Server = null;
     
-    constructor(public readonly port: number, client_id: string, client_secret: string, state: State, tokenCallback: Function, verbose?: boolean) {
+    constructor(public readonly port: number, client_id: string, client_secret: string, state: State, setTokenEventCallback: EventEmitter, verbose?: boolean) {
         this.verbose = verbose;
         this.port = port;
         this.app = express()
             .use(cookieParser())
             .use(cors())
-            .use(FlowRouter.get(client_id, client_secret, tokenCallback))
+            .use(FlowRouter.get(client_id, client_secret, setTokenEventCallback))
             .use(RestAPI.get(state))
             .use(express.static(`${path.resolve(__dirname, '.')}/public`));
     }
@@ -48,9 +49,9 @@ export default class Server {
                 }
             });
     }
-
-    static init(port: number, client_id: string | undefined, client_secret: string | undefined, state: State, apiHook: Function, verbose?: boolean): Server {
-        return new Server(port, client_id, client_secret, state, apiHook, verbose);
+    // Initializes the server, providing the client id and secret for the spotify api and the event hook to update the token alongside the State object
+    static init(port: number, client_id: string | undefined, client_secret: string | undefined, state: State, setTokenEventHandler: EventEmitter, verbose?: boolean): Server {
+        return new Server(port, client_id, client_secret, state, setTokenEventHandler, verbose);
     }
 
 }
@@ -59,8 +60,8 @@ export default class Server {
 class FlowRouter {
     public router : Router;
     private staticFolder: string = `${path.resolve(__dirname, '.')}/public`;
+    constructor(client_id: string, client_secret: string, accessTokenEventCallback: EventEmitter) {
 
-    constructor(client_id: string, client_secret: string, accessTokenCallback: Function) {
         this.router = Router();
         const stateKey = "spotify_auth_state";
         const redirect_uri: string =  `${baseUrl}:${frontEndPort}/callback`;
@@ -138,7 +139,7 @@ class FlowRouter {
                                 if (err) { console.error(`Error writing refresh_token to file: ${err}`); }
                             })
 
-                            accessTokenCallback(tokenInfo);
+                            accessTokenEventCallback.emit('set_token', tokenInfo);
                         
                             res.redirect("/panel");
                         } else {
@@ -156,7 +157,7 @@ class FlowRouter {
         });
     }
 
-    static get(client_id: string, client_secret: string, accessTokenCallback: Function): Router {
-        return new FlowRouter(client_id, client_secret, accessTokenCallback).router;
+    static get(client_id: string, client_secret: string, accessTokenEventCallback: EventEmitter): Router {
+        return new FlowRouter(client_id, client_secret, accessTokenEventCallback).router;
     }
 }

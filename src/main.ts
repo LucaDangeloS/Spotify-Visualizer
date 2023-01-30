@@ -8,14 +8,12 @@ import State from './models/state';
 import { fireBeat } from 'src/server/visualizer/colors';
 require('dotenv').config();
 
-
-
 main();
 
 async function main() {
-    let verbose = false;
+    let verbose = true;
     const state = new State((state: State) => {fireBeat(state);} , verbose);
-    const server = Server.init(frontEndPort, process.env.CLIENT_ID, process.env.CLIENT_SECRET, state, state.setAccessToken, verbose);
+    const server = Server.init(frontEndPort, process.env.CLIENT_ID, process.env.CLIENT_SECRET, state, state.setTokenEventHandler, verbose);
     const sync = new Synchronizer(state, verbose);
     server.start();
     await api.waitForToken(state);

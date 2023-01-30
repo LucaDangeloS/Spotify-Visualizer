@@ -7,6 +7,7 @@ import { colorTickRate } from 'src/config/defaultVisualizer.json';
 import { generateColorPalette } from 'src/models/palette/colors';
 import { VisualizerServer } from '/server/visualizer/server';
 import { Scale, Color } from 'chroma-js';
+import { EventEmitter } from 'stream';
 
 
 export default class State {
@@ -23,6 +24,7 @@ export default class State {
     verbose: boolean;
     active: boolean;
     headers = {};
+    setTokenEventHandler: EventEmitter;
     
     private _accessToken: string = null;
     private _expireTimestamp: Date = null;
@@ -120,7 +122,7 @@ export default class State {
         this.isSynced = false;
     }
 
-    public setAccessToken(accessToken: refreshTokenResponseI) {
+    private setToken(accessToken: refreshTokenResponseI) {
         this._accessToken = accessToken.access_token;
         this._expireTimestamp = new Date(Date.now() + accessToken.expires_in * 1000);
         this.headers = { Authorization: `Bearer ${this._accessToken}` };
@@ -142,6 +144,8 @@ export default class State {
         this.active = true;
         this.beatCallback = beatCallback;
         this.loadPalettes();
+        this.setTokenEventHandler = new EventEmitter();
+        this.setTokenEventHandler.on('set_token', (token) => {this.setToken(token);});
     }
 
 }

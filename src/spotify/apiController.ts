@@ -72,9 +72,14 @@ export async function waitForToken(state: State, timeout: number = 10000): Promi
 
 export async function refreshToken(state: State): Promise<boolean> {
     // TODO: try read catch error
-    let refresh_token: string = readFileSync('token.txt', 'utf-8');
+    let refresh_token: string;
     let refresh_url: string = token_url;
     let ret: boolean = false;
+    try {
+        refresh_token = readFileSync('token.txt', 'utf-8');
+    } catch (err) {
+        return ret;
+    }
     let refresh_body = {
         grant_type: "refresh_token",
         refresh_token: refresh_token,
@@ -92,7 +97,7 @@ export async function refreshToken(state: State): Promise<boolean> {
     await axios.post(refresh_url, querystring.stringify(refresh_body), headers)
         .then((res: AxiosResponse) => {
             let data: refreshTokenResponseI = res.data as refreshTokenResponseI;
-            state.setAccessToken(data);
+            state.setTokenEventHandler.emit('set_token', data);
             ret = true;
         })
         .catch((err: AxiosError) => {
