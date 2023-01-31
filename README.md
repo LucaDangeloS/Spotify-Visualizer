@@ -83,12 +83,13 @@ tsc
 - [x] Figure out a way to delegate the song interpretation to the server
 - [x] Add support for multiple visualizers
 - [x] Implement socket communication
-- [ ] Implement reliable over network communication
+- [x] Implement individual visualizer customization
+- [x] Make color jump related to song attributes
+- [ ] Solve missing song attributes bug when song changes
+- [ ] Solve colors flickering when song changes
 - [ ] Standardize the message exchanges from server to visualizers
-- [ ] Implement individual visualizer customization
-- [ ] Make color jump related to song attributes
+- [ ] Implement reliable over network communication
 - [ ] Fine tune palette sizes
-- [ ] Implement individual visualizer customization
 - [ ] Optimize beat steps to omit the beats lower that then confidence threshold
 - [ ] Make the webapp for parameters tweaking
 - [ ] Code clean-up (duh)

@@ -5,6 +5,9 @@ import State from '../models/state';
 import { ApiResponse, ApiStatusCode } from './apiController';
 import { trackInfoI, progressInfoI } from '../models/spotifyApiInterfaces';
 
+/**
+ * Class that handles the synchronization of the visualizer with the current track through Timeouts
+ */
 export default class Synchronizer {
     private verbose: boolean = false;
     private pingLoop: ReturnType<typeof setTimeout> = null;
