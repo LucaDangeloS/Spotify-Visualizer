@@ -149,7 +149,7 @@ export function makeDistanceTransitionOffset(palette: (string)[], color: string,
     return transition;
 }
 
-// Aux function for debugging
+// Aux function for debugging: prints the palette in python format
 export function pc(colors: (string)[], python_mode: boolean = false) : string {
     if (colors === undefined || colors === null) return null;
     for (let i = 0; i < colors.length; i++) {
@@ -160,13 +160,17 @@ export function pc(colors: (string)[], python_mode: boolean = false) : string {
     }
 }
 
-export function getDistribution(colors: (string)[]) {
+// Aux function for debugging: prints the distance between each adjacent color in the palette
+export function getDistribution(colors: (string)[]): number[] {
     if (colors === undefined || colors === null) return null;
+    let distances = [];
     for (let i = 0; i < colors.length - 1; i++) {
-        console.log(chroma.distance(colors[i], colors[(i + 1)]));
+        distances.push(chroma.distance(colors[i], colors[(i + 1)]));
     }
+    return distances;
 }
 
+// Aux function for debugging: Splits the palette in two based on a chroma threshold to detect 
 export function splitChroma(colors: string[], threshold: number = 23): { underThreshold: string[], overThreshold: string[] } {
     let ret_1: string[] = []
     let ret_2: string[] = []
