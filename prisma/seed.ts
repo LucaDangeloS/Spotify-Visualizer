@@ -6,7 +6,7 @@ async function main() {
     if (palettes.length === 0) {
         await prisma.palette.create({
             data: {
-              genColors: "purple,darkred,darkblue,red",
+              genColors: "#166088,#660094,orange,darkred",
               name: 'Default',
             }
         })

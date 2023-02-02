@@ -77,11 +77,15 @@ function processNextColor(visualizer: VisualizerInfo, duration: number, section:
             (Date.now() - visualizer.lastBeatTimestamp) /
                 visualizer.colorTickRate
         ) % visualizer.palette.hexColors.length;
+    console.log(index);
     // Color transition function taking loudness info
-    let sectionParams: colorShiftParams = {
-        loudness: section.loudness,
-        tempo: section.tempo
-    };
+    let sectionParams: colorShiftParams|null = null;
+    if (section) {
+        sectionParams = {
+            loudness: section.loudness,
+            tempo: section.tempo
+        };
+    }
 
     let color: string = calculateColorShift(visualizer.palette.hexColors[index], baseShiftAlpha, sectionParams, refShiftParams, shiftWeights);
     let trans: string[] = makeTimeTransitionOffset(
@@ -97,10 +101,13 @@ function processNextColor(visualizer: VisualizerInfo, duration: number, section:
 }
 
 function calculateColorShift(startingHexColor: string, initialShift: number, 
-    sectionParams: colorShiftParams, refParams : colorShiftParams, shiftWeights : colorShiftParams): string {
-
+    sectionParams: colorShiftParams|null, refParams : colorShiftParams, shiftWeights : colorShiftParams): string {
+    // Fix negative angles, maybe do it logarithmically
+    // Try to find a better way to detect chorus
     let shift = initialShift;
-
+    if (!sectionParams) {
+        return analogous(startingHexColor, shift).left;
+    }
     let loudnessMod = (refParams.loudness / sectionParams.loudness - 1) * shiftWeights.loudness;
     let tempoMod = (refParams.tempo / sectionParams.tempo - 1) * shiftWeights.tempo;
 
@@ -110,11 +117,15 @@ function calculateColorShift(startingHexColor: string, initialShift: number,
         ${loudnessMod} ${tempoMod} | 
         ${sectionParams.loudness} ${sectionParams.tempo} | 
         ${refParams.loudness} ${refParams.tempo}`);
+    if (shift < 0) {
+        return startingHexColor;
+    }
     let color = analogous(startingHexColor, shift);
     // random left or right
-    if (Math.random() < (0.5 * (1 + loudnessMod))) {
-        return color.left;
-    } else {
-        return color.right;
-    }
+    return color.left;
+    // if (Math.random() < (0.5 * (1 + loudnessMod))) {
+        // return color.left;
+    // } else {
+        // return color.right;
+    // }
 }

@@ -4,7 +4,8 @@
   "description": "A spotify visualizer server",
   "main": "main.ts",
   "scripts": {
-    "init": "npx prisma migrate dev --name initialize && npx prisma db seed",
+    "seed": "npx prisma migrate dev --name initialize && npx prisma db seed",
+    "reset": "npx prisma migrate reset",
     "dev": "nodemon --ignore data/*.json src/main.ts ",
     "start": "ts-node src/main.ts",
     "test": "jest --runInBand",

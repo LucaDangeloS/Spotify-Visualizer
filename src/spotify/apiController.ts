@@ -128,6 +128,7 @@ export async function fetchCurrentlyPlaying(state: State): Promise<ApiResponse> 
                 };
             }
         }).catch((err: AxiosError) => {
+            // TODO: Solve issue "TypeError: Cannot read properties of undefined (reading 'status')"
             if (err.response!.status === 401) {
                 ret = {status: ApiStatusCode.Unauthorized, data: null}
             }

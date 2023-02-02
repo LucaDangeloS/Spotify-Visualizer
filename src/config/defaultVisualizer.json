@@ -1,9 +1,9 @@
 {
-    "colorTickRate": 33,
+    "colorTickRate": 45,
     "delay": 0,
     "transitionModifier": 0,
     "cycleModifier": 0,
-    "loudnessSensibility": 1.5,
+    "loudnessSensibility": 3,
     "tempoSensibility": 1.5,
     "minBeatConf": 0.25,
     "maxBeatConf": 1
