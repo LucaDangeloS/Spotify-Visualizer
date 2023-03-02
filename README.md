@@ -31,10 +31,15 @@ The API processing is delegated to a central server while multiple custom visual
 
 There would also be a WebApp where parameters and color schemes can be changed for each individual visualizer connected to the server.
 
-Albeit over network communication is the main goal of this project, I have come up against a brick wall while doing it. Basically due to how slow or unreliable are the frameworks and protocols I have tried for this.
-I am still trying to get it done, but as for now I'm continuing the project with only local visualizers in mind. At least until I come up with a reliable solution for over network visualization. I have thought of some solutions, and all of them boil down to avoiding this to be a real time application to alleviate internet communications.
+**Edit**: While testing with a LED strip remotely it seemed to work pretty good, I will upload preview videos sometime soon.
 
-**TL;DR**: Just localhost connections for now as things get very messy with remote connections.
+# My main issue when developing this
+I want to keep this as simple as posible, so *anyone* can just copy paste or write 40 lines of code to have a highly customizable visualizer at home,
+without any mayor complications. 
+
+However, some features such as making X degrees color jumps, or saving visualizer profiles become very difficult as the server somehow need to have specific client information that can only be given out by the client voluntarily. This means adding extra communication from the client that needs to be coded manually, which in term adds extra complexity, thus straying from the initial goal of this project.
+
+To overcome this I have planned on adding these features as optional features so that more advanced users can take the full advantage of this project, while not letting down people that just want to see some fancy lights blinking. If you have any advice or idea please let me know!
 <br><br/>
 
 # Features
@@ -43,13 +48,14 @@ I am still trying to get it done, but as for now I'm continuing the project with
 - A backend for the Spotify API processing in nodejs
 - Song Beat and Section synchronization
 - Beat and Section confidence filtering
+- Reactiveness to the song, meaning color jumps are larger during the chorus, for example
 <br><br/>
 
 # Getting Started
 ## Prerequisites
 - Spotify account
 - node
-  - npm (node packet manager)
+  - npm/pnpm (node packet manager)
 <br><br/>
 ## Dependencies
 Install all node dependencies executing this in the root directory
@@ -85,9 +91,9 @@ tsc
 - [x] Implement socket communication
 - [x] Implement individual visualizer customization
 - [x] Make color jump related to song attributes
+- [x] Standardize the message exchanges from server to visualizers
 - [ ] Solve missing song attributes bug when song changes
 - [ ] Solve colors flickering when song changes
-- [ ] Standardize the message exchanges from server to visualizers
 - [ ] Implement reliable over network communication
 - [ ] Fine tune palette sizes
 - [ ] Optimize beat steps to omit the beats lower that then confidence threshold
