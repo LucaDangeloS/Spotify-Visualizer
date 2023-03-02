@@ -33,9 +33,8 @@ There would also be a WebApp where parameters and color schemes can be changed f
 
 **Edit**: While testing with a LED strip remotely it seemed to work pretty good, I will upload preview videos sometime soon.
 
-# My main issue when developing this
-I want to keep this as simple as posible, so *anyone* can just copy paste or write 40 lines of code to have a highly customizable visualizer at home,
-without any mayor complications. 
+#### My main issue when developing this
+I want to keep this as simple as posible, so *anyone* can just follow a dummy guide and copy paste 40 lines of code to have a highly customizable visualizer at home, without any major complications. 
 
 However, some features such as making X degrees color jumps, or saving visualizer profiles become very difficult as the server somehow need to have specific client information that can only be given out by the client voluntarily. This means adding extra communication from the client that needs to be coded manually, which in term adds extra complexity, thus straying from the initial goal of this project.
 
