@@ -91,6 +91,9 @@ tsc
 - [x] Implement individual visualizer customization
 - [x] Make color jump related to song attributes
 - [x] Standardize the message exchanges from server to visualizers
+- [ ] Add parameter for brightness
+- [ ] Fix color palette creations so color chosen are more predominant
+- [ ] Add option for in color palette jump (just shift)
 - [ ] Solve missing song attributes bug when song changes
 - [ ] Solve colors flickering when song changes
 - [ ] Implement reliable over network communication
