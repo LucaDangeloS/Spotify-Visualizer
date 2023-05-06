@@ -1,5 +1,6 @@
 import { VisualizerSocket } from "src/server/visualizer/server";
 import * as def from 'src/config/defaultVisualizer.json';
+import * as defSynced from 'src/config/sharedVisualizer.json';
 import { PaletteDAO } from "src/models/palette/paletteDAO";
 
 export interface VisualizerSocketInfo {
@@ -21,13 +22,14 @@ export interface VisualizerInfo {
     transitionModifier: number,
     loudnessSensibility: number,
     tempoSensibility: number,
-    cycleModifier: number
+    cycleModifier: number,
+    brightness: number
 }
 
 export enum VisualizerState {
-    off,
-    cycle,
-    on
+    off = 0,
+    cycle = 1,
+    on = 2
 }
 
 export function newVisualizerColorInfo(palette: PaletteDAO): VisualizerInfo {
@@ -45,12 +47,33 @@ export function newVisualizerColorInfo(palette: PaletteDAO): VisualizerInfo {
         transitionModifier: def.transitionModifier,
         loudnessSensibility: def.loudnessSensibility,
         tempoSensibility: def.tempoSensibility, 
-        cycleModifier: def.cycleModifier
+        cycleModifier: def.cycleModifier,
+        brightness: def.brightness
+    };
+}
+
+export function loadSyncedVisualizerInfo(palette: PaletteDAO): VisualizerInfo {
+    return {
+        state: VisualizerState.on,
+        minBeatConf: defSynced.minBeatConf,
+        maxBeatConf: defSynced.maxBeatConf,
+        lastBeatTimestamp: Date.now(),
+        palette: {
+            info: palette,
+            scale: null,
+            hexColors: null
+        },
+        colorTickRate: defSynced.colorTickRate,
+        transitionModifier: defSynced.transitionModifier,
+        loudnessSensibility: defSynced.loudnessSensibility,
+        tempoSensibility: defSynced.tempoSensibility, 
+        cycleModifier: defSynced.cycleModifier,
+        brightness: defSynced.brightness
     };
 }
 
 export function newVisualizer(number: number, defaultPalette: PaletteDAO, socket: VisualizerSocket): VisualizerSocketInfo {
-    let colorInfo: VisualizerInfo = newVisualizerColorInfo(defaultPalette);
+    const colorInfo: VisualizerInfo = newVisualizerColorInfo(defaultPalette);
     return {
         name: `Visualizer ${number}`,
         id: socket.id,

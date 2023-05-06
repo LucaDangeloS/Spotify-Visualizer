@@ -1,4 +1,4 @@
-import { VisualizerSocketInfo, VisualizerInfo, VisualizerState, newVisualizerColorInfo } from './visualizerInfo/visualizerInfo';
+import { VisualizerSocketInfo, VisualizerInfo, VisualizerState, newVisualizerColorInfo, loadSyncedVisualizerInfo } from './visualizerInfo/visualizerInfo';
 import { TrackInfo } from './spotifyApiInterfaces';
 import { refreshTokenResponseI  } from '/spotify/apiController';
 import { savePalette, loadPalettes, removePalette, PaletteDAO } from './palette/paletteDAO';
@@ -32,7 +32,7 @@ export default class State {
     // Palette functions
     public async loadPalettes(): Promise<boolean> {
         try {
-            let data = await loadPalettes();
+            const data = await loadPalettes();
             this.colorInfo.palettes = data
             this.colorInfo.defaultPalette = data[0];
         } catch (err) {
@@ -65,7 +65,7 @@ export default class State {
         if (this.colorInfo.palettes.length === 1) {
             return false; // TODO: Raise exception
         }
-        let ret = removePalette(id);
+        const ret = removePalette(id);
         if (ret) {
             await this.loadPalettes();
             return true;
@@ -83,7 +83,7 @@ export default class State {
     }
 
     public removeVisualizer(id: string) {
-        let index = this.visualizers.findIndex(v => v.id === id);
+        const index = this.visualizers.findIndex(v => v.id === id);
         if (index > -1) {
             this.visualizers[index].socket.disconnect();
             this.visualizers.splice(index, 1);
@@ -108,11 +108,11 @@ export default class State {
 
     // sync
     public syncVisualizers() {
-        let palette = this.colorInfo.defaultPalette;
+        const palette = this.colorInfo.defaultPalette;
 
         this.isSynced = true;
-        this.syncSharedData = newVisualizerColorInfo(palette);
-        this.syncSharedData.palette.hexColors = generateColorPalette(palette.genColors, true).colors(colorPaletteSize);
+        this.syncSharedData = loadSyncedVisualizerInfo(palette);
+        this.syncSharedData.palette.hexColors = generateColorPalette(palette.genColors, true, this.syncSharedData.brightness).colors(colorPaletteSize);
         // calculate mean of visualizer delays
         // this.syncSharedData.colorTickRate = this.visualizers.reduce((acc, v) => acc + v.colorInfo.colorTickRate, 0) / this.visualizers.length;
     }
@@ -160,7 +160,8 @@ class ColorInfo {
     defaultPalette: PaletteDAO = null;
 }
 
-class VisualizerSharedData implements VisualizerInfo { // TODO not sure how this is initialized
+class VisualizerSharedData implements VisualizerInfo {
+    brightness: number = 1;
     transitionModifier: number;
     loudnessSensibility: number;
     tempoSensibility: number;
@@ -171,5 +172,4 @@ class VisualizerSharedData implements VisualizerInfo { // TODO not sure how this
     palette: { info: PaletteDAO; scale: Scale<Color>; hexColors: string[]; };
     colorTickRate: number;
     lastBeatTimestamp: number = Date.now();
-
 }

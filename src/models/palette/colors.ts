@@ -7,15 +7,15 @@ import chroma from 'chroma-js';
  * @param {boolean} loop - If palette should be looped
  * @returns {chroma.Scale} A chroma scale palette
  */
-export function generateColorPalette(colors : (string | chroma.Color)[], loop: boolean = true) : chroma.Scale {
+export function generateColorPalette(colors : (string | chroma.Color)[], loop: boolean = true, brightness: number = 0.2) : chroma.Scale {
     if (colors === undefined || colors === null) 
         throw new Error("No valid color provided");
-    let lab_interpolation = false;
-    let hues: number[] = [];
+    let use_lab = false;
+    const hues: number[] = [];
 
     if (colors.length > 1) {
         if (loop) {
-            let loop_color: chroma.Color | string = colors[0];
+            const loop_color: chroma.Color | string = colors[0];
             // make a looped color cycle
             if (loop_color !== colors[colors.length - 1]) {
                 colors.push(loop_color);
@@ -27,14 +27,28 @@ export function generateColorPalette(colors : (string | chroma.Color)[], loop: b
         
         // check if any color makes a near 180 degrees rotation in the hue wheel
         for (let i = 0; i < hues.length - 1; i++) {
-            let diff: number = Math.abs(hues[i] - hues[i + 1]);
-            if (Math.abs(diff - 180) < 20) {
-                lab_interpolation = true;
+            const diff: number = Math.abs(hues[i] - hues[i + 1]);
+            if (Math.abs(diff - 180) < 30) {
+                use_lab = true;
                 break;
             }
         }
+        // process the colors in pairs ?
+        // for (let i = 0; i < colors.length - 1; i = i + 2) {
+        // }
     }
-    return chroma.scale(colors).mode(lab_interpolation ? 'lab' : 'lrgb');
+    // scale the colors to the desired brightness
+    const colorBrightness: number = chroma(colors[0]).hsl()[2];
+    if (brightness !== 1) {
+        colors = colors.map(color => {
+            const c = chroma(color);
+            const hsl = c.hsl();
+            hsl[2] = colorBrightness * brightness;
+            return chroma.hsl(...hsl);
+        });
+    }
+
+    return chroma.scale(colors).mode(use_lab ? 'lab' : 'lrgb');
 }
 
 /**
@@ -55,7 +69,7 @@ export function complementary(color: (string | chroma.Color | number)) : string 
  */
 export function analogous(color: (string | chroma.Color | number), a: number) : {left: string, right: string} {
     if (color === undefined || color === null) throw new Error("No valid color provided");
-    let c = chroma(color);
+    const c = chroma(color);
     return {left: c.set('hsl.h', `-${a}`).hex(), right: c.set('hsl.h', `+${a}`).hex()};
 }
 
@@ -72,7 +86,7 @@ export function analogous(color: (string | chroma.Color | number), a: number) : 
  */
 export function shift(palette: (string)[], index: number, time: number, tickrate: number = 33) : number {
     if (palette === undefined || palette === null) return null;
-    let displacement: number = Math.round(time / tickrate);
+    const displacement: number = Math.round(time / tickrate);
     return (index + displacement) % palette.length;
 }
 
@@ -87,7 +101,7 @@ export function shift(palette: (string)[], index: number, time: number, tickrate
  * */ 
 export function sequence(palette: (string)[], index: number, time: number, tickrate: number = 33) : {rotation: string[], idx: number} {
     if (palette === undefined || palette === null) return null;
-    let new_index: number = shift(palette, index, time, tickrate);
+    const new_index: number = shift(palette, index, time, tickrate);
     return {rotation: palette.slice(index, new_index), idx: new_index};
 }
 
@@ -114,11 +128,11 @@ export function makeTimeTransitionOffset(palette: (string)[], color: string, ind
     if (steps > palette.length) {
         steps = palette.length;
     }
-    let new_index: number = (index + steps) % palette.length;
-    let transition: string[] = generateColorPalette([color, palette[new_index]], false).colors(steps);
+    const new_index: number = (index + steps) % palette.length;
+    const transition: string[] = generateColorPalette([color, palette[new_index]], false, 1).colors(steps);
 
     // palette modification
-    let prev: string[] = palette.splice(0, new_index + 1);
+    const prev: string[] = palette.splice(0, new_index + 1);
 
     palette.push(...prev);
 
@@ -138,12 +152,12 @@ export function makeDistanceTransitionOffset(palette: (string)[], color: string,
     if (colorSteps === null || colorSteps <= 0){
         colorSteps = Math.round(chroma.distance(palette[index], palette[(index + 1) % palette.length]));
     }
-    let steps: number = Math.floor(chroma.distance(palette[index], color) / colorSteps);
-    let new_index: number = (index + steps) % palette.length;
-    let transition: string[] = generateColorPalette([color, palette[new_index]], false).colors(steps);
+    const steps: number = Math.floor(chroma.distance(palette[index], color) / colorSteps);
+    const new_index: number = (index + steps) % palette.length;
+    const transition: string[] = generateColorPalette([color, palette[new_index]], false, 1).colors(steps);
 
     // palette modification
-    let prev: string[] = palette.splice(0, new_index + 1);
+    const prev: string[] = palette.splice(0, new_index + 1);
     palette.push(...prev);
 
     return transition;
@@ -163,7 +177,7 @@ export function pc(colors: (string)[], python_mode: boolean = false) : string {
 // Aux function for debugging: prints the distance between each adjacent color in the palette
 export function getDistribution(colors: (string)[]): number[] {
     if (colors === undefined || colors === null) return null;
-    let distances = [];
+    const distances = [];
     for (let i = 0; i < colors.length - 1; i++) {
         distances.push(chroma.distance(colors[i], colors[(i + 1)]));
     }
@@ -172,11 +186,11 @@ export function getDistribution(colors: (string)[]): number[] {
 
 // Aux function for debugging: Splits the palette in two based on a chroma threshold to detect 
 export function splitChroma(colors: string[], threshold: number = 23): { underThreshold: string[], overThreshold: string[] } {
-    let ret_1: string[] = []
-    let ret_2: string[] = []
+    const ret_1: string[] = []
+    const ret_2: string[] = []
     for (let i = 0; i < colors.length - 1; i++) {
-        let chromaColor: chroma.Color = chroma(colors[i]);
-        let a = {
+        const  chromaColor: chroma.Color = chroma(colors[i]);
+        const a = {
             color: chromaColor.hex(),
             chroma: chromaColor.hcl()[1],
         };
