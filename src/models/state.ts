@@ -2,7 +2,7 @@ import { VisualizerSocketInfo, VisualizerInfo, VisualizerState, newVisualizerCol
 import { TrackInfo } from './spotifyApiInterfaces';
 import { refreshTokenResponseI  } from '/spotify/apiController';
 import { savePalette, loadPalettes, removePalette, PaletteDAO } from './palette/paletteDAO';
-import { beatDelay, colorPaletteSize } from 'src/config/config.json';
+import { globalBeatDelay, colorPaletteSize } from 'src/config/config.json';
 import { colorTickRate } from 'src/config/defaultVisualizer.json';
 import { generateColorPalette } from 'src/models/palette/colors';
 import { VisualizerServer } from '/server/visualizer/server';
@@ -18,7 +18,8 @@ export default class State {
     colorInfo: ColorInfo = new ColorInfo();
     visualizerServerSocket: VisualizerServer = null;
     visualizers: VisualizerSocketInfo[] = [];
-    globalDelay: number = beatDelay;
+    globalDelay: number = globalBeatDelay;
+    paletteSize: number = colorPaletteSize;
     loops: Loops = new Loops();
     beatCallback: Function;
     verbose: boolean;
@@ -78,7 +79,7 @@ export default class State {
     public addVisualizer(visualizer: VisualizerSocketInfo) {
         this.visualizers.push(visualizer);
         if (this.isSynced) {
-            this.syncSharedData.colorTickRate = this.visualizers.reduce((acc, v) => acc + v.colorInfo.colorTickRate, 0) / this.visualizers.length;
+            this.syncSharedData.colorTickRate = this.visualizers.reduce((acc, v) => acc + v.configInfo.colorTickRate, 0) / this.visualizers.length;
         }
     }
 
@@ -89,7 +90,7 @@ export default class State {
             this.visualizers.splice(index, 1);
             if (this.isSynced) {
                 if (this.visualizers.length > 0) {
-                    this.syncSharedData.colorTickRate = this.visualizers.reduce((acc, v) => acc + v.colorInfo.colorTickRate, 0) / this.visualizers.length;
+                    this.syncSharedData.colorTickRate = this.visualizers.reduce((acc, v) => acc + v.configInfo.colorTickRate, 0) / this.visualizers.length;
                 }
                 else {
                     this.syncSharedData.colorTickRate = colorTickRate;
@@ -113,6 +114,7 @@ export default class State {
         this.isSynced = true;
         this.syncSharedData = loadSyncedVisualizerInfo(palette);
         this.syncSharedData.palette.hexColors = generateColorPalette(palette.genColors, true, this.syncSharedData.brightness).colors(colorPaletteSize);
+        this.syncSharedData.palette.size = colorPaletteSize;
         // calculate mean of visualizer delays
         // this.syncSharedData.colorTickRate = this.visualizers.reduce((acc, v) => acc + v.colorInfo.colorTickRate, 0) / this.visualizers.length;
     }
@@ -169,7 +171,7 @@ class VisualizerSharedData implements VisualizerInfo {
     state: VisualizerState;
     minBeatConf: number;
     maxBeatConf: number;
-    palette: { info: PaletteDAO; scale: Scale<Color>; hexColors: string[]; };
+    palette: { info: PaletteDAO; scale: Scale<Color>; hexColors: string[]; size: number; };
     colorTickRate: number;
     lastBeatTimestamp: number = Date.now();
 }

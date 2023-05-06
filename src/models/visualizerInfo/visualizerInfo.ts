@@ -8,7 +8,7 @@ export interface VisualizerSocketInfo {
     socket: VisualizerSocket,
     id: string,
     delay: number,
-    colorInfo: VisualizerInfo
+    configInfo: VisualizerInfo
 }
 
 
@@ -17,7 +17,7 @@ export interface VisualizerInfo {
     minBeatConf: number,
     maxBeatConf: number,
     lastBeatTimestamp: number,
-    palette: {info: PaletteDAO, scale: chroma.Scale, hexColors: string[]},
+    palette: {info: PaletteDAO, scale: chroma.Scale, hexColors: string[], size: number},
     colorTickRate: number // Time in ms that takes for the visualizer to change a color
     transitionModifier: number,
     loudnessSensibility: number,
@@ -41,7 +41,8 @@ export function newVisualizerColorInfo(palette: PaletteDAO): VisualizerInfo {
         palette: {
             info: palette,
             scale: null,
-            hexColors: null
+            hexColors: null,
+            size: null
         },
         colorTickRate: def.colorTickRate,
         transitionModifier: def.transitionModifier,
@@ -61,7 +62,8 @@ export function loadSyncedVisualizerInfo(palette: PaletteDAO): VisualizerInfo {
         palette: {
             info: palette,
             scale: null,
-            hexColors: null
+            hexColors: null,
+            size: null
         },
         colorTickRate: defSynced.colorTickRate,
         transitionModifier: defSynced.transitionModifier,
@@ -79,6 +81,6 @@ export function newVisualizer(number: number, defaultPalette: PaletteDAO, socket
         id: socket.id,
         socket: socket,
         delay: def.delay,
-        colorInfo: colorInfo
+        configInfo: colorInfo
     };
 }

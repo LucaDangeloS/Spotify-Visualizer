@@ -34,26 +34,27 @@ function sendBeat(state: State, beatInfo: beatParamsInfo) {
     let shiftWeights : colorShiftParams;
 
     state.visualizers.forEach((visualizer) => {
-        if (visualizer.colorInfo.state === VisualizerState.on) {
+        console.log(`Palette size: ${visualizer.configInfo.palette.size}`)
+        if (visualizer.configInfo.state === VisualizerState.on) {
             if (
-                beatInfo.activeBeatConf >= visualizer.colorInfo.minBeatConf &&
-                beatInfo.activeBeatConf <= visualizer.colorInfo.maxBeatConf
+                beatInfo.activeBeatConf >= visualizer.configInfo.minBeatConf &&
+                beatInfo.activeBeatConf <= visualizer.configInfo.maxBeatConf
                 )
                 {
                     const vizDelay = -state.globalDelay - visualizer.delay;
                     shiftWeights = {
-                        loudness: visualizer.colorInfo.loudnessSensibility,
-                        tempo: visualizer.colorInfo.tempoSensibility
+                        loudness: visualizer.configInfo.loudnessSensibility,
+                        tempo: visualizer.configInfo.tempoSensibility
                     }
                     const transitionColors = processNextColor( 
-                        visualizer.colorInfo,
+                        visualizer.configInfo,
                         beatInfo.activeBeatDur + vizDelay,
                         state.trackInfo.activeSection,
                         beatInfo.colorShiftParams, 
                         shiftWeights
                         );
-                    sendData(visualizer, transitionColors, visualizer.colorInfo.palette.hexColors, vizDelay);
-                    visualizer.colorInfo.lastBeatTimestamp = Date.now();
+                    sendData(visualizer, transitionColors, visualizer.configInfo.palette.hexColors, vizDelay);
+                    visualizer.configInfo.lastBeatTimestamp = Date.now();
                 }
             }
     });

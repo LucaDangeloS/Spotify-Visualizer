@@ -3,8 +3,8 @@
     "keyConfidence": 0.24,
     "sectionsConfidence": 0.10,
     "pingDelay": 5000,
-    "beatDelay": 0,
+    "globalBeatDelay": 0,
     "syncOffsetThreshold": 20,
     "trackProgressTickRate" : 5,
-    "colorPaletteSize": 200
+    "colorPaletteSize": 300
 }

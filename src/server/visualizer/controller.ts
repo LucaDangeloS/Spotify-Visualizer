@@ -1,5 +1,4 @@
 import { VisualizerInfo, VisualizerSocketInfo, VisualizerState } from "src/models/visualizerInfo/visualizerInfo";
-import { colorPaletteSize } from "src/config/config.json";
 import { generateColorPalette } from "src/models/palette/colors";
 import { NoPaletteDefinedError, NullNameError, NullPaletteError, ValueOutOfBoundsError } from "./errors";
 import { PaletteDAO } from "src/models/palette/paletteDAO";
@@ -25,7 +24,7 @@ export function updateCycleModifier(viz: VisualizerInfo, filler: number): void {
     if (viz.palette.scale.length - filler > 0) {
         viz.cycleModifier = filler;
     } else {
-        throw new ValueOutOfBoundsError(viz, 0, colorPaletteSize);
+        throw new ValueOutOfBoundsError(viz, 0, viz.palette.size);
     }
 }
 
@@ -70,6 +69,7 @@ export function updatePalette(viz: VisualizerInfo, palette: PaletteDAO): void {
         viz.palette.info = palette;
         viz.palette.scale = null;
         viz.palette.hexColors = null;
+        viz.palette.size = null;
     } else {
         throw new NullPaletteError(viz);
     }
@@ -93,7 +93,7 @@ export function generateHexColors(viz: VisualizerInfo): void {
         throw new NoPaletteDefinedError(viz);
     }
     if (viz.palette.scale != null) {
-        viz.palette.hexColors = viz.palette.scale.colors(colorPaletteSize + viz.cycleModifier);
+        viz.palette.hexColors = viz.palette.scale.colors(viz.palette.size + viz.cycleModifier);
     } else {
         throw new NoPaletteDefinedError(viz);
     }
