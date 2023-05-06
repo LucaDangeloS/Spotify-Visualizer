@@ -7,7 +7,7 @@ import chroma from 'chroma-js';
  * @param {boolean} loop - If palette should be looped
  * @returns {chroma.Scale} A chroma scale palette
  */
-export function generateColorPalette(colors : (string | chroma.Color)[], loop: boolean = true, brightness: number = 0.2) : chroma.Scale {
+export function generateColorPalette(colors : (string | chroma.Color)[], loop: boolean = true, brightness: number = 1) : chroma.Scale {
     if (colors === undefined || colors === null) 
         throw new Error("No valid color provided");
     let use_lab = false;
@@ -129,7 +129,7 @@ export function makeTimeTransitionOffset(palette: (string)[], color: string, ind
         steps = palette.length;
     }
     const new_index: number = (index + steps) % palette.length;
-    const transition: string[] = generateColorPalette([color, palette[new_index]], false, 1).colors(steps);
+    const transition: string[] = generateColorPalette([color, palette[new_index]], false).colors(steps);
 
     // palette modification
     const prev: string[] = palette.splice(0, new_index + 1);
@@ -154,7 +154,7 @@ export function makeDistanceTransitionOffset(palette: (string)[], color: string,
     }
     const steps: number = Math.floor(chroma.distance(palette[index], color) / colorSteps);
     const new_index: number = (index + steps) % palette.length;
-    const transition: string[] = generateColorPalette([color, palette[new_index]], false, 1).colors(steps);
+    const transition: string[] = generateColorPalette([color, palette[new_index]], false).colors(steps);
 
     // palette modification
     const prev: string[] = palette.splice(0, new_index + 1);
