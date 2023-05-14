@@ -20,7 +20,7 @@ This is a rewritten version in TypeScript of my previous Spotify Visualizer, ori
     <li><a href="#getting-started">Getting Started</a></li>
     <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#dependencies">Setup</a></li>
+        <li><a href="#setup">Setup</a></li>
         <li><a href="#usage">Usage</a></li>
     </ul>
     <li><a href="#todos">TODOs</a></li>
