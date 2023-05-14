@@ -42,7 +42,7 @@ https://youtu.be/3Z2Jqpxq29M \
 https://youtu.be/PM9xYnZyaM0 
 
 ## Balancing Simplicity and Features
-I want to keep this as simple as posible, so *anyone* can copy paste 40 lines of code to have a highly customizable visualizer at home. However, adding more fancy features usually requires clients to have , thus straying from the initial goal of this project.
+I want to keep this as simple as posible, so *anyone* can copy paste 40 lines of code to have a highly customizable visualizer at home. However, adding more fancy features usually requires clients to be more complex, thus straying from the initial goal of this project.
 
 To overcome this I have planned on adding these features as optionals so that more advanced users can take the full advantage of this project, while not letting down people that just want to see some fancy lights blinking. If you have any advice or ideas, please let me know!
 <br><br/>
