@@ -11,6 +11,10 @@ This is a rewritten version in TypeScript of my previous Spotify Visualizer, ori
   <ol>
     <li>
       <a href="#about-the-project-and-goals">About the project and goals</a>
+      <ul>
+        <li><a href="#preview-videos">Preview Videos</a></li>
+        <li><a href="#balancing-simplicity-and-features">Balancing Simplicity and Features</a></li>
+    </ul>
     </li>
     <li><a href="#features">Features</a></li>
     <li><a href="#getting-started">Getting Started</a></li>
@@ -24,24 +28,23 @@ This is a rewritten version in TypeScript of my previous Spotify Visualizer, ori
   </ol>
 </details>
 
+
 # About the project and goals
-The goal of this project is to provide a centralized, modular and scalable spotify visualizer.
+The goal of this project is to provide a centralized, modular and scalable spotify visualizer server, where anyone can write their own client (visualizer) to interact with the server and create custom visualizations.
 
-The API processing is delegated to a central server while multiple custom visualizers can visualize the song interpretation as they see fit (e.g. a ws2812b LED strip connected to a Raspberry Pi, a web page that changes the background color accordingly, etc.)
+The API processing is delegated to a central server while multiple clients can process the song interpretation as they see fit (e.g. a ws2812b LED strip connected to a Raspberry Pi, a web page that changes the background color accordingly, etc.). The server-client communication is done through SocketIO.
 
-There would also be a WebApp where parameters and color schemes can be changed for each individual visualizer connected to the server.
+Eventually there will also be a WebApp where parameters and color schemes can be changed for each individual visualizer connected to the server.
 
-Preview Videos: \
+## Preview Videos
+Previews with a WS2812b LED strip connected to a Rpi with a client connected over WiFi to the visualizer server. \
 https://youtu.be/3Z2Jqpxq29M \
 https://youtu.be/PM9xYnZyaM0 
 
+## Balancing Simplicity and Features
+I want to keep this as simple as posible, so *anyone* can copy paste 40 lines of code to have a highly customizable visualizer at home. However, adding more fancy features usually requires clients to have , thus straying from the initial goal of this project.
 
-#### My main issue when developing this
-I want to keep this as simple as posible, so *anyone* can just follow a dummy guide and copy paste 40 lines of code to have a highly customizable visualizer at home, without any major complications. 
-
-However, some features such as making X degrees color jumps, or saving visualizer profiles become very difficult as the server somehow need to have specific client information that can only be given out by the client voluntarily. This means adding extra communication from the client that needs to be coded manually, which in term adds extra complexity, thus straying from the initial goal of this project.
-
-To overcome this I have planned on adding these features as optional features so that more advanced users can take the full advantage of this project, while not letting down people that just want to see some fancy lights blinking. If you have any advice or idea please let me know!
+To overcome this I have planned on adding these features as optionals so that more advanced users can take the full advantage of this project, while not letting down people that just want to see some fancy lights blinking. If you have any advice or ideas, please let me know!
 <br><br/>
 
 # Features
@@ -58,28 +61,25 @@ To overcome this I have planned on adding these features as optional features so
 - Spotify account
 - node
   - npm/pnpm (node packet manager)
+- SocketIO client (for the clients)
 <br><br/>
 ## Dependencies
 Install all node dependencies executing this in the root directory
 ```console
 npm install
 ```
-<br><br/>
 Then create a ```.env``` in the root folder with the following keys:
 ```
 CLIENT_ID=
 CLIENT_SECRET=
 ```
-And fill the values with your spotify client ID and Secret 
-
+And fill the values with your spotify client ID and Secret \
 You can get them [here](https://developer.spotify.com/dashboard/applications), creating an app and copying the client ID and Client Secret from the page
-<br><br/>
 ## Usage
 The server can be executed with:
 ```console
 npm start
 ```
-
 Or compiled with:
 ```console
 tsc
