@@ -31,7 +31,10 @@ The API processing is delegated to a central server while multiple custom visual
 
 There would also be a WebApp where parameters and color schemes can be changed for each individual visualizer connected to the server.
 
-**Edit**: While testing with a LED strip remotely it seemed to work pretty good, I will upload preview videos sometime soon.
+Preview Videos: \
+https://youtu.be/3Z2Jqpxq29M \
+https://youtu.be/PM9xYnZyaM0 
+
 
 #### My main issue when developing this
 I want to keep this as simple as posible, so *anyone* can just follow a dummy guide and copy paste 40 lines of code to have a highly customizable visualizer at home, without any major complications. 
@@ -92,7 +95,7 @@ tsc
 - [x] Make color jump related to song attributes
 - [x] Standardize the message exchanges from server to visualizers
 - [x] Add parameter for brightness
-- [ ] Fix color palette creations so color chosen are more predominant
+- [ ] Fix color palette creations so the colors chosen are more predominant
 - [ ] Add option for in color palette jump (just shift)
 - [ ] Solve missing song attributes bug when song changes
 - [ ] Solve colors flickering when song changes
