@@ -20,7 +20,7 @@ This is a rewritten version in TypeScript of my previous Spotify Visualizer, ori
     <li><a href="#getting-started">Getting Started</a></li>
     <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#dependencies">Dependencies</a></li>
+        <li><a href="#dependencies">Setup</a></li>
         <li><a href="#usage">Usage</a></li>
     </ul>
     <li><a href="#todos">TODOs</a></li>
@@ -63,7 +63,7 @@ To overcome this I have planned on adding these features as optionals so that mo
   - npm/pnpm (node packet manager)
 - SocketIO client (for the clients)
 <br><br/>
-## Dependencies
+## Setup
 Install all node dependencies executing this in the root directory
 ```console
 npm install
