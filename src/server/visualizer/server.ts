@@ -30,7 +30,7 @@ export function manageConnection(state: State, socket: Socket) {
 
     const visualizer: VisualizerSocketInfo = newVisualizer(state.visualizers.length, state.colorInfo.defaultPalette, socket);
     visualizer.configInfo.palette.size = state.paletteSize;
-    generateHexColors(visualizer.configInfo);
+    generateHexColors(visualizer.configInfo, state.doublePaletteColors);
     state.addVisualizer(visualizer);
     console.log(`${state.visualizers.length} visualizers connected. Using palette: ${visualizer.configInfo.palette.info.name}`);
 }
@@ -39,7 +39,7 @@ export function sendData(visualizer: VisualizerSocketInfo, transition: string[],
     // let time = new Date().getTime();
     const data : TransitionData = {
         transition: transition,
-        colors: colors ? colors : visualizer.configInfo.palette.hexColors,
+        colors: colors || visualizer.configInfo.palette.hexColors,
     }
     visualizer.socket.emit("beat",
         data

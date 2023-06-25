@@ -84,16 +84,20 @@ export function updatePalette(viz: VisualizerInfo, palette: PaletteDAO): void {
 //     }
 // }
 
-export function generateHexColors(viz: VisualizerInfo): void {
+export function generateHexColors(viz: VisualizerInfo, doubleColors: boolean = false): void {
     if (viz.palette.scale == null && viz.palette != null && viz.palette.info != null) {
         // Generate scale if not already generated
         const genColorsParsed = viz.palette.info.genColors;
-        viz.palette.scale = generateColorPalette(genColorsParsed, true, viz.brightness);
+        viz.palette.scale = generateColorPalette(genColorsParsed, true, viz.brightness, doubleColors);
     } else {
         throw new NoPaletteDefinedError(viz);
     }
     if (viz.palette.scale != null) {
         viz.palette.hexColors = viz.palette.scale.colors(viz.palette.size + viz.cycleModifier);
+        // viz.palette.hexColors.forEach(element => {
+        //     // console.log(`"${element}",`);
+        //     console.log(element);
+        // });
     } else {
         throw new NoPaletteDefinedError(viz);
     }

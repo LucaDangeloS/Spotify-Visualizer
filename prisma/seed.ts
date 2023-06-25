@@ -6,10 +6,16 @@ async function main() {
     if (palettes.length === 0) {
         await prisma.palette.create({
             data: {
-              genColors: "#166088,#660094,orange,darkred",
+              genColors: "#166088,#660094,red,orange,#d106c7",
               name: 'Default',
             }
         })
+        await prisma.palette.create({
+          data: {
+            genColors: "#ffa500,#d106c7,#cc8899",
+            name: 'Simple Purple',
+          }
+      })
     }
 }
 

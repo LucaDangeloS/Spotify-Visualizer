@@ -7,9 +7,10 @@ import chroma from 'chroma-js';
  * @param {boolean} loop - If palette should be looped
  * @returns {chroma.Scale} A chroma scale palette
  */
-export function generateColorPalette(colors : (string | chroma.Color)[], loop: boolean = true, brightness: number = 1) : chroma.Scale {
-    if (colors === undefined || colors === null) 
-        throw new Error("No valid color provided");
+export function generateColorPalette(colors : (string | chroma.Color)[], loop: boolean = true, brightness: number = 1, doubleColors: boolean = false) : chroma.Scale {
+    if (colors === undefined || colors === null) {
+      throw new Error("No valid color provided");
+    }
     let use_lab = false;
     const hues: number[] = [];
 
@@ -46,6 +47,15 @@ export function generateColorPalette(colors : (string | chroma.Color)[], loop: b
             hsl[2] = colorBrightness * brightness;
             return chroma.hsl(...hsl);
         });
+    }
+
+    if (doubleColors) {
+        let tmpColors = [];
+        for (let i = 0; i < colors.length; i++) {
+            tmpColors.push(colors[i]);
+            tmpColors.push(colors[i]);
+        }
+        colors = tmpColors;
     }
 
     return chroma.scale(colors).mode(use_lab ? 'lab' : 'lrgb');

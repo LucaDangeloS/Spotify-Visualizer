@@ -20,6 +20,7 @@ export default class State {
     visualizers: VisualizerSocketInfo[] = [];
     globalDelay: number = globalBeatDelay;
     paletteSize: number = colorPaletteSize;
+    doublePaletteColors: boolean = false;
     loops: Loops = new Loops();
     beatCallback: Function;
     verbose: boolean;
@@ -62,7 +63,7 @@ export default class State {
         }
     }
 
-    public async removePalette(id: string): Promise<boolean> {
+    public async removePalette(id: number): Promise<boolean> {
         if (this.colorInfo.palettes.length === 1) {
             return false; // TODO: Raise exception
         }
@@ -113,7 +114,12 @@ export default class State {
 
         this.isSynced = true;
         this.syncSharedData = loadSyncedVisualizerInfo(palette);
-        this.syncSharedData.palette.hexColors = generateColorPalette(palette.genColors, true, this.syncSharedData.brightness).colors(colorPaletteSize);
+        this.syncSharedData.palette.hexColors = generateColorPalette(
+            palette.genColors, 
+            true, 
+            this.syncSharedData.brightness,
+            this.doublePaletteColors,
+            ).colors(colorPaletteSize);
         this.syncSharedData.palette.size = colorPaletteSize;
         // calculate mean of visualizer delays
         // this.syncSharedData.colorTickRate = this.visualizers.reduce((acc, v) => acc + v.colorInfo.colorTickRate, 0) / this.visualizers.length;

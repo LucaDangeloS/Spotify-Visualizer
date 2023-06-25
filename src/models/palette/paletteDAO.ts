@@ -1,6 +1,7 @@
 import { Palette, PrismaClient } from "@prisma/client";
 
 export interface PaletteDAO {
+    id: number,
     name: string,
     genColors: string[],
 }
@@ -14,6 +15,7 @@ function DAOToModel(dao: PaletteDAO) {
 
 function ModelToDAO(model: Palette): PaletteDAO {
     return {
+        id: model.id,
         name: model.name,
         genColors: model.genColors.split(',')
     }
@@ -49,17 +51,15 @@ export async function loadPalettes(): Promise<PaletteDAO[]> {
     }
 }
 
-export async function removePalette(genColors: string) : Promise<boolean> {
+export async function removePalette(id: number) : Promise<boolean> {
     const prisma = new PrismaClient();
     let ret: boolean;
 
-    await prisma.palette.deleteMany({
+    await prisma.palette.delete({
         where: {
-            genColors: {
-                equals: genColors
-            }
+            id: id
         }
-    }).then( palettes => {
+    }).then( _ => {
         ret = true;
     }).catch(err => {
         console.log(err);

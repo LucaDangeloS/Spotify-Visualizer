@@ -151,7 +151,8 @@ function calculateColorShift(startingHexColor: string, initialShift: number,
         return startingHexColor;
     }
     const color = analogous(startingHexColor, shift);
-    // random left or right
+    // TODO: Add option to choose
+    // random left or righ
     return color.left;
     // if (Math.random() < (0.5 * (1 + loudnessMod))) {
         // return color.left;

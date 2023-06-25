@@ -12,7 +12,8 @@ datasource db {
 
 
 model Palette {
-  genColors   String @id @unique
+  id          Int      @id @default(autoincrement())
+  genColors   String
   name        String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @default(now())
