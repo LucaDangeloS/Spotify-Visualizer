@@ -196,6 +196,7 @@ function calculateTimeUntilNextBeat(state: State): number {
     let trackProgress = state.trackInfo.trackProgress;
     let timeUntilNextBeat =
         activeBeatDuration - (trackProgress - activeBeatStart);
-    console.log(activeBeatDuration)
+    // Round numbers to 2 decimal places
+    console.log(`${activeBeatDuration.toFixed(2)} - (${trackProgress.toFixed(2)} - ${activeBeatStart.toFixed(2)}) = ${timeUntilNextBeat.toFixed(2)} ms`)
     return timeUntilNextBeat;
 }

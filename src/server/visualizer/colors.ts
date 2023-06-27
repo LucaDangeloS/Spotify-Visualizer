@@ -34,7 +34,6 @@ function sendBeat(state: State, beatInfo: beatParamsInfo) {
     let shiftWeights : colorShiftParams;
 
     state.visualizers.forEach((visualizer) => {
-        console.log(`Palette size: ${visualizer.configInfo.palette.size}`)
         if (visualizer.configInfo.state === VisualizerState.on) {
             if (
                 beatInfo.activeBeatConf >= visualizer.configInfo.minBeatConf &&
@@ -142,11 +141,11 @@ function calculateColorShift(startingHexColor: string, initialShift: number,
     const tempoMod = (refParams.tempo / sectionParams.tempo - 1) * shiftWeights.tempo;
 
     shift = shift + (shift * loudnessMod) + (shift * tempoMod);
-    console.log(`Shift of ${shift} | 
-        ${shiftWeights.loudness} ${shiftWeights.tempo} | 
-        ${loudnessMod} ${tempoMod} | 
-        ${sectionParams.loudness} ${sectionParams.tempo} | 
-        ${refParams.loudness} ${refParams.tempo}`);
+    console.log(`Shift of ${shift.toFixed(2)}º | L T |
+        shift weights   ${shiftWeights.loudness.toFixed(2)} ${shiftWeights.tempo.toFixed(2)} | 
+        mods            ${loudnessMod.toFixed(2)} ${tempoMod.toFixed(2)} | 
+        section params  ${sectionParams.loudness.toFixed(2)} ${sectionParams.tempo.toFixed(2)} | 
+        ref params      ${refParams.loudness.toFixed(2)} ${refParams.tempo.toFixed(2)}`);
     if (shift < 0) {
         return startingHexColor;
     }

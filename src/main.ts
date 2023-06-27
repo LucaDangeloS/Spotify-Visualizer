@@ -13,7 +13,7 @@ main();
 async function main() {
     let verbose = true;
     const state = new State((state: State) => {fireBeat(state);} , verbose);
-    const server = Server.init(frontEndPort, process.env.CLIENT_ID, process.env.CLIENT_SECRET, state, state.setTokenEventHandler, verbose);
+    const server = new Server(frontEndPort, process.env.CLIENT_ID, process.env.CLIENT_SECRET, state, state.setTokenEventHandler, verbose);
     const sync = new Synchronizer(state, verbose);
     server.start();
     await api.waitForToken(state);

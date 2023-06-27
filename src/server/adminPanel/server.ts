@@ -15,7 +15,9 @@ import { refreshTokenResponseI } from "/spotify/apiController";
 import { EventEmitter } from "stream";
 
 
-// Main Front-End Server with auth flow
+/* 
+    Main Front-End Server that handles auth flow (in the future, this will be the admin panel)
+*/
 export default class Server {
     private app : express.Application;
     private verbose: boolean = false;
@@ -49,7 +51,9 @@ export default class Server {
                 }
             });
     }
-    // Initializes the server, providing the client id and secret for the spotify api and the event hook to update the token alongside the State object
+    /*
+    Initializes the server, providing the client id and secret for the spotify api and the event hook to update the token alongside the State object
+    */
     static init(port: number, client_id: string | undefined, client_secret: string | undefined, state: State, setTokenEventHandler: EventEmitter, verbose?: boolean): Server {
         return new Server(port, client_id, client_secret, state, setTokenEventHandler, verbose);
     }
