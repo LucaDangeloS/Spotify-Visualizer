@@ -103,6 +103,7 @@ tsc
 - [ ] Fine tune palette sizes
 - [ ] Optimize beat steps to omit the beats lower that then confidence threshold
 - [ ] Make the webapp for parameters tweaking
+- [ ] Think on implementing way of interactively knowing the visualizer color processing speed
 - [ ] Code clean-up (duh)
 
 
