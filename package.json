@@ -22,7 +22,7 @@
     "src"
   ],
   "dependencies": {
-    "@prisma/client": "^4.1.0",
+    "@prisma/client": "^5.3.1",
     "@types/chroma-js": "^2.1.3",
     "@types/cookie-parser": "^1.4.2",
     "@types/cors": "^2.8.12",
