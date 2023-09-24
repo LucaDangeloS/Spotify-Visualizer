@@ -6,6 +6,6 @@
     
     "baseUrl": "http://localhost",
     "frontEndPort": 8000,
-    "backEndPort": 3000,
+    "socketApiPort": 3000,
     "visualizerPort": 5000
 }
