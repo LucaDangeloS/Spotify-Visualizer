@@ -2,7 +2,7 @@
     "beatConfidence": 0.21,
     "keyConfidence": 0.24,
     "sectionsConfidence": 0.10,
-    "pingDelay": 5000,
+    "pingDelay": 7000,
     "globalBeatDelay": 0,
     "syncOffsetThreshold": 20,
     "trackProgressTickRate" : 5,
