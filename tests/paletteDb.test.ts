@@ -1,19 +1,20 @@
 import { Palette, PrismaClient } from "@prisma/client";
 
 describe('Database CRUD operations tests', function() {
+    var paletteId: number = 0;
 
     // Before all empty database and seed it
     beforeAll(async () => {
         const prisma = new PrismaClient();
         await prisma.palette.deleteMany({});
-        await prisma.palette.create({
+        const tmpObj = await prisma.palette.create({
             data: {
                 name: 'Test palette',
                 genColors: '#f9f9f9,#454545'
             }
         });
         await prisma.$disconnect();
-        prisma.$disconnect();
+        paletteId = tmpObj.id;
     }
     , 16000);
 
@@ -108,7 +109,7 @@ describe('Database CRUD operations tests', function() {
                 genColors: true
             },
             where: {
-                genColors: paletteObject.genColors
+                id: paletteId
             },
             data: {
                 name: 'Updated palette'
