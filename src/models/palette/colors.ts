@@ -9,7 +9,7 @@ import chroma from 'chroma-js';
  */
 export function generateColorPalette(colors : (string | chroma.Color)[], loop: boolean = true, brightness: number = 1, doubleColors: boolean = false) : chroma.Scale {
     if (colors === undefined || colors === null) {
-      throw new Error("No valid color provided");
+        throw new Error("No valid color provided");
     }
     let use_lab = false;
     const hues: number[] = [];
