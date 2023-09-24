@@ -38,7 +38,7 @@ export default class Server {
         if (this.server == null)
             this.server = this.app.listen(this.port, () => {
                 if (this.verbose) {
-                    console.log(`Server started on port ${this.port}`)
+                    console.log(`Server started on url http://localhost:${this.port}`)
                 }
             });
     }
