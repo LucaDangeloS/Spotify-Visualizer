@@ -10,7 +10,6 @@ export interface VisualizerServer extends Server {
 }
 
 export interface VisualizerSocket extends Socket {
-    
 }
 
 export function createVisualizerServer(state: State, port: number): VisualizerServer {
