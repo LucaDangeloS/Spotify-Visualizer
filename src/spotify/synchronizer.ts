@@ -19,7 +19,10 @@ export default class Synchronizer {
     }
 
     // -- Public methods -- //
-    public initialize(): void {
+    public start(): void {
+        if (this.active) {
+            return;
+        }
         this.active = true;
         if (this.verbose) {
             console.log("Initializing synchronizer");
@@ -27,7 +30,10 @@ export default class Synchronizer {
         this.startPingLoop();
     }
 
-    public terminate() {
+    public stop() {
+        if (!this.active) {
+            return;
+        }
         this.active = false;
         this.stopPingLoop();
         TrackController.stopVisualizer(this.state);
