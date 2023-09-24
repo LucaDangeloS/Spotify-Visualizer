@@ -51,6 +51,7 @@ export function stopVisualizer(state: State): void {
     if (state.verbose) {
         console.log("\nVisualizer stopped");
     }
+    state.trackInfo.active = false;
     // stop the track progress loop if it's running
     stopTrackProgressLoop(state);
     // stop the beat loop if it's running
@@ -137,6 +138,7 @@ function stopTrackProgressLoop(state: State): void {
 }
 
 function startTrackProgressLoop(state: State): void {
+    stopTrackProgressLoop(state);
     calculateTrackProgress(state);
     // calculate and set track progress on a specified tick rate
     state.loops.trackProgressLoop = setInterval(() => {
