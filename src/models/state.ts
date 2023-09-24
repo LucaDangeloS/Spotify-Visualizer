@@ -17,6 +17,7 @@ export default class State {
     trackInfo: TrackInfo = new TrackInfo();
     colorInfo: ColorInfo = new ColorInfo();
     visualizerServerSocket: VisualizerServer = null;
+    lastConnectedVisualizer: Date = null;
     visualizers: VisualizerSocketInfo[] = [];
     globalDelay: number = globalBeatDelay;
     paletteSize: number = colorPaletteSize;
@@ -25,13 +26,14 @@ export default class State {
     beatCallback: Function;
     verbose: boolean;
     active: boolean;
+    startTime: Date = new Date();
     headers = {};
     setTokenEventHandler: EventEmitter;
     
     private _accessToken: string = null;
     private _expireTimestamp: Date = null;
 
-    // Palette functions
+    //  ############ Palette functions ############
     public async loadPalettes(): Promise<boolean> {
         try {
             const data = await loadPalettes();
@@ -76,12 +78,13 @@ export default class State {
         }
     }
 
-    // Visualizers functions
+    // ############ Visualizers functions ############
     public addVisualizer(visualizer: VisualizerSocketInfo) {
         this.visualizers.push(visualizer);
         if (this.isSynced) {
             this.syncSharedData.colorTickRate = this.visualizers.reduce((acc, v) => acc + v.configInfo.colorTickRate, 0) / this.visualizers.length;
         }
+        this.lastConnectedVisualizer = new Date();
     }
 
     public removeVisualizer(id: string) {
@@ -89,6 +92,7 @@ export default class State {
         if (index > -1) {
             this.visualizers[index].socket.disconnect();
             this.visualizers.splice(index, 1);
+            // Synced code
             if (this.isSynced) {
                 if (this.visualizers.length > 0) {
                     this.syncSharedData.colorTickRate = this.visualizers.reduce((acc, v) => acc + v.configInfo.colorTickRate, 0) / this.visualizers.length;
@@ -98,12 +102,14 @@ export default class State {
                 }
             }
         }
+        this.lastConnectedVisualizer = new Date();
     }
 
     public clearVisualizers() {
         this.visualizers.forEach((v, index, arr) => {
-            if (v.socket)
+            if (v.socket) {
                 v.socket.disconnect();
+            }
             arr.splice(index, 1);
         });
     }
@@ -158,6 +164,7 @@ export default class State {
 
 }
 
+// ############ End of State class ############
 class Loops {
     beatLoop: ReturnType<typeof setTimeout> = null;
     trackProgressLoop: ReturnType<typeof setTimeout> = null;
