@@ -11,6 +11,7 @@ import { trackInfoI, progressInfoI } from '../models/spotifyApiInterfaces';
 export default class Synchronizer {
     private verbose: boolean = false;
     private pingLoop: ReturnType<typeof setTimeout> = null;
+    public active: boolean = false;
 
     constructor(private state: State, verbose?: boolean) {
         this.state = state;
@@ -19,6 +20,7 @@ export default class Synchronizer {
 
     // -- Public methods -- //
     public initialize(): void {
+        this.active = true;
         if (this.verbose) {
             console.log("Initializing synchronizer");
         }
@@ -26,9 +28,9 @@ export default class Synchronizer {
     }
 
     public terminate() {
+        this.active = false;
         this.stopPingLoop();
         TrackController.stopVisualizer(this.state);
-        this.state.trackInfo.active = false;
         if (this.verbose) {
             console.log("\n\t==========\n\tTERMINATED\n\t==========\n");
         }
@@ -45,6 +47,10 @@ export default class Synchronizer {
     }
 
     private startPingLoop(): void {
+        // override previous ping loop
+        if (this.pingLoop !== null) {
+            clearTimeout(this.pingLoop);
+        }
         this.pingLoop = setTimeout(() => { this.ping() }, pingDelay);
     }
 
@@ -52,7 +58,6 @@ export default class Synchronizer {
         if (this.pingLoop !== null) {
             clearTimeout(this.pingLoop);
         }
-        TrackController.stopVisualizer(this.state);
         this.state.trackInfo.active = false;
     }
 
