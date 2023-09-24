@@ -19,13 +19,13 @@ export interface refreshTokenResponseI {
 }
 
 export enum ApiStatusCode {
-    Ok, // Next Ping
-    VizOff, // Start Viz
-    NoPlayback, // Stop Viz
-    ChangedPlayback, // SyncTrackProgress | track, analysis, progress, initialTimestamp
-    DeSynced, // SyncTrackProgress | progress, initialTimestamp
-    Unauthorized, // RefreshToken
-    Error, // Error
+    Ok, // --> Next Ping
+    VizOff, // --> Start Viz
+    NoPlayback, // --> Stop Viz
+    ChangedPlayback, // --> SyncTrackProgress | track, analysis, progress, initialTimestamp
+    DeSynced, // --> SyncTrackProgress | progress, initialTimestamp
+    Unauthorized, // --> RefreshToken
+    Error, // --> Error
 };
 export interface ApiResponse {
     status: ApiStatusCode,
@@ -43,7 +43,9 @@ export async function testToken(state: State): Promise<boolean> {
     await axios.get(currentlyPlaying_url, headers)
         .then((response: AxiosResponse) => {
             s = response.status;
-        }).catch((err: AxiosError) => {});
+        }).catch((err: AxiosError) => {
+            console.error(err.message);
+        });
     if (state.verbose) {
         console.log(`Tested token returned status: ${s}`);
     }
@@ -129,7 +131,7 @@ export async function fetchCurrentlyPlaying(state: State): Promise<ApiResponse> 
             }
         }).catch((err: AxiosError) => {
             // TODO: Solve issue "TypeError: Cannot read properties of undefined (reading 'status')"
-            if (err.response!.status === 401) {
+            if (err.response?.status === 401) {
                 ret = {status: ApiStatusCode.Unauthorized, data: null}
             }
             else {
@@ -189,10 +191,11 @@ async function processResponse(state: State, { track, playing, progress }: {trac
 
         // track has resumed
         case (aux === 1 && !state.trackInfo.active):
-            if (songsInSync)
+            if (songsInSync) {
                 ret = {status: ApiStatusCode.VizOff, data: null};
-            else 
+            } else {
                 ret = await fetchTrackData(state, { track: track, progress: progress });
+            } 
             break;
 
         // track is stopped
