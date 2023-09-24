@@ -2,6 +2,7 @@ import { VisualizerInfo, VisualizerSocketInfo, VisualizerState } from "src/model
 import { generateColorPalette } from "src/models/palette/colors";
 import { NoPaletteDefinedError, NullNameError, NullPaletteError, ValueOutOfBoundsError } from "./errors";
 import { PaletteDAO } from "src/models/palette/paletteDAO";
+import Synchronizer from "/spotify/synchronizer";
 
 
 export function updateDelay(viz: VisualizerSocketInfo, delay: number): void {
