@@ -14,8 +14,8 @@ describe('Track controls flow tests', function() {
 
     test('ping test', async () => {
         await api.waitForToken(state);
-        sync.initialize();
+        sync.start();
         await delay(6000);
-        sync.terminate();
+        sync.stop();
     }, 16000);
 });
