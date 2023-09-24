@@ -50,7 +50,8 @@ function sendBeat(state: State, beatInfo: beatParamsInfo) {
                         beatInfo.activeBeatDur + vizDelay,
                         state.trackInfo.activeSection,
                         beatInfo.colorShiftParams, 
-                        shiftWeights
+                        shiftWeights,
+                        visualizer.configInfo.baseShiftAlpha,
                         );
                     sendData(visualizer, transitionColors, visualizer.configInfo.palette.hexColors, vizDelay);
                     visualizer.configInfo.lastBeatTimestamp = Date.now();
@@ -76,7 +77,7 @@ function broadcastBeat(state: State, beatInfo: beatParamsInfo) {
         beatInfo.activeBeatDur,
         state.trackInfo.activeSection,
         beatInfo.colorShiftParams, 
-        shiftWeights
+        shiftWeights,
     );
     broadcastData(sharedData, transitionColors, state.visualizerServerSocket);
     sharedData.lastBeatTimestamp = Date.now();

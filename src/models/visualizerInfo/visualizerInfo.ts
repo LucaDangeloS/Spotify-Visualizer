@@ -14,16 +14,21 @@ export interface VisualizerSocketInfo {
 
 export interface VisualizerInfo {
     state: VisualizerState,
-    minBeatConf: number,
-    maxBeatConf: number,
     lastBeatTimestamp: number,
     palette: {info: PaletteDAO, scale: chroma.Scale, hexColors: string[], size: number},
-    colorTickRate: number // Time in ms that takes for the visualizer to change a color
+    brightness: number,
+    
+    // Beat modifiers
+    minBeatConf: number,
+    maxBeatConf: number,
+    
+    // Transition modifiers
+    baseShiftAlpha: number,
     transitionModifier: number,
     loudnessSensibility: number,
     tempoSensibility: number,
     cycleModifier: number,
-    brightness: number
+    colorTickRate: number // Time in ms that takes for the visualizer to change a color
 }
 
 export enum VisualizerState {
@@ -49,7 +54,8 @@ export function newVisualizerColorInfo(palette: PaletteDAO): VisualizerInfo {
         loudnessSensibility: def.loudnessSensibility,
         tempoSensibility: def.tempoSensibility, 
         cycleModifier: def.cycleModifier,
-        brightness: def.brightness
+        brightness: def.brightness,
+        baseShiftAlpha: def.baseShiftAlpha
     };
 }
 
@@ -70,7 +76,8 @@ export function loadSyncedVisualizerInfo(palette: PaletteDAO): VisualizerInfo {
         loudnessSensibility: defSynced.loudnessSensibility,
         tempoSensibility: defSynced.tempoSensibility, 
         cycleModifier: defSynced.cycleModifier,
-        brightness: defSynced.brightness
+        brightness: defSynced.brightness,
+        baseShiftAlpha: defSynced.baseShiftAlpha
     };
 }
 

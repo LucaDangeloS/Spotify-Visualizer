@@ -178,6 +178,7 @@ class ColorInfo {
 class VisualizerSharedData implements VisualizerInfo {
     brightness: number = 1;
     transitionModifier: number;
+    baseShiftAlpha: number;
     loudnessSensibility: number;
     tempoSensibility: number;
     cycleModifier: number;
