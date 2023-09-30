@@ -151,7 +151,8 @@ function startTrackProgressLoop(state: State): void {
 
 function stageBeat(state: State): void {
     //set the timeout id to a variable in state for convenient loop cancellation.
-    let baseDelay = (calculateTimeUntilNextBeat(state) + state.globalDelay);
+    let timeForNextBeat = calculateTimeUntilNextBeat(state)
+    let baseDelay = (timeForNextBeat + state.globalDelay);
     let delay = baseDelay > 0 ? baseDelay : 0;
     state.loops.beatLoop = setTimeout(() => {
         state.beatCallback(state);
@@ -176,7 +177,9 @@ function incrementBeat(state: State) {
             sections[state.trackInfo.activeSectionIndex];
     }
     // if the last beat index is the last beat of the song, stop beat loop
-    if (beats.length - 1 !== lastBeatIndex) {
+    if (lastBeatIndex === beats.length - 1) {
+        stopBeatLoop(state);
+    } else {
         // stage the beat
         stageBeat(state);
 
