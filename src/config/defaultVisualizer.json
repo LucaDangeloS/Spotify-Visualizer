@@ -4,9 +4,9 @@
     "minBeatConf": 0.25,
     "maxBeatConf": 1,
     "colorTickRate": 70,
-    "baseShiftAlpha": 30,
+    "baseShiftAlpha": 20,
     "transitionModifier": 0,
     "cycleModifier": 0,
-    "loudnessSensibility": 3,
+    "loudnessSensibility": 2,
     "tempoSensibility": 1.5
 }
