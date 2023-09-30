@@ -166,18 +166,16 @@ function incrementBeat(state: State) {
     let lastBeatIndex = state.trackInfo.activeBeatIndex;
     let lastSectionIndex = state.trackInfo.activeSectionIndex;
 
+    // Change section
     if (
         state.trackInfo.activeSectionIndex < sections.length - 1 &&
-        state.trackInfo.trackProgress >=
-            sections[lastSectionIndex].start +
-                sections[lastSectionIndex].duration
+        state.trackInfo.trackProgress >= sections[lastSectionIndex + 1].start
     ) {
         state.trackInfo.activeSectionIndex += 1;
-        state.trackInfo.activeSection =
-            sections[state.trackInfo.activeSectionIndex];
+        state.trackInfo.activeSection = sections[state.trackInfo.activeSectionIndex];
     }
-    // if the last beat index is the last beat of the song, stop beat loop
-    if (lastBeatIndex === beats.length - 1) {
+    // if the last beat index is the last beat of the song or more, stop beat loop
+    if (lastBeatIndex >= beats.length - 1) {
         stopBeatLoop(state);
     } else {
         // stage the beat
