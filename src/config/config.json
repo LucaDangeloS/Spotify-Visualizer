@@ -4,7 +4,7 @@
     "sectionsConfidence": 0.10,
     "pingDelay": 7000,
     "globalBeatDelay": 0,
-    "syncOffsetThreshold": 20,
+    "syncOffsetThreshold": 70,
     "trackProgressTickRate" : 5,
     "colorPaletteSize": 300
 }
