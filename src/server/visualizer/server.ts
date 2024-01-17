@@ -32,6 +32,7 @@ export function manageConnection(state: State, socket: Socket) {
     generateHexColors(visualizer.configInfo, state.doublePaletteColors);
     state.addVisualizer(visualizer);
     console.log(`${state.visualizers.length} visualizers connected. Using palette: ${visualizer.configInfo.palette.info.name}`);
+    // TODO: Make persistent configuration with a database and a specific event such as 'config'
     sendData(visualizer, [], visualizer.configInfo.palette.hexColors, 0);
 }
 

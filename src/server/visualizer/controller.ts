@@ -4,6 +4,7 @@ import { NoPaletteDefinedError, NullNameError, NullPaletteError, ValueOutOfBound
 import { PaletteDAO } from "src/models/palette/paletteDAO";
 import Synchronizer from "/spotify/synchronizer";
 
+// TODO DEPRECATED
 
 export function updateDelay(viz: VisualizerSocketInfo, delay: number): void {
     if (delay >= 0) {

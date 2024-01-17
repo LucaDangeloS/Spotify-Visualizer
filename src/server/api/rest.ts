@@ -1,11 +1,7 @@
 import { Router, Request, Response } from "express";
 import State from "/models/state";
 
-
-
-
-
-
+// Server should have State and Synchronizer
 export default class RestApi {
     public router : Router;
 
