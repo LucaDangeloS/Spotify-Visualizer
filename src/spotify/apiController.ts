@@ -1,5 +1,4 @@
 import { token_url, trackAnalysis_url, currentlyPlaying_url } from "../config/network-info.json";
-import { syncOffsetThreshold } from "../config/config.json";
 import { delay, normalizeIntervals } from "./utils";
 import { readFileSync } from "fs";
 import State from "/models/state";
@@ -101,7 +100,7 @@ export async function refreshToken(state: State): Promise<boolean> {
 /**
  * gets the currently playing song + track progress from spotify API
  */
-export async function fetchCurrentlyPlaying(state: State): Promise<ApiResponse> {
+export async function fetchCurrentlyPlaying(state: State, syncOffsetThreshold: number): Promise<ApiResponse> {
     // grab the current time
     let timestamp = Date.now();
     let headers = {
@@ -140,7 +139,7 @@ export async function fetchCurrentlyPlaying(state: State): Promise<ApiResponse> 
         });
 
     if (aux === null) return ret;
-    return await processResponse(state, aux);
+    return await processResponse(state, aux, syncOffsetThreshold);
 };
 
 
@@ -148,7 +147,11 @@ export async function fetchCurrentlyPlaying(state: State): Promise<ApiResponse> 
 /**
  * figure out what to do, according to state and track data
  */
-async function processResponse(state: State, { track, playing, progress }: {track: trackI, playing: boolean, progress: number}) : Promise<ApiResponse>{ 
+async function processResponse(
+        state: State, 
+        { track, playing, progress }: {track: trackI, playing: boolean, progress: number},
+        syncOffsetThreshold: number
+    ) : Promise<ApiResponse>{ 
     let songsInSync =
         JSON.stringify(state.trackInfo.currentlyPlaying) ===
         JSON.stringify(track);

@@ -4,6 +4,7 @@ import * as api from './apiController';
 import State from '../models/state';
 import { ApiResponse, ApiStatusCode } from './apiController';
 import { trackInfoI, progressInfoI } from '../models/spotifyApiInterfaces';
+import { syncOffsetThreshold as defaultSyncOffsetThreshold} from "../config/config.json";
 
 /**
  * Class that handles the synchronization of the visualizer with the current track through Timeouts
@@ -11,7 +12,9 @@ import { trackInfoI, progressInfoI } from '../models/spotifyApiInterfaces';
 export default class Synchronizer {
     private verbose: boolean = false;
     private pingLoop: ReturnType<typeof setTimeout> = null;
+    public pingDelay: number = pingDelay;
     public active: boolean = false;
+    public syncOffsetThreshold: number = defaultSyncOffsetThreshold;
 
     constructor(private state: State, verbose?: boolean) {
         this.state = state;
@@ -47,9 +50,9 @@ export default class Synchronizer {
      * Establishes ping loop to query current track progress 
      */
     private async ping(): Promise<void> {
-        let res = await api.fetchCurrentlyPlaying(this.state);
+        let res = await api.fetchCurrentlyPlaying(this.state, this.syncOffsetThreshold);
         this.processResponse(res);
-        this.pingLoop = setTimeout(() => { this.ping() }, pingDelay);
+        this.pingLoop = setTimeout(() => { this.ping() }, this.pingDelay);
     }
 
     private startPingLoop(): void {
@@ -57,7 +60,7 @@ export default class Synchronizer {
         if (this.pingLoop !== null) {
             clearTimeout(this.pingLoop);
         }
-        this.pingLoop = setTimeout(() => { this.ping() }, pingDelay);
+        this.pingLoop = setTimeout(() => { this.ping() }, this.pingDelay);
     }
 
     private stopPingLoop(): void {

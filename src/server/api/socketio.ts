@@ -1,14 +1,19 @@
 import State from "/models/state";
 import Synchronizer from "/spotify/synchronizer";
 import { Server, Socket } from 'socket.io';
-
+import "/server/api/commands";
+import { StopServer, StartServer } from "/server/api/commands";
 
 // Server should have State and Synchronizer
 export default class SocketIOApi {
 
     server = new Server({pingTimeout: 5000, cors:{origin:'*'}});
 
-    constructor(private state: State, private synchronizer: Synchronizer, private port: number, private verbose: boolean = false) {
+    constructor(
+        private state: State, 
+        private synchronizer: Synchronizer, 
+        private port: number, 
+        private verbose: boolean = false) {
     }
     
     public start() {
@@ -35,14 +40,14 @@ export default class SocketIOApi {
             if (this.verbose) {
                 console.log("Shutdown requested");
             }
-            this.synchronizer.stop();
+            StopServer(this.synchronizer);
         });
 
         socket.on('start', () => {
             if (this.verbose) {
                 console.log("Start requested");
             }
-            this.synchronizer.start();
+            StartServer(this.synchronizer);
         });
     }
 }
