@@ -127,6 +127,9 @@ export default class Synchronizer {
                 // process.exit(1);
                 break;
             }
+
+            default:
+                break;
         }
     }
 }

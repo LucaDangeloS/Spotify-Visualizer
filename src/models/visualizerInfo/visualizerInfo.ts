@@ -11,9 +11,15 @@ export interface VisualizerSocketInfo {
     configInfo: VisualizerInfo
 }
 
+export const VisualizerState = {
+    "off": 0,
+    "cycle": 1,
+    "on": 2
+} as const;
+export type VisualizerStateT = typeof VisualizerState[keyof typeof VisualizerState]
 
 export interface VisualizerInfo {
-    state: VisualizerState,
+    state: VisualizerStateT,
     lastBeatTimestamp: number,
     palette: {info: PaletteDAO, scale: chroma.Scale, hexColors: string[], size: number},
     brightness: number,
@@ -29,12 +35,6 @@ export interface VisualizerInfo {
     tempoSensibility: number,
     cycleModifier: number,
     colorTickRate: number // Time in ms that takes for the visualizer to change a color
-}
-
-export enum VisualizerState {
-    off = 0,
-    cycle = 1,
-    on = 2
 }
 
 export function newVisualizerColorInfo(palette: PaletteDAO): VisualizerInfo {

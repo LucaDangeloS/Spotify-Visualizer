@@ -17,17 +17,19 @@ export interface refreshTokenResponseI {
     expires_in: number;
 }
 
-export enum ApiStatusCode {
-    Ok, // --> Next Ping
-    VizOff, // --> Start Viz
-    NoPlayback, // --> Stop Viz
-    ChangedPlayback, // --> SyncTrackProgress | track, analysis, progress, initialTimestamp
-    DeSynced, // --> SyncTrackProgress | progress, initialTimestamp
-    Unauthorized, // --> RefreshToken
-    Error, // --> Error
-};
+export const ApiStatusCode = {
+    "Ok" : 0, // --> Next Ping
+    "VizOff" : 1, // --> Start Viz
+    "NoPlayback" : 2, // --> Stop Viz
+    "ChangedPlayback" : 3, // --> SyncTrackProgress | track, analysis, progress, initialTimestamp
+    "DeSynced" : 4, // --> SyncTrackProgress | progress, initialTimestamp
+    "Unauthorized" : 5, // --> RefreshToken
+    "Error" : 6, // --> Error
+} as const;
+export type ApiStatusCodeT = typeof ApiStatusCode[keyof typeof ApiStatusCode]
+
 export interface ApiResponse {
-    status: ApiStatusCode,
+    status: ApiStatusCodeT,
     data: trackInfoI | progressInfoI | AxiosResponse
 }
 

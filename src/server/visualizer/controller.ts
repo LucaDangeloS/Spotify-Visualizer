@@ -1,4 +1,4 @@
-import { VisualizerInfo, VisualizerSocketInfo, VisualizerState } from "src/models/visualizerInfo/visualizerInfo";
+import { VisualizerInfo, VisualizerSocketInfo, VisualizerStateT } from "src/models/visualizerInfo/visualizerInfo";
 import { generateColorPalette } from "src/models/palette/colors";
 import { NoPaletteDefinedError, NullNameError, NullPaletteError, ValueOutOfBoundsError } from "./errors";
 import { PaletteDAO } from "src/models/palette/paletteDAO";
@@ -54,7 +54,7 @@ export function updateMinBeatConf(viz: VisualizerInfo, confidence: number): void
     }
 }
 
-export function updateVisualizerState(viz: VisualizerInfo, state: VisualizerState): void {
+export function updateVisualizerState(viz: VisualizerInfo, state: VisualizerStateT): void {
     viz.state = state;
 }
 

@@ -1,4 +1,4 @@
-import { VisualizerSocketInfo, VisualizerInfo, VisualizerState, newVisualizerColorInfo, loadSyncedVisualizerInfo } from './visualizerInfo/visualizerInfo';
+import { VisualizerSocketInfo, VisualizerInfo, loadSyncedVisualizerInfo, VisualizerStateT } from './visualizerInfo/visualizerInfo';
 import { TrackInfo } from './spotifyApiInterfaces';
 import { refreshTokenResponseI  } from '/spotify/apiController';
 import { savePalette, loadPalettes, removePalette, PaletteDAO } from './palette/paletteDAO';
@@ -182,7 +182,7 @@ class VisualizerSharedData implements VisualizerInfo {
     loudnessSensibility: number;
     tempoSensibility: number;
     cycleModifier: number;
-    state: VisualizerState;
+    state: VisualizerStateT;
     minBeatConf: number;
     maxBeatConf: number;
     palette: { info: PaletteDAO; scale: Scale<Color>; hexColors: string[]; size: number; };
