@@ -30,10 +30,9 @@ This is a rewritten version in TypeScript of my previous Spotify Visualizer, ori
 
 
 # About the project and goals
-The goal of this project is to provide a centralized, modular and scalable spotify visualizer server, where anyone can write their own client (visualizer) to interact with the server and create custom visualizations.
+The goal of this project is to provide a centralized, modular and scalable spotify visualizer, where anyone can write their own client (visualizer) to interact with the server and create custom visualizations of their songs.
 
-The API processing is delegated to a central server while multiple clients can process the song interpretation as they see fit (e.g. a ws2812b LED strip connected to a Raspberry Pi, a web page that changes the background color accordingly, etc.), following
-a master-slave model. The server-client communication is done through SocketIO.
+The API processing is delegated to a central server while multiple clients can process the song interpretation as they see fit (e.g. a ws2812b LED strip connected to a Raspberry Pi, a web page that changes the background color accordingly, etc.). The server-client communication is done through SocketIO.
 
 Eventually there will also be a WebApp where parameters and color schemes can be changed for each individual visualizer connected to the server.
 
