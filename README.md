@@ -95,6 +95,8 @@ tsc
 - [x] Make color jump related to song attributes
 - [x] Standardize the message exchanges from server to visualizers
 - [x] Add parameter for brightness
+- [ ] Create API
+- [ ] Create sample visualizer that changes colors along the strip
 - [ ] Fix color palette creations so the colors chosen are more predominant
 - [ ] Add option for in color palette jump (just shift)
 - [ ] Solve missing song attributes bug when song changes
