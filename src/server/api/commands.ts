@@ -9,21 +9,33 @@ export class WrongArgumentsError extends Error {
 }
 // Auxiliary functions
 function checkNegative(value: number) {
+    if (typeof value !== "number") {
+        throw new WrongArgumentsError("Value is not a number");
+    }
     if (value < 0) {
         throw new WrongArgumentsError("Negative value");
     }
 }
 function checkLowerThreshold(value: number, threshold: number) {
+    if (typeof value !== "number") {
+        throw new WrongArgumentsError("Value is not a number");
+    }
     if (value < threshold) {
         throw new WrongArgumentsError("Value below threshold");
     }
 }
 function checkUpperThreshold(value: number, threshold: number) {
+    if (typeof value !== "number") {
+        throw new WrongArgumentsError("Value is not a number");
+    }
     if (value > threshold) {
         throw new WrongArgumentsError("Value above threshold");
     }
 }
 function checkDoubleThreshold(value: number, lowerThreshold: number, upperThreshold: number) {
+    if (typeof value !== "number") {
+        throw new WrongArgumentsError("Value is not a number");
+    }
     if (value < lowerThreshold || value > upperThreshold) {
         throw new WrongArgumentsError("Value above threshold");
     }
@@ -35,10 +47,10 @@ function checkPercentage(value: number) {
 
 // Server commands
 export function StopServer(synchronizer: Synchronizer) {
-    synchronizer.stop();
+    synchronizer.stop(false);
 }
 export function StartServer(synchronizer: Synchronizer) {
-    synchronizer.start();
+    synchronizer.start(false);
 }
 // Implement cycle option, where there are no transitions
 // export function SetCycle(state: State, cycle: number) {
@@ -55,23 +67,25 @@ export function ToggleSync(state: State) {
 // export function SyncVisualizers(state: State) {
 // }
 
-
-export function SetLoudnessSensibility(state: State, loudnessSensibility: number) {
+// Sync commands
+export function SetSyncLoudnessSensibility(state: State, loudnessSensibility: number) {
     checkDoubleThreshold(loudnessSensibility, 0, 3);
     state.syncSharedData.loudnessSensibility = loudnessSensibility;
 }
-export function SetBaseTransitionAngle(state: State, baseTransitionAngle: number) {
+export function SetSyncBaseTransitionAngle(state: State, baseTransitionAngle: number) {
     checkDoubleThreshold(baseTransitionAngle, -360, 360);
     state.syncSharedData.baseShiftAlpha = baseTransitionAngle;
 }
-export function SetMinBeatConfidence(state: State, minBeatConfidence: number) {
+export function SetSyncMinBeatConfidence(state: State, minBeatConfidence: number) {
     checkDoubleThreshold(minBeatConfidence, 0, state.syncSharedData.maxBeatConf);
     state.syncSharedData.minBeatConf = minBeatConfidence;
 }
-export function SetMaxBeatConfidence(state: State, maxBeatConfidence: number) {
+export function SetSyncMaxBeatConfidence(state: State, maxBeatConfidence: number) {
     checkDoubleThreshold(maxBeatConfidence, state.syncSharedData.minBeatConf, 1);
     state.syncSharedData.maxBeatConf = maxBeatConfidence;
 }
+
+// Server commands
 export function SetGlobalDelay(state: State, pingInterval: number) {
     checkNegative(pingInterval);
     state.globalDelay = pingInterval;
@@ -89,16 +103,26 @@ export function SetPaletteSize(state: State, paletteSize: number) {
     state.paletteSize = paletteSize;
     // TODO Pending recreate all palettes from visualizers
 }
-
-
-// Visualizer commands
-export function AddVisualizer(state: State, visualizer: VisualizerSocketInfo) {
-    state.visualizers.push(visualizer);
+export function FlushVisualizersColors(state: State) {
+    // Sends an empty color array to all visualizers
+    state.clearVisualizersColors()
 }
 
-export function SetCycle(state: State, cycle: number) {
+// Visualizer commands (TODO: pass in the visualizer id?)
+// export function AddVisualizer(state: State, visualizerId: string) {
+//     state.visualizers.push(visualizer);
+// }
+
+// What the fuck is a cycle?
+export function SetCycleModifier(state: State, cycleModifier: number) {
     // synchronizer.setCycle(cycle);
 }
 
-export function SetTransition(state: State, transition: number) {
+export function SetTransitionModifier(state: State, transitionModifier: number) {
+}
+
+export function FlushVisualizer(state: State, visualizerId: string) {
+    state.visualizers.find((v) => v.id === visualizerId)?.socket.emit(
+        'beat', []
+    )
 }
