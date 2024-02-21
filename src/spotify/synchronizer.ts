@@ -12,6 +12,7 @@ import { syncOffsetThreshold as defaultSyncOffsetThreshold} from "../config/conf
 export default class Synchronizer {
     private verbose: boolean = false;
     private pingLoop: ReturnType<typeof setTimeout> = null;
+    public isAutoControlled: boolean = false;
     public pingDelay: number = pingDelay;
     public active: boolean = false;
     public syncOffsetThreshold: number = defaultSyncOffsetThreshold;
@@ -22,7 +23,8 @@ export default class Synchronizer {
     }
 
     // -- Public methods -- //
-    public start(): void {
+    public start(auto: boolean = true): void {
+        this.isAutoControlled = auto;
         if (this.active) {
             return;
         }
@@ -33,16 +35,23 @@ export default class Synchronizer {
         this.startPingLoop();
     }
 
-    public stop() {
+    public stop(auto: boolean = true) {
+        this.isAutoControlled = auto;
         if (!this.active) {
             return;
         }
         this.active = false;
         this.stopPingLoop();
         TrackController.stopVisualizer(this.state);
+        // TrackController.flushBeatQueue(this.state);
         if (this.verbose) {
             console.log("\n\t==========\n\tTERMINATED\n\t==========\n");
         }
+    }
+
+    // setter for clarity, despite the fact that the attribute is public
+    public setAutoControlled(auto: boolean): void {
+        this.isAutoControlled = auto;
     }
 
     // -- Private methods -- //

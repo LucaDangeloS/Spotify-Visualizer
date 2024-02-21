@@ -44,6 +44,9 @@ async function main() {
 
 // Function that terminates the synchronizer if no users are connected within a certain time
 async function wakeOnUsers(state: State, synchronizer: Synchronizer, timeout: number) {
+    if (!synchronizer.isAutoControlled) {
+        return
+    }
     if (!state.active) {
         synchronizer.stop();
         return
@@ -53,7 +56,9 @@ async function wakeOnUsers(state: State, synchronizer: Synchronizer, timeout: nu
     }
 
     if (synchronizer.active && state.visualizers.length == 0) {
-        if (state.lastConnectedVisualizer != null && state.lastConnectedVisualizer.getTime() + timeout < Date.now()) {
+        let lastConnectionTime: Date | null = state.lastConnectedVisualizer
+
+        if (lastConnectionTime != null && lastConnectionTime.getTime() + timeout < Date.now()) {
             synchronizer.stop();
         } else if (state.startTime.getTime() + timeout*2 < Date.now()) {
             synchronizer.stop();
