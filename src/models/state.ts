@@ -131,6 +131,12 @@ export default class State {
         // this.syncSharedData.colorTickRate = this.visualizers.reduce((acc, v) => acc + v.colorInfo.colorTickRate, 0) / this.visualizers.length;
     }
 
+    public clearVisualizersColors() {
+        this.visualizers.forEach((v) => {
+            v.socket.emit('clear_colors');
+        });
+    }
+
     // TODO: desync
     public desyncVisualizers() {
         this.isSynced = false;
@@ -161,7 +167,6 @@ export default class State {
         this.setTokenEventHandler = new EventEmitter();
         this.setTokenEventHandler.on('set_token', (token) => {this.setToken(token);});
     }
-
 }
 
 // ############ End of State class ############
