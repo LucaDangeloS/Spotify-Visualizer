@@ -48,9 +48,9 @@ export function startVisualizer(state: State): void {
  * sets visualizer to inactive, terminates beat loop, and turns off led strip
  */
 export function stopVisualizer(state: State): void {
-    if (!state.trackInfo.active) {
-        return;
-    }
+    // if (!state.trackInfo.active) {
+    //     return;
+    // }
     if (state.verbose) {
         console.log("\nVisualizer stopped");
     }
