@@ -1,6 +1,7 @@
 import State from '../src/models/state';
 import * as api from '../src/spotify/apiController';
 import fs  from 'fs';
+import { syncOffsetThreshold as defaultSyncOffsetThreshold} from "../src/config/config.json";
 
 require('dotenv').config();
 
@@ -17,7 +18,7 @@ describe('API flow tests', function() {
 
     test('Request Song Playing', async () => {
       let res:(api.ApiResponse|null) = null;
-      await api.fetchCurrentlyPlaying(state).then(
+      await api.fetchCurrentlyPlaying(state, defaultSyncOffsetThreshold).then(
         (data) => {
           res = data;
           console.log(data);

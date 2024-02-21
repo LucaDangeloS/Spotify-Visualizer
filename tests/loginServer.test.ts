@@ -8,7 +8,7 @@ const state = new State();
 
 
 describe('Front-end server tests', () => {
-    const server = Server.init(frontEndPort, process.env.CLIENT_ID, process.env.CLIENT_SECRET, state, state.setAccessToken, false);
+    const server = Server.init(frontEndPort, process.env.CLIENT_ID, process.env.CLIENT_SECRET, state, state.setTokenEventHandler, false);
 
     test('Server start', () => {
         expect(server).toBeInstanceOf(Server);
