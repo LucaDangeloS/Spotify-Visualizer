@@ -7,12 +7,10 @@ import chroma from 'chroma-js';
  * @param {boolean} loop - If palette should be looped
  * @returns {chroma.Scale} A chroma scale palette
  */
-export function generateColorPalette(colors : (string | chroma.Color)[], loop: boolean = true, brightness: number = 1, doubleColors: boolean = false) : chroma.Scale {
+export function generateColorPalette(colors : (string | chroma.Color)[], loop: boolean = true, lightnessModifier: number = 1, doubleColors: boolean = false) : chroma.Scale {
     if (colors === undefined || colors === null) {
         throw new Error("No valid color provided");
     }
-    let use_lab = false;
-    const hues: number[] = [];
 
     if (colors.length > 1) {
         if (loop) {
@@ -23,29 +21,18 @@ export function generateColorPalette(colors : (string | chroma.Color)[], loop: b
             }
         }
         
-        // collect the hues of the colors
-        hues.map(color => { return chroma(color).hsl()[0] });
-        
-        // check if any color makes a near 180 degrees rotation in the hue wheel
-        for (let i = 0; i < hues.length - 1; i++) {
-            const diff: number = Math.abs(hues[i] - hues[i + 1]);
-            if (Math.abs(diff - 180) < 30) {
-                use_lab = true;
-                break;
-            }
-        }
         // process the colors in pairs ?
         // for (let i = 0; i < colors.length - 1; i = i + 2) {
         // }
     }
-    // scale the colors to the desired brightness
-    const colorBrightness: number = chroma(colors[0]).hsl()[2];
-    if (brightness !== 1) {
+    // scale the colors to the desired lightness
+    if (lightnessModifier !== 1) {
         colors = colors.map(color => {
-            const c = chroma(color);
-            const hsl = c.hsl();
-            hsl[2] = colorBrightness * brightness;
-            return chroma.hsl(...hsl);
+            let l = chroma(color).oklab()[0];
+            l = l * lightnessModifier;
+            if (l >= 1) l = 1;
+            if (l <= 0) l = 0;
+            return chroma(color).set('oklab.l', l).hex();
         });
     }
 
@@ -58,7 +45,7 @@ export function generateColorPalette(colors : (string | chroma.Color)[], loop: b
         colors = tmpColors;
     }
 
-    return chroma.scale(colors).mode(use_lab ? 'lab' : 'lrgb');
+    return chroma.scale(colors).mode('oklab');
 }
 
 /**
@@ -68,7 +55,10 @@ export function generateColorPalette(colors : (string | chroma.Color)[], loop: b
  */
 export function complementary(color: (string | chroma.Color | number)) : string {
     if (color === undefined || color === null) return null;
-    return chroma(color).set('hsl.h', '+180').hex();
+    const c = chroma(color).oklab();
+    const a = c[1];
+    const b = c[2];
+    return chroma(color).set('oklab.a', -a).set('oklab.b', -b).hex();
 }
 
 /**
@@ -80,9 +70,22 @@ export function complementary(color: (string | chroma.Color | number)) : string 
 export function analogous(color: (string | chroma.Color | number), a: number) : {left: string, right: string} {
     if (color === undefined || color === null) throw new Error("No valid color provided");
     const c = chroma(color);
-    return {left: c.set('hsl.h', `-${a}`).hex(), right: c.set('hsl.h', `+${a}`).hex()};
+    const left = c.set('hsl.h', `+${a}`);
+    const right = c.set('hsl.h', `-${a}`);
+    left.set('oklab.l', c.oklab()[0]);
+    right.set('oklab.l', c.oklab()[0]);
+    return {left: left.hex(), right: right.hex()};
 }
 
+
+export function lightnessShift(color: (string | chroma.Color | number), shift: number) : string {
+    if (color === undefined || color === null) throw new Error("No valid color provided");
+    let l = chroma(color).oklab()[0];
+    l = l * (1 + shift);
+    if (l > 1) l = 1;
+    if (l < 0) l = 0;
+    return chroma(color).set('oklab.l', l).hex();
+}
 
 
 /**
@@ -145,7 +148,7 @@ export function makeTimeTransitionOffset(palette: (string)[], color: string, ind
     const prev: string[] = palette.splice(0, new_index + 1);
 
     palette.push(...prev);
-
+    pc(transition);
     return transition;
 }
 
