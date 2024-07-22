@@ -5,7 +5,7 @@ import { savePalette, loadPalettes, removePalette, PaletteDAO } from './palette/
 import { globalBeatDelay, colorPaletteSize } from 'src/config/config.json';
 import { colorTickRate } from 'src/config/defaultVisualizer.json';
 import { generateColorPalette } from 'src/models/palette/colors';
-import { VisualizerServer } from '/server/visualizer/server';
+import { VisualizerServer } from '../visualizer/server';
 import { Scale, Color } from 'chroma-js';
 import { EventEmitter } from 'stream';
 

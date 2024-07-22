@@ -1,12 +1,12 @@
-import { broadcastData, createVisualizerServer, manageConnection, sendData, VisualizerServer } from '/server/visualizer/server';
+import { broadcastData, createVisualizerServer, manageConnection, sendData, VisualizerServer } from './visualizer/server';
 import { frontEndPort, visualizerPort, socketApiPort } from "./config/network-info.json";
 import * as TrackController from './spotify/trackController';
 import Synchronizer from './spotify/synchronizer';
 import * as api from './spotify/apiController';
-import Server from './server/adminPanel/server';
+import Server from './adminPanel/server';
 import State from './models/state';
-import { fireBeat } from 'src/server/visualizer/colors';
-import SocketIOApi from './server/api/socketio';
+import { fireBeat } from '/visualizer/colors';
+import SocketIOApi from './api/socketio';
 require('dotenv').config();
 
 main();

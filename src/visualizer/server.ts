@@ -1,7 +1,7 @@
 import { newVisualizer, VisualizerInfo, VisualizerSocketInfo } from '/models/visualizerInfo/visualizerInfo';
 import { Server, Socket } from 'socket.io';
 import { TransitionData } from './DTO';
-import State from '../../models/state';
+import State from '../models/state';
 import 'socket.io';
 import { generateHexColors } from './controller';
 
@@ -26,6 +26,8 @@ export function manageConnection(state: State, socket: Socket) {
         console.log(`Disconnection of socket ${socket.id}`);
         state.removeVisualizer(socket.id);
     });
+
+    // socket.on('')
 
     const visualizer: VisualizerSocketInfo = newVisualizer(state.visualizers.length, state.colorInfo.defaultPalette, socket);
     visualizer.configInfo.palette.size = state.paletteSize;

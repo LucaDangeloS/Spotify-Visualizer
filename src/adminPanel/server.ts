@@ -3,7 +3,7 @@ import express, { Router, Request, Response } from 'express';
 import axios, { AxiosError, AxiosResponse } from "axios";
 import cookieParser from "cookie-parser";
 import querystring from "query-string";
-import RestAPI from 'src/server/api/rest';
+import RestAPI from '/api/rest';
 import * as http from "http";
 import State from "/models/state";
 import crypto from 'crypto';

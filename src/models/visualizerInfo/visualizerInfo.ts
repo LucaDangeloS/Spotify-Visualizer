@@ -1,4 +1,4 @@
-import { VisualizerSocket } from "src/server/visualizer/server";
+import { VisualizerSocket } from "/visualizer/server";
 import * as def from 'src/config/defaultVisualizer.json';
 import * as defSynced from 'src/config/sharedVisualizer.json';
 import { PaletteDAO } from "src/models/palette/paletteDAO";

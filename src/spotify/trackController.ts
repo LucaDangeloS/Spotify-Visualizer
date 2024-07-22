@@ -107,7 +107,7 @@ export function syncBeats(state: State) {
         let beats = state.trackInfo.beats;
         let sections = state.trackInfo.sections;
 
-        for (var i = 0; i < sections.length - 2; i++) {
+        for (let i = 0; i < sections.length - 2; i++) {
             if (
                 trackProgress > sections[i].start &&
                 trackProgress < sections[i + 1].start
@@ -118,7 +118,7 @@ export function syncBeats(state: State) {
         }
 
         // find and set the currently active beat
-        for (var i = 0; i < beats.length - 2; i++) {
+        for (let i = 0; i < beats.length - 2; i++) {
             if (
                 trackProgress > beats[i].start &&
                 trackProgress < beats[i + 1].start
