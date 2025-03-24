@@ -1,3 +1,7 @@
+<h1><strong>IMPORTANT NOTE:</stron></h1>
+<h1><strong>This project is essentially virtual garbage now, as Spotify took the questionable decision to [shutdown](https://developer.spotify.com/blog/2024-11-27-changes-to-the-web-api) pretty much all the useful API endpoints they offered, including the one that this project relied on, rendering it useless. </strong></h1>
+If someday I find some alternative to this I may continue on with this project, until then RIP.
+
 <div align="center"> <h1><strong>🎵 Spotify Visualizer 🎵</strong></h1> </div>
 
 This is a rewritten version in TypeScript of my previous Spotify Visualizer, originally written in pure JavaScript.
